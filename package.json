@@ -1,6 +1,7 @@
 {
   "name": "adminpanel",
   "version": "0.1.0",
+  "homepage": "https://git.heroku.com/vidrebany.git",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
@@ -10,8 +11,14 @@
     "@types/node": "^16.11.45",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
+    "autoprefixer": "^10.4.12",
+    "bootstrap": "^5.2.1",
+    "firebase": "^9.9.0",
+    "jquery": "^3.6.1",
     "react": "^18.2.0",
+    "react-bootstrap": "^2.4.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
     "typescript": "^4.7.4",
     "web-vitals": "^2.1.4"
