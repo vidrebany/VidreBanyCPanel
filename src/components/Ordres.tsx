@@ -23,6 +23,7 @@ const Ordres = () => {
     var [totalPuntuation, setTotalPuntuation] = useState(0);
     var [totalOrders, setTotalOrders] = useState(0);
     var [ordersList, setOrdersList] = useState<Orders[]>([]);
+    var [datesList, setDatesList] = useState<string[]>([]);
 
     const [startDate, setStartDate] = useState<Dayjs | null>(
         //dayjs(''),
@@ -31,9 +32,7 @@ const Ordres = () => {
 
     const handleStartDateChange = (newStartDate: Dayjs | null) => {
         setStartDate(newStartDate);
-                    if (startDate != null && endDate != null) {
-                alert(getDates(startDate, endDate));
-            }
+
     };
 
 
@@ -45,14 +44,17 @@ const Ordres = () => {
 
         const handleEndDateChange = (newEndDate: Dayjs | null) => {
             setEndDate(newEndDate);
-            //alert getDates
-            if (startDate != null && endDate != null) {
-                alert(getDates(startDate, endDate));
+            //set dates list
+
+            if (startDate != null && newEndDate != null) {
+                setDatesList(getDates(startDate, newEndDate));
+
+                alert(datesList);
             }
         };
         
    //get startDate and endDate in DD/MM/YYYY format and calculate the range of days also in DD/MM/YYYY format inside a list
-   const getDates = (startDate: Dayjs | null, endDate: Dayjs) => {
+   const getDates = (startDate: Dayjs, endDate: Dayjs) => {
     let dates = [],
     //transform startDate to Date
     startDateTransformed = startDate.toDate(),
