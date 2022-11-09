@@ -1,9 +1,10 @@
 {
   "name": "adminpanel",
   "version": "0.1.0",
-  "homepage": "https://git.heroku.com/vidrebany.git",
   "private": true,
   "dependencies": {
+    "@mui/material": "latest",
+    "@mui/x-date-pickers": "^5.0.0",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^13.5.0",
@@ -13,6 +14,7 @@
     "@types/react-dom": "^18.0.6",
     "autoprefixer": "^10.4.12",
     "bootstrap": "^5.2.1",
+    "dayjs": "^1.11.6",
     "firebase": "^9.9.0",
     "jquery": "^3.6.1",
     "react": "^18.2.0",
@@ -20,6 +22,8 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
+    "@emotion/react": "latest",
+    "@emotion/styled": "latest",
     "typescript": "^4.7.4",
     "web-vitals": "^2.1.4"
   },

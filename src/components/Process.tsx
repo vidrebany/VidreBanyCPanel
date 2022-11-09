@@ -95,7 +95,6 @@ const Process = () => {
         onValue(todoRef, (snapshot) => {
 
             const data = snapshot.val();
-            console.log(data)
             code = data.code;
             name = data.name;
             process = data.process;
@@ -171,13 +170,13 @@ const Process = () => {
                 setCode(code)
                 setProcess(process)
             });
+
         } else {
             let puntuation = 0;
             let ordersTotal = 0;
             let temp = 0;
             //get total puntuation from ordersConstList by splitting the order code by X and getting the [1] index which is the puntuation
             var newOrdersList: any = [];
-
 
             temp++;
 
@@ -186,64 +185,50 @@ const Process = () => {
             //split splitted[i] by space
             const splitted = e.target.value.split(" ");
             var filteredOrders = ordersConstList;
-
-
             for (let i = 0; i < splitted.length; i++) {
                 // eslint-disable-next-line array-callback-return
                 for (let id in ordersConstList) {
-                    if (id.includes(splitted[i])) {
-                        newOrdersList[id] = ordersConstList[id];
-                    } else {
+                    
                         for (let id2 in ordersConstList[id]) {
-                            if (id2.includes(splitted[i])) {
-                                newOrdersList[id] = ordersConstList[id];
-                            } else {
+                           
                                 for (let id3 in ordersConstList[id][id2]) {
-                                    if (id3.includes(splitted[i])) {
-                                        newOrdersList[id] = ordersConstList[id];
-                                    } else {
-                                        if (ordersConstList[id][id2][id3].started !== undefined) {
-                                            if (ordersConstList[id][id2][id3].started.includes(splitted[i])) {
-                                            }
-                                        }
+                                    
+                               
 
                                         if (ordersConstList[id][id2][id3].code !== undefined) {
-                                            if (ordersConstList[id][id2][id3].code.includes(splitted[i])) {
+                                            if (ordersConstList[id][id2][id3].code.toLowerCase().includes(splitted[i].toLowerCase())) {
                                                 newOrdersList[id] = ordersConstList[id];
                                             }
-                                            else if (ordersConstList[id][id2][id3].process !== undefined) {
-                                                if (ordersConstList[id][id2][id3].process.includes(splitted[i])) {
+                                            else if (ordersConstList[id][id2][id3].user !== undefined) {
+                                                if (ordersConstList[id][id2][id3].user.toLowerCase().includes(splitted[i].toLowerCase())) {
                                                     newOrdersList[id] = ordersConstList[id];
                                                 }
                                                 else if (ordersConstList[id][id2][id3].started !== undefined) {
-                                                    if (ordersConstList[id][id2][id3].started.includes(splitted[i])) {
+                                                    if (ordersConstList[id][id2][id3].started.toLowerCase().includes(splitted[i].toLowerCase())) {
                                                         newOrdersList[id] = ordersConstList[id];
                                                     }
                                                     else if (ordersConstList[id][id2][id3].ended !== undefined) {
-                                                        if (ordersConstList[id][id2][id3].ended.includes(splitted[i])) {
+                                                        if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(splitted[i].toLowerCase())) {
                                                             newOrdersList[id] = ordersConstList[id];
                                                         }
                                                     }
                                                 }
                                             }
                                         }
-                                    }
+                                    
                                 }
-                            }
+                            
                         }
-                    }
+                    
                 }
 
             }
             // eslint-disable-next-line array-callback-return
-            console.log(newOrdersList)
             for (let id in newOrdersList) {
-                console.log(id)
                 for (let id2 in newOrdersList[id]) {
                     for (let id3 in newOrdersList[id][id2]) {
                         if (newOrdersList[id][id2][id3].code !== undefined) {
                             puntuation += parseInt(newOrdersList[id][id2][id3].code.split("X")[1]);
-                            console.log(puntuation)
                             ordersTotal++;
                         }
                     }
@@ -261,7 +246,6 @@ const Process = () => {
 
 
     };
-    console.log(ordersList)
     return (
 
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>

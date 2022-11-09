@@ -5,6 +5,14 @@ import { getDatabase, ref, set, onValue, remove, update } from "firebase/databas
 import firebaseApp from "../firebase";
 import Navbar from './Navbar';
 import { Orders } from "../types";
+//Datepicker
+import dayjs, { Dayjs } from 'dayjs';
+import Stack from '@mui/material/Stack';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+
 
 const db = getDatabase(firebaseApp);
 
@@ -15,6 +23,56 @@ const Ordres = () => {
     var [totalPuntuation, setTotalPuntuation] = useState(0);
     var [totalOrders, setTotalOrders] = useState(0);
     var [ordersList, setOrdersList] = useState<Orders[]>([]);
+
+    const [startDate, setStartDate] = useState<Dayjs | null>(
+        //dayjs(''),
+        null
+    );
+
+    const handleStartDateChange = (newStartDate: Dayjs | null) => {
+        setStartDate(newStartDate);
+                    if (startDate != null && endDate != null) {
+                alert(getDates(startDate, endDate));
+            }
+    };
+
+
+    //same for endDate
+    const [endDate, setEndDate] = useState<Dayjs | null>(
+        //dayjs('2022-08-18T21:11:54'),
+        null
+    );
+
+        const handleEndDateChange = (newEndDate: Dayjs | null) => {
+            setEndDate(newEndDate);
+            //alert getDates
+            if (startDate != null && endDate != null) {
+                alert(getDates(startDate, endDate));
+            }
+        };
+        
+   //get startDate and endDate in DD/MM/YYYY format and calculate the range of days also in DD/MM/YYYY format inside a list
+   const getDates = (startDate: Dayjs | null, endDate: Dayjs) => {
+    let dates = [],
+    //transform startDate to Date
+    startDateTransformed = startDate.toDate(),
+    //transform endDate to Date
+    endDateTransformed = endDate.toDate(),
+
+    //get the difference between startDate and endDate in days (taking note the months) in a list
+    currentDate = startDateTransformed,
+    addDays = function (this: any, days: number) {
+        let date = new Date(this.valueOf());
+        date.setDate(date.getDate() + days);
+        return date;
+    };
+    while (currentDate <= endDateTransformed) {
+        dates.push(dayjs(currentDate).format('DD/MM/YYYY'));
+        currentDate = addDays.call(currentDate, 1);
+    }
+    
+    return dates;
+}
 
 
     useEffect(() => {
@@ -179,6 +237,28 @@ const Ordres = () => {
                 <div>
                     <div style={{ display: 'flex', justifyContent: 'center' }}>
                         <Form style={{ display: 'flex', width: '70vw' }}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <Stack spacing={3}>
+                                    <DesktopDatePicker
+                                        label="Date desktop"
+                                        inputFormat="DD/MM/YYYY"
+                                        value={startDate}
+                                        onChange={handleStartDateChange}
+                                        renderInput={(params: JSX.IntrinsicAttributes & TextFieldProps) => <TextField {...params} />}
+                                    />
+
+                                </Stack>
+                                <Stack spacing={3}>
+                                    <DesktopDatePicker
+                                        label="Date desktop"
+                                        inputFormat="DD/MM/YYYY"
+                                        value={endDate}
+                                        onChange={handleEndDateChange}
+                                        renderInput={(params: JSX.IntrinsicAttributes & TextFieldProps) => <TextField {...params} />}
+                                    />
+                                </Stack>
+                                </LocalizationProvider>
+
                             <Form.Control aria-label={'orderSearch'} type="text"
                                 placeholder="Buscar per codi, data o nom" onChange={handleChange} />
                             <Button type="submit">
@@ -241,11 +321,11 @@ const Ordres = () => {
 
     function deleteProcess(code: string, processName: string, processStarted: string, processUser: string) {
         update(ref(db, 'codes/' + code), {
-              [processName]: null,
-              [processName + 'User']: null,
-              [processName + 'Started']: null,
-              [processName + 'Ended']: null,
-          }); 
+            [processName]: null,
+            [processName + 'User']: null,
+            [processName + 'Started']: null,
+            [processName + 'Ended']: null,
+        });
         //format processStarted to date in DD mm YYYY string
         let date = new Date(processStarted);
         let day = date.getDate();
@@ -253,6 +333,10 @@ const Ordres = () => {
         let year = date.getFullYear();
         let monthString = "";
         //if month has only one digit, add a 0 before
+
+        //Question: When using the React Developer Tools Chrome extension, if the React icon is red, it means that you are using "".
+        //Answer: 
+
         if (monthNumber < 10) {
             monthString = "0" + monthNumber;
         } else {
@@ -277,9 +361,9 @@ const Ordres = () => {
                     //delete from user
                     alert(JSON.stringify(data[key].orders));
                     remove(ref(db, 'users/' + key + '/orders/' + dateString + '/' + dateString + '/' + code));
-        
-    }
-}
+
+                }
+            }
         });
     }
 

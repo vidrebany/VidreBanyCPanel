@@ -198,32 +198,27 @@ const User = () => {
             const splitted = e.target.value.split(" ");
             var filteredOrders = ordersConstList;
 
-
             for (let i = 0; i < splitted.length; i++) {
                 // eslint-disable-next-line array-callback-return
                 for (let id in ordersConstList) {
-                    if (id.includes(splitted[i])) {
+                    /*if (id.includes(splitted[i])) {
                         newOrdersList[id] = ordersConstList[id];
-                    } else {
+                    } else {*/
                         for (let id2 in ordersConstList[id]) {
-                            if (id2.includes(splitted[i])) {
+                            /*if (id2.includes(splitted[i])) {
                                 newOrdersList[id] = ordersConstList[id];
-                            } else {
+                            } else {*/
                                 for (let id3 in ordersConstList[id][id2]) {
-                                    if (id3.includes(splitted[i])) {
+                                    /*if (id3.includes(splitted[i])) {
                                         newOrdersList[id] = ordersConstList[id];
-                                    } else {
-                                        if (ordersConstList[id][id2][id3].started !== undefined) {
-                                            if (ordersConstList[id][id2][id3].started.includes(splitted[i])) {
-                                            }
-                                        }
-
+                                    } else {*/
+                                        
                                         if (ordersConstList[id][id2][id3].code !== undefined) {
                                             if (ordersConstList[id][id2][id3].code.includes(splitted[i])) {
                                                 newOrdersList[id] = ordersConstList[id];
                                             }
                                             else if (ordersConstList[id][id2][id3].process !== undefined) {
-                                                if (ordersConstList[id][id2][id3].process.includes(splitted[i])) {
+                                                if (ordersConstList[id][id2][id3].process.toLowerCase().includes(splitted[i].toLowerCase())) {
                                                     newOrdersList[id] = ordersConstList[id];
                                                 }
                                                 else if (ordersConstList[id][id2][id3].started !== undefined) {
@@ -231,30 +226,27 @@ const User = () => {
                                                         newOrdersList[id] = ordersConstList[id];
                                                     }
                                                     else if (ordersConstList[id][id2][id3].ended !== undefined) {
-                                                        if (ordersConstList[id][id2][id3].ended.includes(splitted[i])) {
+                                                        if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(splitted[i].toLowerCase())) {
                                                             newOrdersList[id] = ordersConstList[id];
                                                         }
                                                     }
                                                 }
                                             }
                                         }
-                                    }
+                                    //}
                                 }
-                            }
+                            //}
                         }
-                    }
+                    //}
                 }
 
             }
             // eslint-disable-next-line array-callback-return
-            console.log(newOrdersList)
             for (let id in newOrdersList) {
-                console.log(id)
                 for (let id2 in newOrdersList[id]) {
                     for (let id3 in newOrdersList[id][id2]) {
                         if (newOrdersList[id][id2][id3].code !== undefined) {
                             puntuation += parseInt(newOrdersList[id][id2][id3].code.split("X")[1]);
-                            console.log(puntuation)
                             ordersTotal++;
                         }
                     }
@@ -283,7 +275,7 @@ const User = () => {
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <Form style={{ display: 'flex', width: '70vw' }}>
                         <Form.Control aria-label={'orderSearch'} type="text"
-                            placeholder="Buscar per codi, data o nom" onChange={handleChange} />
+                            placeholder="Buscar per data inici, fi, codi o procés" onChange={handleChange} />
                         <Button type="submit">
                             Buscar
                         </Button>
