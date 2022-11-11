@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Form } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import { getDatabase, ref, set, onValue, remove, update } from "firebase/database";
 // Import firebase configuration from firebase.ts file
 import firebaseApp from "../firebase";
@@ -33,6 +33,14 @@ const Ordres = () => {
     const handleStartDateChange = (newStartDate: Dayjs | null) => {
         setStartDate(newStartDate);
 
+        if (newStartDate != null && endDate != null) {
+            var value = "";
+
+            var dates = getDates(newStartDate, endDate);
+            setDatesList(dates);
+
+            //alert(dates);
+        }
     };
 
 
@@ -42,39 +50,41 @@ const Ordres = () => {
         null
     );
 
-        const handleEndDateChange = (newEndDate: Dayjs | null) => {
-            setEndDate(newEndDate);
-            //set dates list
+    const handleEndDateChange = (newEndDate: Dayjs | null) => {
+        setEndDate(newEndDate);
+        //set dates list
 
-            if (startDate != null && newEndDate != null) {
-                setDatesList(getDates(startDate, newEndDate));
+        if (startDate != null && newEndDate != null) {
+            var value = "";
 
-                alert(datesList);
-            }
-        };
-        
-   //get startDate and endDate in DD/MM/YYYY format and calculate the range of days also in DD/MM/YYYY format inside a list
-   const getDates = (startDate: Dayjs, endDate: Dayjs) => {
-    let dates = [],
-    //transform startDate to Date
-    startDateTransformed = startDate.toDate(),
-    //transform endDate to Date
-    endDateTransformed = endDate.toDate(),
-
-    //get the difference between startDate and endDate in days (taking note the months) in a list
-    currentDate = startDateTransformed,
-    addDays = function (this: any, days: number) {
-        let date = new Date(this.valueOf());
-        date.setDate(date.getDate() + days);
-        return date;
+            var dates = getDates(startDate, newEndDate);
+            setDatesList(dates);
+         
+        }
     };
-    while (currentDate <= endDateTransformed) {
-        dates.push(dayjs(currentDate).format('DD/MM/YYYY'));
-        currentDate = addDays.call(currentDate, 1);
+
+    //get startDate and endDate in DD/MM/YYYY format and calculate the range of days also in DD/MM/YYYY format inside a list
+    const getDates = (startDate: Dayjs, endDate: Dayjs) => {
+        let dates = [],
+            //transform startDate to Date
+            startDateTransformed = startDate.toDate(),
+            //transform endDate to Date
+            endDateTransformed = endDate.toDate(),
+
+            //get the difference between startDate and endDate in days (taking note the months) in a list
+            currentDate = startDateTransformed,
+            addDays = function (this: any, days: number) {
+                let date = new Date(this.valueOf());
+                date.setDate(date.getDate() + days);
+                return date;
+            };
+        while (currentDate <= endDateTransformed) {
+            dates.push(dayjs(currentDate).format('DD/MM/YYYY'));
+            currentDate = addDays.call(currentDate, 1);
+        }
+
+        return dates;
     }
-    
-    return dates;
-}
 
 
     useEffect(() => {
@@ -100,6 +110,9 @@ const Ordres = () => {
             });
             setTotalPuntuation(puntuation);
             setTotalOrders(ordersTotal);
+            if (ordersTotal === 0) {
+                setOrdersList([]);
+            }
         });
 
     }, []);
@@ -107,7 +120,13 @@ const Ordres = () => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
-        if ((e.target.value) === "") {
+        var value = e.target.value;
+
+        if ((e.target.value) === "" && startDate === null && endDate === null) {
+
+
+
+
             let puntuation = 0;
             let ordersTotal = 0;
 
@@ -131,96 +150,157 @@ const Ordres = () => {
                 });
                 setTotalPuntuation(puntuation);
                 setTotalOrders(ordersTotal);
+                if (ordersTotal === 0) {
+                    setOrdersList([]);
+                }
             });
 
         } else {
+
+          
             //filter ordersList order.code and corteUser based on splitted[i]
             let puntuation = 0;
             let ordersTotal = 0;
-            //split splitted[i] by space
-            const splitted = e.target.value.split(" ");
-            var filteredOrders = ordersConstList;
+            let filteredOrders = ordersConstList;
 
-            for (let i = 0; i < splitted.length; i++) {
+
+
+            //replace all spaces in value by empty string
+            var query = value;
+            //alert(query);
+            let orderCat;
+
+            //if query is empty then set ordersList to ordersConstList
+            if (query === "") {
+                setOrdersList(ordersConstList);
+            } else {
+                console.log(query)
                 filteredOrders = ordersConstList.filter((order) => {
-                    console.log(ordersConstList);
+                    let processes = ["corte", "cajones", "unero", "montaje", "espejos", "admin", "canteado", "mecanizado", "embalaje"];
+                    let params = ["Started", "Ended"];
+                    let orderStringify = JSON.stringify(order);
+                    for (let i = 0; i < processes.length; i++) {
+                        for (let j = 0; j < params.length; j++) {
+                            let JSONquery = "order." + processes[i] + params[j];
+                            if (eval(JSONquery) !== undefined) {
 
-                    return (order.code.toLowerCase().includes(splitted[i])) ||
-                        (order.code.toLowerCase().includes(splitted[i - 1])) ||
-                        (order.corteUser !== undefined && order.corteUser.toLowerCase().includes((splitted[i]))) ||
-                        (order.corteUser !== undefined && order.corteUser.toLowerCase().includes((splitted[i - 1]))) ||
-                        (order.corteStarted !== undefined && new Date(order.corteStarted).toLocaleDateString().includes(splitted[i])) ||
-                        (order.corteStarted !== undefined && new Date(order.corteStarted).toLocaleDateString().includes(splitted[i - 1])) ||
-                        (order.corteEnded !== undefined && new Date(order.corteEnded).toLocaleDateString().includes(splitted[i])) ||
-                        (order.corteEnded !== undefined && new Date(order.corteEnded).toLocaleDateString().includes(splitted[i - 1])) ||
-                        (order.cajonesUser !== undefined && order.cajonesUser.toLowerCase().includes((splitted[i]))) ||
-                        (order.cajonesUser !== undefined && order.cajonesUser.toLowerCase().includes((splitted[i - 1]))) ||
-                        (order.cajonesStarted !== undefined && new Date(order.cajonesStarted).toLocaleDateString().includes(splitted[i])) ||
-                        (order.cajonesStarted !== undefined && new Date(order.cajonesStarted).toLocaleDateString().includes(splitted[i - 1])) ||
-                        (order.cajonesEnded !== undefined && new Date(order.cajonesEnded).toLocaleDateString().includes(splitted[i])) ||
-                        (order.cajonesEnded !== undefined && new Date(order.cajonesEnded).toLocaleDateString().includes(splitted[i - 1])) ||
-                        (order.uneroUser !== undefined && order.uneroUser.toLowerCase().includes((splitted[i]))) ||
-                        (order.uneroUser !== undefined && order.uneroUser.toLowerCase().includes((splitted[i - 1]))) ||
-                        (order.uneroStarted !== undefined && new Date(order.uneroStarted).toLocaleDateString().includes(splitted[i])) ||
-                        (order.uneroStarted !== undefined && new Date(order.uneroStarted).toLocaleDateString().includes(splitted[i - 1])) ||
-                        (order.uneroEnded !== undefined && new Date(order.uneroEnded).toLocaleDateString().includes(splitted[i])) ||
-                        (order.uneroEnded !== undefined && new Date(order.uneroEnded).toLocaleDateString().includes(splitted[i - 1])) ||
-                        (order.montajeUser !== undefined && order.montajeUser.toLowerCase().includes((splitted[i]))) ||
-                        (order.montajeUser !== undefined && order.montajeUser.toLowerCase().includes((splitted[i - 1]))) ||
-                        (order.montajeStarted !== undefined && new Date(order.montajeStarted).toLocaleDateString().includes(splitted[i])) ||
-                        (order.montajeStarted !== undefined && new Date(order.montajeStarted).toLocaleDateString().includes(splitted[i - 1])) ||
-                        (order.montajeEnded !== undefined && new Date(order.montajeEnded).toLocaleDateString().includes(splitted[i])) ||
-                        (order.montajeEnded !== undefined && new Date(order.montajeEnded).toLocaleDateString().includes(splitted[i - 1])) ||
-                        (order.espejosUser !== undefined && order.espejosUser.toLowerCase().includes((splitted[i]))) ||
-                        (order.espejosUser !== undefined && order.espejosUser.toLowerCase().includes((splitted[i - 1]))) ||
-                        (order.espejosStarted !== undefined && new Date(order.espejosStarted).toLocaleDateString().includes(splitted[i])) ||
-                        (order.espejosStarted !== undefined && new Date(order.espejosStarted).toLocaleDateString().includes(splitted[i - 1])) ||
-                        (order.espejosEnded !== undefined && new Date(order.espejosEnded).toLocaleDateString().includes(splitted[i])) ||
-                        (order.espejosEnded !== undefined && new Date(order.espejosEnded).toLocaleDateString().includes(splitted[i - 1])) ||
-                        (order.adminUser !== undefined && order.adminUser.toLowerCase().includes((splitted[i]))) ||
-                        (order.adminUser !== undefined && order.adminUser.toLowerCase().includes((splitted[i - 1]))) ||
-                        (order.adminStarted !== undefined && new Date(order.adminStarted).toLocaleDateString().includes(splitted[i])) ||
-                        (order.adminStarted !== undefined && new Date(order.adminStarted).toLocaleDateString().includes(splitted[i - 1])) ||
-                        (order.adminEnded !== undefined && new Date(order.adminEnded).toLocaleDateString().includes(splitted[i])) ||
-                        (order.adminEnded !== undefined && new Date(order.adminEnded).toLocaleDateString().includes(splitted[i - 1])) ||
-                        (order.canteadoUser !== undefined && order.canteadoUser.toLowerCase().includes((splitted[i]))) ||
-                        (order.canteadoUser !== undefined && order.canteadoUser.toLowerCase().includes((splitted[i - 1]))) ||
-                        (order.canteadoStarted !== undefined && new Date(order.canteadoStarted).toLocaleDateString().includes(splitted[i])) ||
-                        (order.canteadoStarted !== undefined && new Date(order.canteadoStarted).toLocaleDateString().includes(splitted[i - 1])) ||
-                        (order.canteadoEnded !== undefined && new Date(order.canteadoEnded).toLocaleDateString().includes(splitted[i])) ||
-                        (order.canteadoEnded !== undefined && new Date(order.canteadoEnded).toLocaleDateString().includes(splitted[i - 1])) ||
-                        (order.mecanizadoUser !== undefined && order.mecanizadoUser.toLowerCase().includes((splitted[i]))) ||
-                        (order.mecanizadoUser !== undefined && order.mecanizadoUser.toLowerCase().includes((splitted[i - 1]))) ||
-                        (order.mecanizadoStarted !== undefined && new Date(order.mecanizadoStarted).toLocaleDateString().includes(splitted[i])) ||
-                        (order.mecanizadoStarted !== undefined && new Date(order.mecanizadoStarted).toLocaleDateString().includes(splitted[i - 1])) ||
-                        (order.mecanizadoEnded !== undefined && new Date(order.mecanizadoEnded).toLocaleDateString().includes(splitted[i])) ||
-                        (order.mecanizadoEnded !== undefined && new Date(order.mecanizadoEnded).toLocaleDateString().includes(splitted[i - 1])) ||
-                        (order.embalajeUser !== undefined && order.embalajeUser.toLowerCase().includes((splitted[i]))) ||
-                        (order.embalajeUser !== undefined && order.embalajeUser.toLowerCase().includes((splitted[i - 1]))) ||
-                        (order.embalajeStarted !== undefined && new Date(order.embalajeStarted).toLocaleDateString().includes(splitted[i])) ||
-                        (order.embalajeStarted !== undefined && new Date(order.embalajeStarted).toLocaleDateString().includes(splitted[i - 1])) ||
-                        (order.embalajeEnded !== undefined && new Date(order.embalajeEnded).toLocaleDateString().includes(splitted[i])) ||
-                        (order.embalajeEnded !== undefined && new Date(order.embalajeEnded).toLocaleDateString().includes(splitted[i - 1]))
+                                let evalquery = eval(JSONquery);
+                                let dateFormatted;
+                                //if evalquery has three dots at some point, then it is a date
+                                if (!evalquery.toString().includes(".")) {
+
+                                    if (startDate != null && endDate != null) {
+                                        for (let i = 0; i < datesList.length; i++) {
+                                            //change all "/" to "." to match the date format in firebase
+                                            datesList[i] = datesList[i].replace(/\//g, ".");
+                                            //switch day with month
+                                            datesList[i] = datesList[i].split(".")[1] + "." + datesList[i].split(".")[0] + "." + datesList[i].split(".")[2];
+
+                                        }
+                                        console.log(datesList)
+                                    }
+
+
+
+
+                                    const orderTimestamp = new Date(evalquery);
+                                    let day = orderTimestamp.getDate();
+                                    let month = orderTimestamp.getMonth() + 1;
+                                    let year = orderTimestamp.getFullYear();
+
+                                    let dayString = day.toString();
+                                    let monthString = month.toString();
+                                    //if day or month is less than 10 then add 0 to the left
+                                    if (day < 10) {
+                                        dayString = "0" + day;
+                                    }
+                                    if (month < 10) {
+                                        monthString = "0" + month;
+                                    }
+                                    dateFormatted = dayString + "." + monthString + "." + year;
+
+                                } else {
+                                    
+                                    if (startDate != null && endDate != null) {
+                                        for (let i = 0; i < datesList.length; i++) {
+                                            //change all "/" to "." to match the date format in firebase
+                                            datesList[i] = datesList[i].replace(/\//g, ".");
+                                        }
+                                    }
+
+                                    console.log(datesList)
+
+                                    //alert("2")
+                                    dateFormatted = evalquery;
+                                }
+
+
+
+                                //let dateFormatted = dayjs(orderTimestamp).format('DD/MM/YYYY');
+                                //replace all "/" to "." to match the date format in firebase
+                                //dateFormatted = dateFormatted.replace(/\//g, ".");
+
+                                //assign dateFormatted to orderCat
+                                orderCat = dateFormatted;
+                                //assign orderCat to the order (create new json query)
+                                let JSONquery2 = "order." + processes[i] + params[j];
+                                eval(JSONquery2 + " = orderCat");
+
+                            }
+
+
+                        }
+                    }
+
+
+
+                    //if orderStringify includes query then return true
+                    //remove all spaces in orderStringify
+                    orderStringify = orderStringify.replace(/\s/g, '').toLowerCase();
+                    console.log(orderStringify)
+
+                    var splitted = query.split(" ");
+
+                    var temp = 0;
+                    for (let i = 0; i < splitted.length; i++) {
+                        if (orderStringify.includes(splitted[i].toLowerCase())) {
+                            temp++;
+                        }
+                    }
+                    if (temp === splitted.length) {
+
+                        for (let i = 0; i < datesList.length; i++) {
+                            if (orderStringify.includes(datesList[i])) {
+                                return true;
+                            }
+                        }
+
+                    }
+                
+
                 });
-
-
-
 
             }
 
+            setOrdersList(filteredOrders);
 
-            console.log(filteredOrders);
             filteredOrders.map((order) => {
                 puntuation += parseInt(order.code.split("X")[1]);
                 ordersTotal += 1;
-                setOrdersList(filteredOrders);
 
                 return true;
             });
+
+            // alert("filteredOrders2"+JSON.stringify(filteredOrders));
+
             setTotalPuntuation(puntuation);
             setTotalOrders(ordersTotal);
+            if (ordersTotal === 0) {
+                setOrdersList([]);
+            }
             puntuation = 0;
             ordersTotal = 0;
+
 
         }
 
@@ -259,13 +339,11 @@ const Ordres = () => {
                                         renderInput={(params: JSX.IntrinsicAttributes & TextFieldProps) => <TextField {...params} />}
                                     />
                                 </Stack>
-                                </LocalizationProvider>
+                            </LocalizationProvider>
 
                             <Form.Control aria-label={'orderSearch'} type="text"
                                 placeholder="Buscar per codi, data o nom" onChange={handleChange} />
-                            <Button type="submit">
-                                Buscar
-                            </Button>
+
                         </Form>
                     </div>
                 </div>
