@@ -34,7 +34,6 @@ const Ordres = () => {
         setStartDate(newStartDate);
 
         if (newStartDate != null && endDate != null) {
-            var value = "";
 
             var dates = getDates(newStartDate, endDate);
             setDatesList(dates);

@@ -7,9 +7,79 @@ import { getDatabase, ref, onValue } from "firebase/database";
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React from "react";
+import dayjs, { Dayjs } from 'dayjs';
+import Stack from '@mui/material/Stack';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
 
 const Process = () => {
+
+    var [datesList, setDatesList] = useState<string[]>([]);
+
+
+    const [startDate, setStartDate] = useState<Dayjs | null>(
+        //dayjs(''),
+        null
+    );
+
+    const handleStartDateChange = (newStartDate: Dayjs | null) => {
+        setStartDate(newStartDate);
+
+        if (newStartDate != null && endDate != null) {
+
+            var dates = getDates(newStartDate, endDate);
+            setDatesList(dates);
+
+            //alert(dates);
+        }
+    };
+
+
+    //same for endDate
+    const [endDate, setEndDate] = useState<Dayjs | null>(
+        //dayjs('2022-08-18T21:11:54'),
+        null
+    );
+
+    const handleEndDateChange = (newEndDate: Dayjs | null) => {
+        setEndDate(newEndDate);
+        //set dates list
+
+        if (startDate != null && newEndDate != null) {
+            var value = "";
+
+            var dates = getDates(startDate, newEndDate);
+            setDatesList(dates);
+
+        }
+    };
+
+    //get startDate and endDate in DD/MM/YYYY format and calculate the range of days also in DD/MM/YYYY format inside a list
+    const getDates = (startDate: Dayjs, endDate: Dayjs) => {
+        let dates = [],
+            //transform startDate to Date
+            startDateTransformed = startDate.toDate(),
+            //transform endDate to Date
+            endDateTransformed = endDate.toDate(),
+
+            //get the difference between startDate and endDate in days (taking note the months) in a list
+            currentDate = startDateTransformed,
+            addDays = function (this: any, days: number) {
+                let date = new Date(this.valueOf());
+                date.setDate(date.getDate() + days);
+                return date;
+            };
+        while (currentDate <= endDateTransformed) {
+            dates.push(dayjs(currentDate).format('DD/MM/YYYY'));
+            currentDate = addDays.call(currentDate, 1);
+        }
+
+        return dates;
+    }
+
 
     const location = useLocation();
     var number = "";
@@ -131,7 +201,7 @@ const Process = () => {
     }, []);
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
-        if ((e.target.value) === "") {
+        if ((e.target.value) === "" && startDate === null && endDate === null) {
             onValue(todoRef, (snapshot) => {
                 let puntuation = 0;
                 let ordersTotal = 0;
@@ -184,42 +254,67 @@ const Process = () => {
 
             //split splitted[i] by space
             const splitted = e.target.value.split(" ");
-            var filteredOrders = ordersConstList;
             for (let i = 0; i < splitted.length; i++) {
                 // eslint-disable-next-line array-callback-return
                 for (let id in ordersConstList) {
-                    
-                        for (let id2 in ordersConstList[id]) {
-                           
-                                for (let id3 in ordersConstList[id][id2]) {
-                                    
-                               
 
-                                        if (ordersConstList[id][id2][id3].code !== undefined) {
-                                            if (ordersConstList[id][id2][id3].code.toLowerCase().includes(splitted[i].toLowerCase())) {
-                                                newOrdersList[id] = ordersConstList[id];
-                                            }
-                                            else if (ordersConstList[id][id2][id3].user !== undefined) {
-                                                if (ordersConstList[id][id2][id3].user.toLowerCase().includes(splitted[i].toLowerCase())) {
+                    for (let date in datesList) {
+                        for (let id2 in ordersConstList[id]) {
+
+                            for (let id3 in ordersConstList[id][id2]) {
+
+
+
+                                if (ordersConstList[id][id2][id3].code !== undefined) {
+                                    if (ordersConstList[id][id2][id3].code.toLowerCase().includes(splitted[i].toLowerCase())) {
+                                        if (ordersConstList[id][id2][id3].user.toLowerCase().includes(splitted[i].toLowerCase())) {
+                                            if (ordersConstList[id][id2][id3].started !== undefined) {
+                                                if (ordersConstList[id][id2][id3].started.toLowerCase().includes(date.toLowerCase())) {
                                                     newOrdersList[id] = ordersConstList[id];
                                                 }
-                                                else if (ordersConstList[id][id2][id3].started !== undefined) {
-                                                    if (ordersConstList[id][id2][id3].started.toLowerCase().includes(splitted[i].toLowerCase())) {
+                                            }
+                                            else if (ordersConstList[id][id2][id3].ended !== undefined) {
+                                                if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(date.toLowerCase())) {
+                                                    newOrdersList[id] = ordersConstList[id];
+                                                }
+                                            }
+                                        }
+                                    } else if (ordersConstList[id][id2][id3].user !== undefined) {
+                                        if (splitted[i] != "") {
+                                            if (ordersConstList[id][id2][id3].user.toLowerCase().includes(splitted[i].toLowerCase())) {
+                                                if (ordersConstList[id][id2][id3].started !== undefined) {
+                                                    if (ordersConstList[id][id2][id3].started.toLowerCase().includes(date.toLowerCase())) {
                                                         newOrdersList[id] = ordersConstList[id];
                                                     }
                                                     else if (ordersConstList[id][id2][id3].ended !== undefined) {
-                                                        if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(splitted[i].toLowerCase())) {
+                                                        if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(date.toLowerCase())) {
                                                             newOrdersList[id] = ordersConstList[id];
                                                         }
                                                     }
                                                 }
                                             }
+                                        } else {
+                                            if (ordersConstList[id][id2][id3].started !== undefined) {
+                                                if (ordersConstList[id][id2][id3].started.toLowerCase().includes(date.toLowerCase())) {
+                                                    newOrdersList[id] = ordersConstList[id];
+                                                }
+                                                else if (ordersConstList[id][id2][id3].ended !== undefined) {
+                                                    if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(date.toLowerCase())) {
+                                                        newOrdersList[id] = ordersConstList[id];
+                                                    }
+                                                }
+                                            }
                                         }
-                                    
+                                        
+                                    }
                                 }
-                            
+                            }
+
                         }
-                    
+                    }
+
+
+
                 }
 
             }
@@ -255,11 +350,32 @@ const Process = () => {
             <div>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <Form style={{ display: 'flex', width: '70vw' }}>
+
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <Stack spacing={3}>
+                                <DesktopDatePicker
+                                    label="Date desktop"
+                                    inputFormat="DD/MM/YYYY"
+                                    value={startDate}
+                                    onChange={handleStartDateChange}
+                                    renderInput={(params: JSX.IntrinsicAttributes & TextFieldProps) => <TextField {...params} />}
+                                />
+
+                            </Stack>
+                            <Stack spacing={3}>
+                                <DesktopDatePicker
+                                    label="Date desktop"
+                                    inputFormat="DD/MM/YYYY"
+                                    value={endDate}
+                                    onChange={handleEndDateChange}
+                                    renderInput={(params: JSX.IntrinsicAttributes & TextFieldProps) => <TextField {...params} />}
+                                />
+                            </Stack>
+                        </LocalizationProvider>
+
                         <Form.Control aria-label={'orderSearch'} type="text"
                             placeholder="Buscar per codi, data o nom" onChange={handleChange} />
-                        <Button type="submit">
-                            Buscar
-                        </Button>
+
                     </Form>
                 </div>
             </div>
