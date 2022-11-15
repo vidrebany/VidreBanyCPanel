@@ -54,10 +54,94 @@ const Process = () => {
             var dates = getDates(startDate, newEndDate);
             setDatesList(dates);
 
+
+            let puntuation = 0;
+            let ordersTotal = 0;
+            let temp = 0;
+            //get total puntuation from ordersConstList by splitting the order code by X and getting the [1] index which is the puntuation
+            var newOrdersList: any = [];
+
+            temp++;
+
+            //filter ordersList order.code and corteUser based on splitted[i]
+
+            //split splitted[i] by space
+                // eslint-disable-next-line array-callback-return
+                for (let id in ordersConstList) {
+
+                    for (let id2 in ordersConstList[id]) {
+
+                        for (let id3 in ordersConstList[id][id2]) {
+
+
+
+                            if (ordersConstList[id][id2][id3].code !== undefined) {
+
+                                if (ordersConstList[id][id2][id3].user !== undefined) {
+                                   if (ordersConstList[id][id2][id3].started !== undefined) {
+
+                                        if (dates.length > 0) {
+                                            for (let date in dates) {
+
+                                                if (ordersConstList[id][id2][id3].started.toLowerCase().includes(dates[date].toLowerCase())) {
+                                                    newOrdersList[id] = ordersConstList[id];
+                                                }
+                                                else if (ordersConstList[id][id2][id3].ended !== undefined) {
+                                                    if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(dates[date].toLowerCase())) {
+                                                        newOrdersList[id] = ordersConstList[id];
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            
+
+
+
+
+
+
+
+
+
+
+
+            // eslint-disable-next-line array-callback-return
+            for (let id in newOrdersList) {
+                for (let id2 in newOrdersList[id]) {
+                    for (let id3 in newOrdersList[id][id2]) {
+                        if (newOrdersList[id][id2][id3].code !== undefined) {
+                            puntuation += parseInt(newOrdersList[id][id2][id3].code.split("X")[1]);
+                            ordersTotal++;
+                        }
+                    }
+                }
+            }
+
+            setTotalPuntuation(puntuation);
+            setTotalOrders(ordersTotal);
+
+            setOrdersList(newOrdersList);
+
+            puntuation = 0;
+            ordersTotal = 0;
         }
+
+
+
+
     };
 
-    //get startDate and endDate in DD/MM/YYYY format and calculate the range of days also in DD/MM/YYYY format inside a list
+    //get startDate and endDate in DD/MM/YY format and calculate the range of days also in DD/MM/YYYY format inside a list
     const getDates = (startDate: Dayjs, endDate: Dayjs) => {
         let dates = [],
             //transform startDate to Date
@@ -73,7 +157,7 @@ const Process = () => {
                 return date;
             };
         while (currentDate <= endDateTransformed) {
-            dates.push(dayjs(currentDate).format('DD/MM/YYYY'));
+            dates.push(dayjs(currentDate).format('DD/MM/YY'));
             currentDate = addDays.call(currentDate, 1);
         }
 
@@ -199,7 +283,10 @@ const Process = () => {
         });
 
     }, []);
+
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+
 
         if ((e.target.value) === "" && startDate === null && endDate === null) {
             onValue(todoRef, (snapshot) => {
@@ -258,66 +345,95 @@ const Process = () => {
                 // eslint-disable-next-line array-callback-return
                 for (let id in ordersConstList) {
 
-                    for (let date in datesList) {
-                        for (let id2 in ordersConstList[id]) {
+                    for (let id2 in ordersConstList[id]) {
 
-                            for (let id3 in ordersConstList[id][id2]) {
-
+                        for (let id3 in ordersConstList[id][id2]) {
 
 
-                                if (ordersConstList[id][id2][id3].code !== undefined) {
-                                    if (ordersConstList[id][id2][id3].code.toLowerCase().includes(splitted[i].toLowerCase())) {
-                                        if (ordersConstList[id][id2][id3].user.toLowerCase().includes(splitted[i].toLowerCase())) {
-                                            if (ordersConstList[id][id2][id3].started !== undefined) {
-                                                if (ordersConstList[id][id2][id3].started.toLowerCase().includes(date.toLowerCase())) {
+
+                            if (ordersConstList[id][id2][id3].code !== undefined) {
+
+                                if (ordersConstList[id][id2][id3].code.toLowerCase().includes(splitted[i].toLowerCase())) {
+                                    if (ordersConstList[id][id2][id3].user.toLowerCase().includes(splitted[i].toLowerCase())) {
+                                        if (datesList.length > 0) {
+                                            for (let date in datesList) {
+                                                if (date !== null && ordersConstList[id][id2][id3].started !== undefined) {
+                                                    if (ordersConstList[id][id2][id3].started.toLowerCase().includes(datesList[date].toLowerCase())) {
+                                                        newOrdersList[id] = ordersConstList[id];
+                                                    }
+                                                }
+                                                else if (date !== null && ordersConstList[id][id2][id3].ended !== undefined) {
+                                                    if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(datesList[date].toLowerCase())) {
+                                                        newOrdersList[id] = ordersConstList[id];
+                                                    }
+                                                } else {
                                                     newOrdersList[id] = ordersConstList[id];
                                                 }
                                             }
-                                            else if (ordersConstList[id][id2][id3].ended !== undefined) {
-                                                if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(date.toLowerCase())) {
-                                                    newOrdersList[id] = ordersConstList[id];
-                                                }
-                                            }
+                                        } else {
+                                            newOrdersList[id] = ordersConstList[id];
                                         }
-                                    } else if (ordersConstList[id][id2][id3].user !== undefined) {
-                                        if (splitted[i] != "") {
-                                            if (ordersConstList[id][id2][id3].user.toLowerCase().includes(splitted[i].toLowerCase())) {
-                                                if (ordersConstList[id][id2][id3].started !== undefined) {
-                                                    if (ordersConstList[id][id2][id3].started.toLowerCase().includes(date.toLowerCase())) {
+
+
+                                    }
+                                } else if (ordersConstList[id][id2][id3].user !== undefined) {
+                                    if (ordersConstList[id][id2][id3].user.toLowerCase().includes(splitted[i].toLowerCase())) {
+                                        if (ordersConstList[id][id2][id3].started !== undefined) {
+                                            if (datesList.length > 0) {
+                                                for (let date in datesList) {
+
+                                                    if (ordersConstList[id][id2][id3].started.toLowerCase().includes(datesList[date].toLowerCase())) {
                                                         newOrdersList[id] = ordersConstList[id];
                                                     }
                                                     else if (ordersConstList[id][id2][id3].ended !== undefined) {
-                                                        if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(date.toLowerCase())) {
+                                                        if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(datesList[date].toLowerCase())) {
                                                             newOrdersList[id] = ordersConstList[id];
                                                         }
                                                     }
                                                 }
+
+                                            } else {
+                                                newOrdersList[id] = ordersConstList[id];
                                             }
-                                        } else {
-                                            if (ordersConstList[id][id2][id3].started !== undefined) {
-                                                if (ordersConstList[id][id2][id3].started.toLowerCase().includes(date.toLowerCase())) {
+
+                                        }
+                                    } else if (splitted[i] === "" && ordersConstList[id][id2][id3].started !== undefined) {
+
+                                        if (datesList.length > 0) {
+                                            for (let date in datesList) {
+
+                                                if (ordersConstList[id][id2][id3].started.toLowerCase().includes(datesList[date].toLowerCase())) {
                                                     newOrdersList[id] = ordersConstList[id];
                                                 }
                                                 else if (ordersConstList[id][id2][id3].ended !== undefined) {
-                                                    if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(date.toLowerCase())) {
+                                                    if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(datesList[date].toLowerCase())) {
                                                         newOrdersList[id] = ordersConstList[id];
                                                     }
                                                 }
                                             }
                                         }
-                                        
                                     }
                                 }
+
                             }
 
                         }
+
                     }
 
-
-
                 }
-
             }
+
+
+
+
+
+
+
+
+
+
+
             // eslint-disable-next-line array-callback-return
             for (let id in newOrdersList) {
                 for (let id2 in newOrdersList[id]) {
