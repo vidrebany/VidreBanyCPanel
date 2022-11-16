@@ -2,14 +2,186 @@ import { useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 import { useState, useEffect } from "react";
 import firebaseApp from "../firebase";
-import { Button, Form } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import { getDatabase, ref, onValue } from "firebase/database";
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React from "react";
+import dayjs, { Dayjs } from 'dayjs';
+import Stack from '@mui/material/Stack';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
 
 const User = () => {
+
+
+
+    var [datesList, setDatesList] = useState<string[]>([]);
+
+
+    const [startDate, setStartDate] = useState<Dayjs | null>(
+        //dayjs(''),
+        null
+    );
+
+    const handleStartDateChange = (newStartDate: Dayjs | null) => {
+        setStartDate(newStartDate);
+
+        if (newStartDate != null && endDate != null) {
+
+            var dates = getDates(newStartDate, endDate);
+            setDatesList(dates);
+
+        }
+    };
+
+
+    //same for endDate
+    const [endDate, setEndDate] = useState<Dayjs | null>(
+        //dayjs('2022-08-18T21:11:54'),
+        null
+    );
+
+    const handleEndDateChange = (newEndDate: Dayjs | null) => {
+        setEndDate(newEndDate);
+        //set dates list
+
+        if (startDate != null && newEndDate != null) {
+            var value = "";
+
+            var dates = getDates(startDate, newEndDate);
+            setDatesList(dates);
+
+
+            let puntuation = 0;
+            let ordersTotal = 0;
+            let temp = 0;
+            //get total puntuation from ordersConstList by splitting the order code by X and getting the [1] index which is the puntuation
+            var newOrdersList: any = [];
+
+            temp++;
+
+            //filter ordersList order.code and corteUser based on splitted[i]
+
+            //split splitted[i] by space
+            // eslint-disable-next-line array-callback-return
+            for (let id in ordersConstList) {
+
+                for (let id2 in ordersConstList[id]) {
+
+                    for (let id3 in ordersConstList[id][id2]) {
+
+
+
+                        if (ordersConstList[id][id2][id3].code !== undefined) {
+
+                            if (ordersConstList[id][id2][id3].started !== undefined) {
+
+                                if (dates.length > 0) {
+                                    for (let date in dates) {
+
+                                        if (ordersConstList[id][id2][id3].started.toLowerCase().includes(dates[date].toLowerCase())) {
+                                            newOrdersList[id] = ordersConstList[id];
+                                        }
+                                        else if (ordersConstList[id][id2][id3].ended !== undefined) {
+                                            if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(dates[date].toLowerCase())) {
+                                                newOrdersList[id] = ordersConstList[id];
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+
+
+
+
+
+
+
+
+
+            // eslint-disable-next-line array-callback-return
+            for (let id in newOrdersList) {
+                for (let id2 in newOrdersList[id]) {
+                    for (let id3 in newOrdersList[id][id2]) {
+                        if (newOrdersList[id][id2][id3].code !== undefined) {
+                            puntuation += parseInt(newOrdersList[id][id2][id3].code.split("X")[1]);
+                            ordersTotal++;
+                        }
+                    }
+                }
+            }
+
+            setTotalPuntuation(puntuation);
+            setTotalOrders(ordersTotal);
+
+            setOrdersList(newOrdersList);
+
+            puntuation = 0;
+            ordersTotal = 0;
+        }
+
+
+
+
+    };
+
+
+
+
+    //get startDate and endDate in DD/MM/YY format and calculate the range of days also in DD/MM/YYYY format inside a list
+    const getDates = (startDate: Dayjs, endDate: Dayjs) => {
+        let dates = [],
+            //transform startDate to Date
+            startDateTransformed = startDate.toDate(),
+            //transform endDate to Date
+            endDateTransformed = endDate.toDate(),
+
+            //get the difference between startDate and endDate in days (taking note the months) in a list
+            currentDate = startDateTransformed,
+            addDays = function (this: any, days: number) {
+                let date = new Date(this.valueOf());
+                date.setDate(date.getDate() + days);
+                return date;
+            };
+        while (currentDate <= endDateTransformed) {
+            dates.push(dayjs(currentDate).format('DD/MM/YY'));
+            currentDate = addDays.call(currentDate, 1);
+        }
+
+        return dates;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     const location = useLocation();
     var number = "";
@@ -91,7 +263,6 @@ const User = () => {
     useEffect(() => {
         let puntuation = 0;
         let ordersTotal = 0;
-        let temp = 0;
 
         onValue(todoRef, (snapshot) => {
 
@@ -139,10 +310,9 @@ const User = () => {
 
     }, []);
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        console.log(232)
 
-        if ((e.target.value) === "") {
-            let temp = 0;
-            temp++;
+        if ((e.target.value) === "" && startDate === null && endDate === null) {
             onValue(todoRef, (snapshot) => {
                 let puntuation = 0;
                 let ordersTotal = 0;
@@ -182,61 +352,77 @@ const User = () => {
                 setCode(code)
                 setProcess(process)
             });
+            console.log(234)
+
         } else {
             let puntuation = 0;
             let ordersTotal = 0;
-            let temp = 0;
             //get total puntuation from ordersConstList by splitting the order code by X and getting the [1] index which is the puntuation
             var newOrdersList: any = [];
 
 
-            temp++;
 
             //filter ordersList order.code and corteUser based on splitted[i]
 
             //split splitted[i] by space
             const splitted = e.target.value.split(" ");
-            var filteredOrders = ordersConstList;
-
+            console.log(23)
             for (let i = 0; i < splitted.length; i++) {
-                // eslint-disable-next-line array-callback-return
                 for (let id in ordersConstList) {
-                    /*if (id.includes(splitted[i])) {
-                        newOrdersList[id] = ordersConstList[id];
-                    } else {*/
-                        for (let id2 in ordersConstList[id]) {
-                            /*if (id2.includes(splitted[i])) {
-                                newOrdersList[id] = ordersConstList[id];
-                            } else {*/
-                                for (let id3 in ordersConstList[id][id2]) {
-                                    /*if (id3.includes(splitted[i])) {
-                                        newOrdersList[id] = ordersConstList[id];
-                                    } else {*/
-                                        
-                                        if (ordersConstList[id][id2][id3].code !== undefined) {
-                                            if (ordersConstList[id][id2][id3].code.includes(splitted[i])) {
-                                                newOrdersList[id] = ordersConstList[id];
-                                            }
-                                            else if (ordersConstList[id][id2][id3].process !== undefined) {
-                                                if (ordersConstList[id][id2][id3].process.toLowerCase().includes(splitted[i].toLowerCase())) {
+                    for (let id2 in ordersConstList[id]) {
+                        for (let id3 in ordersConstList[id][id2]) {
+                            console.log("test")
+                            if (ordersConstList[id][id2][id3].code !== undefined) {
+                                if (ordersConstList[id][id2][id3].code.toLowerCase().includes(splitted[i].toLowerCase())) {
+                                    console.log("includes code")
+                                    if (datesList.length > 0) {
+                                        for (let date in datesList) {
+                                            if (date !== null && ordersConstList[id][id2][id3].started !== undefined) {
+                                                if (ordersConstList[id][id2][id3].started.includes(datesList[date].toLowerCase())) {
                                                     newOrdersList[id] = ordersConstList[id];
                                                 }
-                                                else if (ordersConstList[id][id2][id3].started !== undefined) {
-                                                    if (ordersConstList[id][id2][id3].started.includes(splitted[i])) {
-                                                        newOrdersList[id] = ordersConstList[id];
-                                                    }
-                                                    else if (ordersConstList[id][id2][id3].ended !== undefined) {
-                                                        if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(splitted[i].toLowerCase())) {
-                                                            newOrdersList[id] = ordersConstList[id];
-                                                        }
-                                                    }
+                                            } else if (date !== null && ordersConstList[id][id2][id3].ended !== undefined) {
+                                                if (ordersConstList[id][id2][id3].ended.includes(datesList[date].toLowerCase())) {
+                                                    newOrdersList[id] = ordersConstList[id];
                                                 }
+                                            } else {
+                                                newOrdersList[id] = ordersConstList[id];
                                             }
                                         }
-                                    //}
+                                        
+                                    } else {
+                                        newOrdersList[id] = ordersConstList[id];
+
+                                    }
+                                } else  if (ordersConstList[id][id2][id3].process !== undefined) {
+                                    if (ordersConstList[id][id2][id3].process.toLowerCase().includes(splitted[i].toLowerCase())) {
+                                        if (datesList.length > 0) {
+                                            for (let date in datesList) {
+                                                if (date !== null && ordersConstList[id][id2][id3].started !== undefined) {
+                                                    if (ordersConstList[id][id2][id3].started.includes(datesList[date].toLowerCase())) {
+                                                        newOrdersList[id] = ordersConstList[id];
+                                                    }
+                                                } else if (date !== null && ordersConstList[id][id2][id3].ended !== undefined) {
+                                                    if (ordersConstList[id][id2][id3].ended.includes(datesList[date].toLowerCase())) {
+                                                        newOrdersList[id] = ordersConstList[id];
+                                                    }
+                                                } else {
+                                                    newOrdersList[id] = ordersConstList[id];
+                                                }
+                                            }
+                                            
+                                        } else {
+                                            newOrdersList[id] = ordersConstList[id];
+
+                                        }
+                                    }
+
                                 }
+                            }
                             //}
                         }
+                        //}
+                    }
                     //}
                 }
 
@@ -274,11 +460,30 @@ const User = () => {
             <div>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <Form style={{ display: 'flex', width: '70vw' }}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <Stack spacing={3}>
+                                <DesktopDatePicker
+                                    label="Date desktop"
+                                    inputFormat="DD/MM/YYYY"
+                                    value={startDate}
+                                    onChange={handleStartDateChange}
+                                    renderInput={(params: JSX.IntrinsicAttributes & TextFieldProps) => <TextField {...params} />}
+                                />
+
+                            </Stack>
+                            <Stack spacing={3}>
+                                <DesktopDatePicker
+                                    label="Date desktop"
+                                    inputFormat="DD/MM/YYYY"
+                                    value={endDate}
+                                    onChange={handleEndDateChange}
+                                    renderInput={(params: JSX.IntrinsicAttributes & TextFieldProps) => <TextField {...params} />}
+                                />
+                            </Stack>
+                        </LocalizationProvider>
                         <Form.Control aria-label={'orderSearch'} type="text"
                             placeholder="Buscar per data inici, fi, codi o procés" onChange={handleChange} />
-                        <Button type="submit">
-                            Buscar
-                        </Button>
+
                     </Form>
                 </div>
             </div>
