@@ -22,7 +22,7 @@ const root = ReactDOM.createRoot(
 
 root.render(
   
-  <BrowserRouter>
+  <BrowserRouter basename="VidreBanyCPanel">
     <Routes>
       <Route path="/" element={<App />} />
       <Route path="/processes" element={<Processes />} />
