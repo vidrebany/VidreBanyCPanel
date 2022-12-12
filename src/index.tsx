@@ -7,6 +7,7 @@ import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import { 
   BrowserRouter,
   Routes,
+  HashRouter,
   Route,
  } from 'react-router-dom';
  import Usuaris from "./components/Usuaris";
@@ -21,7 +22,7 @@ const root = ReactDOM.createRoot(
 );
 
 root.render(
-  
+  /*
   <BrowserRouter basename="VidreBanyCPanel">
     <Routes>
       <Route path="/" element={<App />} />
@@ -32,6 +33,19 @@ root.render(
       <Route path="/process" element={<Process />} />
     </Routes>
   </BrowserRouter>
+
+*/
+
+<HashRouter>
+<Routes>
+  <Route path="/" element={<App />} />
+  <Route path="/processes" element={<Processes />} />
+  <Route path="/users" element={<Usuaris />} />
+  <Route path="/edit" element={<Ordres />} />
+  <Route path="/user" element={<User />} />
+  <Route path="/process" element={<Process />} />
+</Routes>
+</HashRouter>
 );
 
 // If you want to start measuring performance in your app, pass a function
