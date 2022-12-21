@@ -5,7 +5,6 @@ import reportWebVitals from './reportWebVitals';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
 import { 
-  BrowserRouter,
   Routes,
   HashRouter,
   Route,
@@ -15,6 +14,8 @@ import {
  import Process from "./components/Process";
 import Ordres from "./components/Ordres";
 import User from "./components/User";
+import Transport from "./components/Transport"
+import AddTransportOrder from "./components/AddTransportOrder"
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -44,6 +45,8 @@ root.render(
   <Route path="/edit" element={<Ordres />} />
   <Route path="/user" element={<User />} />
   <Route path="/process" element={<Process />} />
+  <Route path="/transport" element={<Transport />} />
+  <Route path="/addtransportorder" element={<AddTransportOrder />} />
 </Routes>
 </HashRouter>
 );

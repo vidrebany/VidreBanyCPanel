@@ -1,7 +1,6 @@
 {
   "name": "adminpanel",
   "version": "0.1.0",
-  "homepage": "https://alexanderbkl.github.io/VidreBanyCPanel/",
   "private": true,
   "dependencies": {
     "@emotion/react": "latest",
@@ -15,6 +14,7 @@
     "@types/node": "^16.11.45",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
+    "@types/react-pdf": "^6.2.0",
     "autoprefixer": "^10.4.12",
     "bootstrap": "^5.2.1",
     "dayjs": "^1.11.6",
@@ -23,6 +23,7 @@
     "react": "^18.2.0",
     "react-bootstrap": "^2.4.0",
     "react-dom": "^18.2.0",
+    "react-pdf": "^6.2.0",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
     "typescript": "^4.7.4",
