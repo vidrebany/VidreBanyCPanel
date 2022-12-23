@@ -18,6 +18,9 @@ const AddTransportOrder = () => {
 
     const [pdfText, setPdfText] = useState('');
     const [addressTxt, setAddressTxt] = useState('');
+    const [clientNum, setClientNum] = useState('');
+    const [firstTel, setFirstTel] = useState('');
+    const [secondTel, setSecondTel] = useState('');
     const [error, setError] = useState('');
 
     useEffect(() => {
@@ -28,14 +31,44 @@ const AddTransportOrder = () => {
     }, [error])
 
     useEffect(() => {
+        console.log(pdfText);
 
-        const start = "CLIENTE:\nENVÍO:"
-        const end = "TEL2."
+    //numero client
+        const regex = /(\d+\n\s\n\d+\/\d+\/\d+\n\s\n)\d+/g;
+        const match = pdfText.match(regex);
+        if (match) {
+            const regex2 = /\d+$/g;
+            const match2 = match[0].match(regex2);
+            if (match2) {
+                setClientNum(match2[0]);
+            }
+        }
 
-        const startIndex = pdfText.indexOf(start) + start.length
-        const endIndex = pdfText.indexOf(end)
+        //telefon 1
+        const regex3 = /TEL\.\s*\n\s*(\d+)/g;
+        //get group 1 from pdfText regex3 match
+        const match3 = pdfText.match(regex3)?.[0]?.match(/\d+/g)?.[0];
+        if (match3) {
+            setFirstTel(match3);
+        }
+        //telefon 2
+        const regex4 = /TEL2\.\s*\n\s*(\d+)/g;
+        //get group 1 from pdfText regex4 match
+        const match4 = pdfText.match(regex4)?.[0]?.match(/\d+/g)?.[1];
+        if (match4) {
+            setSecondTel(match4);
+        }
 
-        let address = pdfText.substring(startIndex, endIndex).trim()
+
+
+
+        const startAddress = "CLIENTE:\nENVÍO:"
+        const endAddress = "TEL2."
+
+        const startAddressIndex = pdfText.indexOf(startAddress) + startAddress.length
+        const endAddressIndex = pdfText.indexOf(endAddress)
+        //direccio client
+        let address = pdfText.substring(startAddressIndex, endAddressIndex).trim()
 
 
         let lines = address.split("\n") // split the text into an array of lines
@@ -112,6 +145,9 @@ const AddTransportOrder = () => {
             <h3>Pujar PDF</h3>
             <Stack spacing={2} direction="column">
                 <Button onClick={inputFileClick} variant="contained">Afegir comanda</Button>
+                <p><b>Núm. client:</b> {clientNum}</p>
+                <p><b>Tel.:</b> {firstTel}</p>
+                <p><b>Tel. 2:</b> {secondTel}</p>
                 <p><b>Direcció:</b> {addressTxt}</p>
             </Stack>
 
