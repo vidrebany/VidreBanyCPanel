@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { Users } from "../types";
+import { Transports } from "../types";
 import Navbar from "./Navbar";
+import firebaseApp from "../firebase";
+import { getDatabase, ref, onValue } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
@@ -8,7 +10,54 @@ import "./styles/Transport.css"
 const Transport = () => {
     const navigate = useNavigate();
 
-    const processesList = ["Comanda1", "Comanda2"]
+    //firebase database
+    const db = getDatabase(firebaseApp);
+    //transport ref
+    const transportRef = ref(db, "/transport/");
+
+    //transport list useState that has a list of Transports[] objects
+    const [transportList, setTransportList] = useState<Transports[]>([]);
+
+    //get transport list
+    useEffect(() => {
+        onValue(transportRef, (snapshot) => {
+            const data = snapshot.val();
+
+            let transportListTemp: Transports[] = [];
+            for (const key in data) {
+                if (data.hasOwnProperty(key)) {
+                    let transportOrder: Transports = {
+                        id: data[key].id,
+                        address: data[key].address,
+                        clientNum: data[key].clientNum,
+                        date: data[key].date,
+                        firstTel: data[key].firstTel,
+                        secondTel: data[key].secondTel,
+                        observations: data[key].observations,
+                        pdfUrl: data[key].pdfUrl,
+                        status: data[key].status,
+                        time: data[key].time,
+                        transId: data[key].transId,
+                        transName: data[key].transName,
+                    }
+                    transportListTemp.push(transportOrder);
+                }
+            }
+
+            //alert(JSON.stringify(transportListTemp[0].id)); 
+
+
+  
+                setTransportList(transportListTemp);
+            
+
+
+        });
+    }, []);
+
+
+
+
 
 
 
@@ -24,35 +73,19 @@ const Transport = () => {
             <h3>Lista commandes</h3>
             <Stack spacing={2} direction="column">
                 <Button onClick={() => navigate('/addtransportorder')} variant="contained">Afegir comanda</Button>
+                <Button onClick={() => navigate('/transporters')} variant="contained">Transportistes</Button>
             </Stack>
             <div className="listView">
 
-                {processesList.map((value, index) => {
+                {/*Map transportList*/}
+                {transportList.map((transport) => {
                     return (
-                        <div
-                            key={index}
-                            style={{
-                                backgroundColor: "#000000",
-                                position: 'relative', left: '50%', top: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: '300px',
-                                textAlign: 'left',
-                                fontSize: '20px',
-                                fontWeight: 'bold',
-                                color: 'white',
-                                borderRadius: '15px',
-                                border: '2px solid white',
-                                padding: '10px',
-                                margin: '10px',
-                                cursor: 'pointer'
-                            }}
-                            onClick={() => navigate('/process', { state: { number: value } })}
-                        >
-                            <p>{value}</p>
+                        <div className="transportCard" key={transport.id}>
+                            <h3>{transport.clientNum} {transport.transName}</h3>
+                            <p>Adreça: {transport.address}
+                            </p>
                         </div>
-
                     );
-
                 })}
 
 

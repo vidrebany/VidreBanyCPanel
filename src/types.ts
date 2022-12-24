@@ -37,3 +37,25 @@ export type Orders = {
   embalajeStarted: string;
   embalajeEnded: string;
 }
+
+export interface Transports {
+  address: string;
+  clientNum: string;
+  date: string;
+  firstTel: string;
+  observations: string;
+  pdfUrl: string;
+  secondTel: string;
+  status: string;
+  time: string;
+  [key: string]: string;
+  id: string;
+  transId: string;
+  transName: string;
+}
+
+export interface TransportersData {
+  name: string;
+  [key: string]: string;
+  id: string;
+}

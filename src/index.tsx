@@ -15,6 +15,7 @@ import {
 import Ordres from "./components/Ordres";
 import User from "./components/User";
 import Transport from "./components/Transport"
+import Transporters from "./components/Transporters"
 import AddTransportOrder from "./components/AddTransportOrder"
 
 const root = ReactDOM.createRoot(
@@ -46,6 +47,7 @@ root.render(
   <Route path="/user" element={<User />} />
   <Route path="/process" element={<Process />} />
   <Route path="/transport" element={<Transport />} />
+  <Route path="/transporters" element={<Transporters />} />
   <Route path="/addtransportorder" element={<AddTransportOrder />} />
 </Routes>
 </HashRouter>
