@@ -1,6 +1,7 @@
 {
   "name": "adminpanel",
   "version": "0.1.0",
+  "homepage": "https://alexanderbkl.github.io/VidreBanyCPanel/",
   "private": true,
   "dependencies": {
     "@emotion/react": "latest",
