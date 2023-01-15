@@ -1,0 +1,64 @@
+h1 {
+    text-align: center;
+    font-size: 2.5em;
+    font-weight: 600;
+    color: #000;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 1em;
+}
+
+
+
+.Stack {
+    /*align stack to center of screen:*/
+
+    align-self: center;
+    height: 100%;
+    width: 100%;
+    background-color: #fff;
+    padding: 1em;
+    margin: 0;
+    margin-bottom: 1em;
+    border-radius: 0.5em;
+    box-shadow: 0 0 0.5em 0.1em rgb(190, 186, 186);
+    /*Align items to center*/
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.MasterStack {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    align-self: center;
+    width: 30%;
+    height: 100%;
+    background-color: #fff;
+    padding: 1em;
+    margin: 0;
+    margin-bottom: 1em;
+    border-radius: 0.5em;
+    box-shadow: 0 0 0.5em 0.1em rgb(255, 255, 255);
+    /*Align items to center*/
+}
+
+.StackCheck {
+    /*align stack to center of screen:*/
+
+    align-self: center;
+    height: 100%;
+    width: 100%;
+
+    background-color: #fff;
+    padding: 1em;
+    margin: 0;
+    margin-bottom: 1em;
+    border-radius: 0.5em;
+    /*Align items to center*/
+    display: flex;
+
+    align-items: center;
+    justify-content: flex-start;
+}

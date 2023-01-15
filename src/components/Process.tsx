@@ -17,6 +17,7 @@ import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
 const Process = () => {
 
+
     var [datesList, setDatesList] = useState<string[]>([]);
 
 
@@ -266,7 +267,8 @@ const Process = () => {
 
         });
 
-    }, []);
+    }, [todoRef]);
+
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

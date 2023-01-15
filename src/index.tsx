@@ -17,6 +17,8 @@ import User from "./components/User";
 import Transport from "./components/Transport"
 import Transporters from "./components/Transporters"
 import AddTransportOrder from "./components/AddTransportOrder"
+import Incidencies from "./components/Incidencies"
+import AddIncidencia from "./components/AddIncidencia"
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -49,6 +51,8 @@ root.render(
   <Route path="/transport" element={<Transport />} />
   <Route path="/transporters" element={<Transporters />} />
   <Route path="/addtransportorder" element={<AddTransportOrder />} />
+  <Route path="/incidencies" element={<Incidencies />} />
+  <Route path="/addincidencia" element={<AddIncidencia />} />
 </Routes>
 </HashRouter>
 );

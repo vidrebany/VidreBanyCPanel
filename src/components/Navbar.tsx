@@ -18,6 +18,7 @@ const Navbar = () => {
             <Nav.Link href="#/users">Usuaris</Nav.Link>
             <Nav.Link href="#/edit">Ordres</Nav.Link>
             <Nav.Link href="#/transport">Transports</Nav.Link>
+            <Nav.Link href="#/incidencies">Incidències</Nav.Link>
           </Nav>
         </NavbarReact.Collapse>
             <NavbarReact.Toggle aria-controls="basic-navbar-nav" />
