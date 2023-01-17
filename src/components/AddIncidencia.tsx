@@ -39,7 +39,7 @@ const Incidencies = () => {
 
     const [comentarisNC, setComentarisNC] = useState('');
 
-    const [serveiChecked, setserviciChecked] = useState(false); const [producteChecked, setProducteChecked] = useState(false);
+    const [serveiChecked, setServeiChecked] = useState(false); const [producteChecked, setProducteChecked] = useState(false);
     
     const [error, setError] = useState('');
 
@@ -58,10 +58,18 @@ const Incidencies = () => {
         setDate(newValue);
     };
     const handleServeiCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setserviciChecked(event.target.checked);
+        if (producteChecked) {
+            setProducteChecked(false);
+        }
+        setServeiChecked(event.target.checked);
+
     };
     const handleProducteCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (serveiChecked) {
+            setServeiChecked(false);
+        }
         setProducteChecked(event.target.checked);
+
     };
 
 
