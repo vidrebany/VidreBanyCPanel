@@ -99,6 +99,30 @@ export interface ComandaType {
   type: string;
 }
 
+export interface Incidencia {
+  key: string;
+  ncNum: string;
+  id: number;
+  admin: string;
+  comandaType: string;
+  formaRegistre: string;
+  comandaNum: string;
+  codiDistribuidor: string;
+  nomDistribuidor: string;
+  correuDistribuidor: string;
+  nomTrucador: string;
+  correuTrucador: string;
+  tlfTrucador: string;
+  direccioClientFinal: string;
+  tlfClientFinal: string;
+  refProducte: string;
+  descrProducte: string;
+  comentarisNC: string;
+  serveioproducte: string;
+  downloadURL: string;
+  fileTitle: string;
+}
+
 export const comandaTypeObject: ComandaType[] = [
   {
     key: 1,

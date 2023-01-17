@@ -3,11 +3,11 @@ import "./styles/AddIncidencia.css"
 import { Button, Stack, Checkbox, FormControlLabel, TextField, Select, SelectChangeEvent, MenuItem, InputLabel, FormControl } from '@mui/material';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers/';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { AdminsData, formaRegistreObject, comandaTypeObject } from "../types";
+import { AdminsData, Incidencia, formaRegistreObject, comandaTypeObject } from "../types";
 import { useRef, useState, useEffect } from "react";
 
 import { getDatabase, ref, push, set, DatabaseReference, onValue } from "firebase/database";
-import { getStorage, ref as refStorage, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { getStorage, ref as refStorage, deleteObject, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import firebaseApp from "../firebase";
 
 import { useNavigate } from "react-router-dom";
@@ -40,7 +40,7 @@ const Incidencies = () => {
     const [comentarisNC, setComentarisNC] = useState('');
 
     const [serveiChecked, setServeiChecked] = useState(false); const [producteChecked, setProducteChecked] = useState(false);
-    
+
     const [error, setError] = useState('');
 
 
@@ -130,31 +130,33 @@ const Incidencies = () => {
     function submitIncidencia(): void {
 
         console.log('submitting');
-        console.log("date: "+date);
-        console.log("admin: "+admin);
-        console.log("comandaType: "+comandaType);
-        console.log("formaRegistre: "+formaRegistre);
-        console.log("ncNum: "+ncNum);
-        console.log("comandaNum: "+comandaNum);
-        console.log("codiDistribuidor: "+codiDistribuidor);
-        console.log("nomDistribuidor: "+nomDistribuidor);
-        console.log("correuDistribuidor: "+correuDistribuidor);
-        console.log("nomTrucador: "+nomTrucador);
-        console.log("correuTrucador: "+correuTrucador);
-        console.log("tlfTrucador: "+tlfTrucador);
-        console.log("direccioClientFinal: "+direccioClientFinal);
-        console.log("tlfClientFinal: "+tlfClientFinal);
-        console.log("refProducte: "+refProducte);
-        console.log("descrProducte: "+descrProducte);
-        console.log("comentarisNC: "+comentarisNC);
-        console.log("serveiChecked: "+serveiChecked);
-        console.log("producteChecked: "+producteChecked);
-        console.log("file: "+file);
-        console.log("fileTitle: "+fileTitle);
+        console.log("date: " + date);
+        console.log("admin: " + admin);
+        console.log("comandaType: " + comandaType);
+        console.log("formaRegistre: " + formaRegistre);
+        console.log("ncNum: " + ncNum);
+        console.log("comandaNum: " + comandaNum);
+        console.log("codiDistribuidor: " + codiDistribuidor);
+        console.log("nomDistribuidor: " + nomDistribuidor);
+        console.log("correuDistribuidor: " + correuDistribuidor);
+        console.log("nomTrucador: " + nomTrucador);
+        console.log("correuTrucador: " + correuTrucador);
+        console.log("tlfTrucador: " + tlfTrucador);
+        console.log("direccioClientFinal: " + direccioClientFinal);
+        console.log("tlfClientFinal: " + tlfClientFinal);
+        console.log("refProducte: " + refProducte);
+        console.log("descrProducte: " + descrProducte);
+        console.log("comentarisNC: " + comentarisNC);
+        console.log("serveiChecked: " + serveiChecked);
+        console.log("producteChecked: " + producteChecked);
+        console.log("file: " + file);
+        console.log("fileTitle: " + fileTitle);
+        const storage = getStorage(firebaseApp);
 
-          //get realtime database ref and push
-/*
-          try {
+
+        //get realtime database ref and push
+
+        try {
 
             try {
                 //get firebaseStorage from firebase
@@ -171,34 +173,59 @@ const Incidencies = () => {
                     console.log('Uploaded a blob or file!');
 
                     //get download url
-                    getDownloadURL(snapshot.ref).then((url) => {
-
-
+                    getDownloadURL(snapshot.ref).then((downloadURL) => {
+                        //     let storageRefFromDownloadURL = refStorage(storage, downloadURL);
+                        /*  deleteObject(storageRefFromDownloadURL).then(() => {
+                                console.log("deleted")
+                            });*/
                         try {
                             const dbRef = ref(db, 'incidencies');
 
-                            const newTransportRef = push(dbRef);
-                            //get key from newTransportRef
-                            const key = newTransportRef.key;
+                            const newIncidenciaRef = push(dbRef);
+                            //get key from newIncidenciaRef
+                            const dbKey = newIncidenciaRef.key;
+                            if (dbKey) {
+                                let serveioproducte;
+                                if (serveiChecked) {
+                                    serveioproducte = "servei";
+                                } else if (producteChecked) {
+                                    serveioproducte = "producte";
+                                } else {
+                                    alert("Has de marcar servei o producte!")
+                                    return;
+                                }
+                                const incidencia: Incidencia = {
+                                    key: dbKey,
+                                    ncNum: ncNum,
+                                    id: 1,
+                                    admin: admin,
+                                    comandaType: comandaType,
+                                    formaRegistre: formaRegistre,
+                                    comandaNum: comandaNum,
+                                    codiDistribuidor: codiDistribuidor,
+                                    nomDistribuidor: nomDistribuidor,
+                                    correuDistribuidor: correuDistribuidor,
+                                    nomTrucador: nomTrucador,
+                                    correuTrucador: correuTrucador,
+                                    tlfTrucador: tlfTrucador,
+                                    direccioClientFinal: direccioClientFinal,
+                                    tlfClientFinal: tlfClientFinal,
+                                    refProducte: refProducte,
+                                    descrProducte: descrProducte,
+                                    comentarisNC: comentarisNC,
+                                    serveioproducte: serveioproducte,
+                                    downloadURL: downloadURL,
+                                    fileTitle: fileTitle,
+                                };
+                                set(newIncidenciaRef, incidencia);
 
-                            //get transportista name from transList based on "transportista" id
-                            let transName = "";
-                            
-                            set(newTransportRef, {
-                                id: key,
-                                clientNum: clientNum,
-                                address: addressTxt,
-                                firstTel: firstTel,
-                                secondTel: secondTel,
-                                observations: observations,
-                                date: new Date().toLocaleDateString(),
-                                time: new Date().toLocaleTimeString(),
-                                status: "pendiente",
-                                pdfUrl: url,
-                                transId: transportista,
-                                transName: transName
-                            });
-                            
+                            } else {
+                                alert("error a la base de dades");
+                            }
+
+
+
+
                         } catch (error: any) {
                             alert("error: " + error.message);
                         }
@@ -224,8 +251,9 @@ const Incidencies = () => {
         }
 
         //navigate to transport page
+        console.log("Created incidencia")
         navigate('/incidencies');
-*/
+
     }
 
     return (
@@ -503,13 +531,13 @@ const Incidencies = () => {
             </Stack>
 
             {/*Servicio (checkbox)*/}
-            <Stack style={{margin: "30px"}}className="StackCheck" spacing={1} direction="row">
+            <Stack style={{ margin: "30px" }} className="StackCheck" spacing={1} direction="row">
 
                 <Button onClick={inputFileClick} variant="contained">{fileTitle}</Button>
                 {/*Input for document*/}
                 {/*Enviar button*/}
             </Stack>
-            <Stack style={{margin: "30px"}} className="StackCheck" spacing={1} direction="row">
+            <Stack style={{ margin: "30px" }} className="StackCheck" spacing={1} direction="row">
                 <Button onClick={() => submitIncidencia()} variant="contained">NOVA INCIDÈNCIA</Button>
             </Stack>
         </div >
