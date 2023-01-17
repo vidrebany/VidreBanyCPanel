@@ -2,12 +2,11 @@ import { useRef, useState, useEffect } from "react";
 import { TransportersData } from "../types";
 import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
-import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import "./styles/Transport.css"
 import Alert from '@mui/material/Alert';
 import { TextField } from "@mui/material";
-import { getDatabase, ref, push, set, DatabaseReference, onValue } from "firebase/database";
+import { getDatabase, ref, push, set, onValue } from "firebase/database";
 import firebaseApp from "../firebase";
 //import firebase storage
 import { getStorage, ref as refStorage, uploadBytesResumable, getDownloadURL } from "firebase/storage";
@@ -56,6 +55,7 @@ const AddTransportOrder = () => {
             }
 
 
+            // eslint-disable-next-line react-hooks/exhaustive-deps
             mounted = true;
         });
     }, [transList]);
@@ -98,20 +98,49 @@ const AddTransportOrder = () => {
         }
 
         //telefon 1
-        const regex3 = /TEL\.\s*\n\s*(\d+)/g;
-        //get group 1 from pdfText regex3 match
-        const match3 = pdfText.match(regex3)?.[0]?.match(/\d+/g)?.[0];
-        if (match3) {
-            setFirstTel(match3);
-        }
+        const regex3 = /TEL\.\s*\n\s*(\d+\s?\d+\s?\d+\s?\d+\s)/g;
         //telefon 2
-        const regex4 = /TEL2\.\s*\n\s*(\d+)/g;
-        //get group 1 from pdfText regex4 match
-        const match4 = pdfText.match(regex4)?.[0]?.match(/\d+/g)?.[1];
-        if (match4) {
-            setSecondTel(match4);
+        const regex4 = /TEL2\.\s*\n\s*(\d+\s?\d+\s?\d+\s?\d+\s)/g;
+
+        //get group 1 from pdfText regex3 match
+        if (pdfText) {
+            const match3 = pdfText.match(regex3);
+            //split match3 by space and remove the first element
+            if (match3) {
+
+
+                const match3Split: string[] = match3?.[0]?.split(" ");
+                match3Split.shift();
+                //combine all elements in match3Split to a string
+                const match3SplitString = match3Split.join(" ");
+                console.log(match3SplitString)
+
+                setFirstTel(match3SplitString);
+            }
+
+
+
+            //get group 1 from pdfText regex4 match
+
+            //get group 1 from pdfText regex3 match
+
+            const match4 = pdfText.match(regex4);
+            //split match3 by space and remove the first element
+            if (match4) {
+
+
+                const match4Split: string[] = match4?.[0]?.split(" ");
+                match4Split.shift();
+                //combine all elements in match3Split to a string
+                const match4SplitString = match4Split.join(" ");
+
+                setSecondTel(match4SplitString);
+            }
+
         }
 
+
+     
 
 
 
@@ -129,7 +158,7 @@ const AddTransportOrder = () => {
         address = lines.join("\n") // join the lines back into a single string
 
         setAddressTxt(address) // prints address
-        if (address != "") {
+        if (address !== "") {
             if (dadesDiv) {
                 dadesDiv.style.visibility = "visible";
             }
@@ -192,7 +221,7 @@ const AddTransportOrder = () => {
 
 
 
-
+/*
     function copyData(data: string): void {
         navigator.clipboard.writeText(data);
 
@@ -210,7 +239,7 @@ const AddTransportOrder = () => {
 
 
     }
-
+*/
     function uploadTransport(): void {
         //get realtime database ref and push
 
@@ -244,7 +273,7 @@ const AddTransportOrder = () => {
                             //get transportista name from transList based on "transportista" id
                             let transName = "";
                             for (let i = 0; i < transList.length; i++) {
-                                if (transList[i].id == transportista) {
+                                if (transList[i].id === transportista) {
                                     transName = transList[i].name;
                                 }
                             }

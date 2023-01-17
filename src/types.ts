@@ -1,11 +1,11 @@
 export type Users = {
-    id: string;
-    name: string;
-    number: string;
-    code: string;
-    process: string;
-    done: boolean;
-  }
+  id: string;
+  name: string;
+  number: string;
+  code: string;
+  process: string;
+  done: boolean;
+}
 
 export type Orders = {
   code: string;
@@ -59,3 +59,57 @@ export interface TransportersData {
   [key: string]: string;
   id: string;
 }
+
+export interface AdminsData {
+  name: string;
+  [key: string]: string;
+  id: string;
+}
+
+export interface FormaRegistre {
+  key: number;
+  name: string;
+}
+
+export const formaRegistreObject: FormaRegistre[] = [
+  {
+    key: 2,
+    name: 'WhatsApp',
+  },
+  {
+    key: 3,
+    name: 'e-mail',
+  },
+  {
+    key: 4,
+    name: 'Web',
+  },
+  {
+    key: 5,
+    name: 'Presencial',
+  },
+  {
+    key: 6,
+    name: 'Altres',
+  },
+];
+
+export interface ComandaType {
+  key: number;
+  type: string;
+}
+
+export const comandaTypeObject: ComandaType[] = [
+  {
+    key: 1,
+    type: 'Albarà',
+  },
+  {
+    key: 2,
+    type: 'Comanda',
+  },
+  {
+    key: 3,
+    type: 'Comanda client',
+  },
+];

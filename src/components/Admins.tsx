@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { TransportersData } from "../types";
+import { AdminsData } from "../types";
 import Navbar from "./Navbar";
 import firebaseApp from "../firebase";
 import { getDatabase, ref, onValue, push, set, remove } from "firebase/database";
@@ -7,47 +7,47 @@ import { useNavigate } from "react-router-dom";
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import { TextField } from "@mui/material";
-import "./styles/Transporters.css"
+import "./styles/Admins.css"
 import Alert from "@mui/material/Alert";
 
 
-const Transporters = () => {
+const Admins = () => {
     const navigate = useNavigate();
 
     //firebase database
     const db = getDatabase(firebaseApp);
-    //transport ref
-    const transportRef = ref(db, "/transporters/");
+    //admin ref
+    const adminsRef = ref(db, "/admins/");
 
-    //transport list useState that has a list of Transports[] objects
-    const [transportList, setTransportList] = useState<TransportersData[]>([]);
-    const [transName, setTransName] = useState('');
+    //admin list useState that has a list of AdminsData[] objects
+    const [adminList, setAdminList] = useState<AdminsData[]>([]);
+    const [adminName, setAdminName] = useState('');
 
-    //get transport list
+    //get admin list
     useEffect(() => {
-        onValue(transportRef, (snapshot) => {
+        onValue(adminsRef, (snapshot) => {
             const data = snapshot.val();
 
-            let transportListTemp: TransportersData[] = [];
+            let adminListTemp: AdminsData[] = [];
             for (const key in data) {
                 if (data.hasOwnProperty(key)) {
-                    let transportOrder: TransportersData = {
+                    let adminData: AdminsData = {
                         id: data[key].id,
                         name: data[key].name,
                     }
-                    transportListTemp.push(transportOrder);
+                    adminListTemp.push(adminData);
                 }
             }
 
 
 
-                setTransportList(transportListTemp);
+                setAdminList(adminListTemp);
 
             
 
 
         });
-    }, [transportList]);
+    }, [adminList]);
 
 
 
@@ -71,18 +71,18 @@ const Transporters = () => {
         }
     }
 
-    function addNewTrans(): void {
+    function addNewAdmin(): void {
         showFields();
-        //push new transName to firebase, the pushed content will be the transName and the generated id
-        const dbRef = ref(db, '/transporters/');
+        //push new adminName to firebase, the pushed content will be the adminName and the generated id
+        const dbRef = ref(db, '/admins/');
 
-        const newTransportRef = push(dbRef);
-        //get key from newTransportRef
-        const key = newTransportRef.key;
+        const newAdminRef = push(dbRef);
+        //get key from newAdminRef
+        const key = newAdminRef.key;
 
-        set(newTransportRef, {
+        set(newAdminRef, {
             id: key,
-            name: transName,
+            name: adminName,
         });
         //select Alert element
         let alert = document.querySelector('.alert') as HTMLDivElement;
@@ -94,8 +94,8 @@ const Transporters = () => {
         }
     }
 
-    function deleteTrans(id: string): void {
-        const dbRef = ref(db, '/transporters/' + id);
+    function deleteAdmin(id: string): void {
+        const dbRef = ref(db, '/admins/' + id);
         remove(dbRef);      
     }
 
@@ -104,37 +104,37 @@ const Transporters = () => {
             <Navbar />
             <Alert className="alert" severity="success">Èxit</Alert>
             <div>
-                <h1 style={{ textAlign: 'center' }}>Transports</h1>
+                <h1 style={{ textAlign: 'center' }}>Admins</h1>
             </div>
 
             {/*Sepparate from Navbar 150px*/}
 
-            <h3>Llista transportistes</h3>
+            <h3>Lista administradors</h3>
             <Stack spacing={2} direction="column">
-                <Button id="addButton" onClick={() => showFields()} variant="contained">Afegir transportista</Button>
+                <Button id="addButton" onClick={() => showFields()} variant="contained">Afegir admin</Button>
                 <TextField className="textField" style={{ margin: "10px" }}
                     id="outlined-multiline-static"
-                    label="Nom trans."
+                    label="Nom admin."
                     rows={4}
-                    value={transName}
+                    value={adminName}
                     variant="outlined"
-                    onChange={(e) => setTransName(e.target.value)}
+                    onChange={(e) => setAdminName(e.target.value)}
                 />
-                <Button className="textField" onClick={() => addNewTrans()} variant="contained">Afegir nou</Button>
+                <Button className="textField" onClick={() => addNewAdmin()} variant="contained">Afegir nou</Button>
 
             </Stack>
             <div className="listView">
 
-                {/*Map transportList*/}
-                {transportList.map((transport) => {
+                {/*Map adminList*/}
+                {adminList.map((admin) => {
                     
 
                     return (
-                        <div className="transportCard" key={transport.id}>
-                            <p>{transport.name}</p>
+                        <div className="adminCard" key={admin.id}>
+                            <p>{admin.name}</p>
                             <img
                             style={{ position: 'absolute', right: 0, bottom: 10 }} role={'button'} width={"30px"}
-                            onClick={() => deleteTrans(transport.id)}
+                            onClick={() => deleteAdmin(admin.id)}
                             src={"https://www.shareicon.net/data/128x128/2015/09/06/96798_trash_512x512.png"}
                             alt={"trashcan"}></img>
                         </div>
@@ -148,4 +148,4 @@ const Transporters = () => {
     );
 };
 
-export default Transporters;
+export default Admins;
