@@ -37,6 +37,8 @@ const EditInconformitat = () => {
     //get one Incidencia interface object
     const [incidencia, setIncidencia] = useState<Incidencia>();
 
+    const [timestamp, setTimestamp] = useState('');
+    
     //get current date and time (in day month year minutes and hours format) using dayjs and transforming to Dayjs type
     const [date, setDate] = useState<Dayjs | null>(
         dayjs(),
@@ -67,12 +69,11 @@ const EditInconformitat = () => {
     useEffect(() => {
         onValue(incidenciesRef, (snapshot) => {
             const data = snapshot.val();
-            console.log(data);
             let incidenciaTemp: Incidencia = {
-                key: data.key,
+                key: data.key ? data.key : null,
                 ncNum: data.ncNum,
                 //check if date is not undefined, if it is, set it to current date
-                date: data.date ? dayjs(data.date).toString() : dayjs().toString(),
+                date: data.date,
                 adminId: data.adminId,
                 comandaType: data.comandaType,
                 formaRegistre: data.formaRegistre,
@@ -105,7 +106,13 @@ const EditInconformitat = () => {
             setAdminId(incidenciaTemp.adminId);
             setComandaType(incidenciaTemp.comandaType);
             setFormaRegistre(incidenciaTemp.formaRegistre);
-            setDate(dayjs(incidenciaTemp.date));
+            setDate(() => {
+                if (incidenciaTemp.date) {
+                    return dayjs(parseInt(incidenciaTemp.date));
+                } else {
+                    return dayjs();
+                }
+            });
             setNcNum(incidenciaTemp.ncNum);
             setComandaNum(incidenciaTemp.comandaNum);
             setCodiDistribuidor(incidenciaTemp.codiDistribuidor);
@@ -154,6 +161,8 @@ const EditInconformitat = () => {
     };
     const handleDateChange = (newValue: Dayjs | null) => {
         setDate(newValue);
+        let timestamp = newValue?.valueOf();
+        setTimestamp(timestamp?.toString() || '');
     };
     const handleServeiCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (producteChecked) {
@@ -253,30 +262,6 @@ const EditInconformitat = () => {
     async function editIncidencia() {
 
 
-        console.log('submitting');
-        console.log("date: " + date);
-        console.log("adminId: " + adminId);
-        console.log("comandaType: " + comandaType);
-        console.log("formaRegistre: " + formaRegistre);
-        console.log("ncNum: " + ncNum);
-        console.log("comandaNum: " + comandaNum);
-        console.log("codiDistribuidor: " + codiDistribuidor);
-        console.log("nomDistribuidor: " + nomDistribuidor);
-        console.log("correuDistribuidor: " + correuDistribuidor);
-        console.log("nomTrucador: " + nomTrucador);
-        console.log("correuTrucador: " + correuTrucador);
-        console.log("tlfTrucador: " + tlfTrucador);
-        console.log("direccioClientFinal: " + direccioClientFinal);
-        console.log("tlfClientFinal: " + tlfClientFinal);
-        console.log("refProducte: " + refProducte);
-        console.log("descrProducte: " + descrProducte);
-        console.log("comentarisNC: " + comentarisNC);
-        console.log("serveiChecked: " + serveiChecked);
-        console.log("producteChecked: " + producteChecked);
-        console.log("file: " + file);
-        console.log("fileTitle: " + fileTitle);
-
-
         //get realtime database ref and push
 
         try {
@@ -313,7 +298,7 @@ const EditInconformitat = () => {
                         const incidencia: Incidencia = {
                             key: incidenciaKey,
                             ncNum: ncNum,
-                            date: date?.toString() || '',
+                            date: timestamp || '',
                             adminId: adminId,
                             comandaType: comandaType,
                             formaRegistre: formaRegistre,
@@ -358,7 +343,7 @@ const EditInconformitat = () => {
                                     const incidencia: Incidencia = {
                                         key: incidenciaKey,
                                         ncNum: ncNum,
-                                        date: date?.toString() || '',
+                                        date: timestamp || '',
                                         adminId: adminId,
                                         comandaType: comandaType,
                                         formaRegistre: formaRegistre,

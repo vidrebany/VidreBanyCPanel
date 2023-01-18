@@ -9,6 +9,7 @@ import Button from '@mui/material/Button';
 import "./styles/IncidenciesObertes.css"
 import { getStorage, ref as refStorage, deleteObject } from "firebase/storage";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import dayjs, { Dayjs } from 'dayjs';
 
 
 const IncidenciesObertes = () => {
@@ -25,7 +26,7 @@ const IncidenciesObertes = () => {
     const [inconformitatsList, setInconformitatsList] = useState<Incidencia[]>([]);
 
 
-    
+
     //get incidencies list
     useEffect(() => {
         onValue(incidenciesRef, (snapshot) => {
@@ -70,7 +71,6 @@ const IncidenciesObertes = () => {
 
 
             setInconformitatsList(inconformitatsListTemp);
-            console.log(inconformitatsListTemp)
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -84,21 +84,21 @@ const IncidenciesObertes = () => {
 
     const handleDeleteDialogClose = () => {
         setOpenDeleteAlert(false);
-      };
+    };
 
-      const handleDeleteCancel = () => {
+    const handleDeleteCancel = () => {
         setOpenDeleteAlert(false);
-      }
+    }
 
-      const handleDeleteAgree = () => {
+    const handleDeleteAgree = () => {
         setOpenDeleteAlert(false);
         deleteIncidencia(incidenciaDeleteKey, incidenciaDeleteDownloadURL);
-      }
+    }
 
-      function deleteIncidencia(incidenciaDeleteKey: string, incidenciaDeleteDownloadURL: string) {
-    
+    function deleteIncidencia(incidenciaDeleteKey: string, incidenciaDeleteDownloadURL: string) {
+
         const dbRef = ref(db, '/incidencies/inconformitats/' + incidenciaDeleteKey);
-    
+
         if (incidenciaDeleteDownloadURL !== "") {
             try {
                 let storageRefFromDownloadURL = refStorage(storage, incidenciaDeleteDownloadURL);
@@ -112,7 +112,7 @@ const IncidenciesObertes = () => {
         } else {
             remove(dbRef);
         }
-    
+
     }
 
 
@@ -147,26 +147,36 @@ const IncidenciesObertes = () => {
                 }
 
                 return (
-                    <div className="listView">
-                        <div className="listItem" key={incidencia.key}>
+                    <div key={incidencia.key} style={{ whiteSpace: 'pre-wrap' }} className="listView">
+                        <div className="listItem">
                             <div className="listItemContent">
                                 <div className="listItemContentLeft">
-                                    <h4>NC: {incidencia.ncNum}</h4>
-                                    <Stack spacing={2} direction="row">
-                                        <Stack spacing={2} direction="column">
-                                            <p><b>Tipus: </b>{incidencia.serveioproducte}</p>
-                                            <p><b>{incidencia.comandaType}:</b> {incidencia.comandaNum}</p>
-                                            <p><b>Comentaris: </b>{incidencia.comentarisNC}</p>
+                                    <Stack sx={{justifyContent: 'center'}} spacing={2} direction="row">
+                                        <h4>NC: {incidencia.ncNum}</h4>
+                                        <h4>{dayjs(parseInt(incidencia.date)).format("DD/MM/YYYY - HH:mm").toString()}</h4>
+                                    </Stack>
+                                    <Stack spacing={1} direction="column">
+                                        <Stack spacing={1} direction="row">
+                                            <Stack spacing={2} direction="column">
+                                                <p><b>Tipus: </b>{incidencia.serveioproducte}</p>
+                                                <p><b>{incidencia.comandaType}:</b> {incidencia.comandaNum}</p>
 
-                                        </Stack>
-                                        <Stack spacing={2} direction="column">
-                                            <p><b>Codi distribuïdor: </b>{incidencia.codiDistribuidor}</p>
-                                            <p><b>Nom distribuïdor: </b>{incidencia.nomDistribuidor}</p>
-                                          
-                                            {incidencia.downloadURL !== "" ? <a href={`${incidencia.downloadURL}`} rel="noreferrer" target="_blank">{incidencia.fileTitle}</a> : <p>No hi ha fitxer adjunt</p>}
-                                                 
 
+
+                                            </Stack>
+                                            <Stack spacing={2} direction="column">
+                                                <p><b>Codi distribuïdor: </b>{incidencia.codiDistribuidor}</p>
+                                                <p><b>Nom distribuïdor: </b>{incidencia.nomDistribuidor}</p>
+
+
+
+                                            </Stack>
                                         </Stack>
+
+                                        <p><b>Comentaris: </b>{"\n" + incidencia.comentarisNC}</p>
+                                        {incidencia.downloadURL !== "" ? <a href={`${incidencia.downloadURL}`} rel="noreferrer" target="_blank">{incidencia.fileTitle}</a> : <p>No hi ha fitxer adjunt</p>}
+
+
 
                                     </Stack>
                                 </div>

@@ -17,10 +17,14 @@ import dayjs, { Dayjs } from 'dayjs';
 
 const Incidencies = () => {
     const db = getDatabase(firebaseApp);
+    const [timestamp, setTimestamp] = useState('');
 
     //get current date and time (in day month year minutes and hours format) using dayjs and transforming to Dayjs type
-    const [date, setDate] = useState<Dayjs | null>(
-        dayjs(),
+    const [date, setDate] = useState<Dayjs | null>( () =>{
+        setTimestamp(dayjs().valueOf().toString());
+        return dayjs();
+
+    }
     );
 
     const [adminId, setAdminId] = useState(''); const [comandaType, setComandaType] = useState(''); const [adminsList, setAdminsList] = useState<AdminsData[]>([]); const [formaRegistre, setFormaRegistre] = useState('');
@@ -55,6 +59,8 @@ const Incidencies = () => {
     };
     const handleDateChange = (newValue: Dayjs | null) => {
         setDate(newValue);
+        let timestamp = newValue?.valueOf();
+        setTimestamp(timestamp?.toString() || '');
     };
     const handleServeiCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (producteChecked) {
@@ -222,7 +228,7 @@ const Incidencies = () => {
                             const incidencia: Incidencia = {
                                 key: dbKey,
                                 ncNum: ncNum,
-                                date: date?.toString() || '',
+                                date: timestamp || '',
                                 adminId: adminId,
                                 comandaType: comandaType,
                                 formaRegistre: formaRegistre,
@@ -273,7 +279,7 @@ const Incidencies = () => {
                                     const incidencia: Incidencia = {
                                         key: dbKey,
                                         ncNum: ncNum,
-                                        date: date?.toString() || '',
+                                        date: timestamp || '',
                                         adminId: adminId,
                                         comandaType: comandaType,
                                         formaRegistre: formaRegistre,
@@ -330,7 +336,7 @@ const Incidencies = () => {
 
         //navigate to transport page
         console.log("Created incidencia")
-        navigate('/incidencies');
+        navigate('/incidenciesobertes');
 
     }
 
