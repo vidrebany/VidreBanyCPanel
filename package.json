@@ -61,8 +61,8 @@
     "@types/react-router-dom": "^5.3.3",
     "gh-pages": "^4.0.0"
   },
-  "license:" {
-    "type": "All rights reserved to Vidre!BANY"
+  "license:": {
+    "type": "LicenseRef-LICENSE"
   }
   
 }
