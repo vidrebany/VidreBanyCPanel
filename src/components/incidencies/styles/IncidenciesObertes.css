@@ -1,0 +1,42 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+  }
+  .listView {
+    display: flex;
+    margin-top: 10px;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .alert {
+    visibility: hidden;
+  }
+  .dadesDiv {
+    visibility: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .data {
+    /*align text to left*/
+    text-align: left;
+  }
+  .box {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    flex-direction: column;
+    width: 300px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    margin: 10px;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    text-align: left;
+
+  }

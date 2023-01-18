@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Users } from "../types";
-import Navbar from "./Navbar";
+import { Users } from "../../types";
+import Navbar from "../Navbar";
 import { useNavigate } from "react-router-dom";
 
 

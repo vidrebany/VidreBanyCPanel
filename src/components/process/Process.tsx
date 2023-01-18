@@ -1,10 +1,10 @@
 import { useLocation } from "react-router-dom";
-import Navbar from "./Navbar";
+import Navbar from "../Navbar";
 import { useState, useEffect } from "react";
-import firebaseApp from "../firebase";
+import firebaseApp from "../../firebase";
 import { Form } from "react-bootstrap";
 import { getDatabase, ref, onValue } from "firebase/database";
-import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import '../../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React from "react";
 import dayjs, { Dayjs } from 'dayjs';
@@ -15,8 +15,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
 
-const User = () => {
-
+const Process = () => {
 
 
     var [datesList, setDatesList] = useState<string[]>([]);
@@ -35,6 +34,7 @@ const User = () => {
             var dates = getDates(newStartDate, endDate);
             setDatesList(dates);
 
+            //alert(dates);
         }
     };
 
@@ -50,7 +50,6 @@ const User = () => {
         //set dates list
 
         if (startDate != null && newEndDate != null) {
-            var value = "";
 
             var dates = getDates(startDate, newEndDate);
             setDatesList(dates);
@@ -58,51 +57,52 @@ const User = () => {
 
             let puntuation = 0;
             let ordersTotal = 0;
-            let temp = 0;
             //get total puntuation from ordersConstList by splitting the order code by X and getting the [1] index which is the puntuation
             var newOrdersList: any = [];
 
-            temp++;
 
             //filter ordersList order.code and corteUser based on splitted[i]
 
             //split splitted[i] by space
-            // eslint-disable-next-line array-callback-return
-            for (let id in ordersConstList) {
+                // eslint-disable-next-line array-callback-return
+                for (let id in ordersConstList) {
 
-                for (let id2 in ordersConstList[id]) {
+                    for (let id2 in ordersConstList[id]) {
 
-                    for (let id3 in ordersConstList[id][id2]) {
+                        for (let id3 in ordersConstList[id][id2]) {
 
 
 
-                        if (ordersConstList[id][id2][id3].code !== undefined) {
+                            if (ordersConstList[id][id2][id3].code !== undefined) {
 
-                            if (ordersConstList[id][id2][id3].started !== undefined) {
+                                if (ordersConstList[id][id2][id3].user !== undefined) {
+                                   if (ordersConstList[id][id2][id3].started !== undefined) {
 
-                                if (dates.length > 0) {
-                                    for (let date in dates) {
+                                        if (dates.length > 0) {
+                                            for (let date in dates) {
 
-                                        if (ordersConstList[id][id2][id3].started.toLowerCase().includes(dates[date].toLowerCase())) {
-                                            newOrdersList[id] = ordersConstList[id];
-                                        }
-                                        else if (ordersConstList[id][id2][id3].ended !== undefined) {
-                                            if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(dates[date].toLowerCase())) {
-                                                newOrdersList[id] = ordersConstList[id];
+                                                if (ordersConstList[id][id2][id3].started.toLowerCase().includes(dates[date].toLowerCase())) {
+                                                    newOrdersList[id] = ordersConstList[id];
+                                                }
+                                                else if (ordersConstList[id][id2][id3].ended !== undefined) {
+                                                    if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(dates[date].toLowerCase())) {
+                                                        newOrdersList[id] = ordersConstList[id];
+                                                    }
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
 
+                            }
 
                         }
 
                     }
 
                 }
+            
 
-            }
 
 
 
@@ -139,9 +139,6 @@ const User = () => {
 
     };
 
-
-
-
     //get startDate and endDate in DD/MM/YY format and calculate the range of days also in DD/MM/YYYY format inside a list
     const getDates = (startDate: Dayjs, endDate: Dayjs) => {
         let dates = [],
@@ -166,23 +163,6 @@ const User = () => {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     const location = useLocation();
     var number = "";
 
@@ -192,7 +172,7 @@ const User = () => {
                 "": {
                     "code": "",
                     "ended": "25/09/22-12:26",
-                    "process": "",
+                    "user": "Administració",
                     "started": "25/09/22-12:26"
                 }
             },
@@ -203,7 +183,7 @@ const User = () => {
                 "": {
                     "code": "",
                     "ended": "",
-                    "process": "",
+                    "user": "",
                     "started": ""
                 }
             },
@@ -222,9 +202,6 @@ const User = () => {
     var [totalPuntuation, setTotalPuntuation] = useState(0);
     var [totalOrders, setTotalOrders] = useState(0);
 
-    var [namee, setName] = useState("");
-    var [codee, setCode] = useState("");
-    var [processs, setProcess] = useState("");
 
 
     //create an Object.entries array from the location object, if key is state, return the value of the number key
@@ -234,13 +211,7 @@ const User = () => {
         }
     });
 
-
-    const todoRef = ref(db, "/users/" + number);
-
-    var code = "sense codi";
-    var name = "sense nom";
-    var process = "sense procés";
-
+    const todoRef = ref(db, "/processes/" + number.toLowerCase());
 
 
     //exemple orders object:
@@ -267,26 +238,15 @@ const User = () => {
         onValue(todoRef, (snapshot) => {
 
             const data = snapshot.val();
-            const newOrdersList = [];
-            code = data.code;
-            name = data.name;
-            process = data.process;
-
-            for (let id in data) {
-                if (id === "orders") {
-                    setOrdersConstList(data[id]);
-                    setOrdersList(data[id]);
-                    newOrdersList.push({ id, ...data[id] });
-                }
-            }
-
+            setOrdersConstList(data);
+            setOrdersList(data);
 
             //get total puntuation from orders by splitting the order code by X and getting the [1] index which is the puntuation
-            for (let id in data.orders) {
-                for (let id2 in data.orders[id]) {
-                    for (let id3 in data.orders[id][id2]) {
-                        if (data.orders[id][id2][id3].code !== undefined) {
-                            puntuation += parseInt(data.orders[id][id2][id3].code.split("X")[1]);
+            for (let id in data) {
+                for (let id2 in data[id]) {
+                    for (let id3 in data[id][id2]) {
+                        if (data[id][id2][id3].code !== undefined) {
+                            puntuation += parseInt(data[id][id2][id3].code.split("X")[1]);
                             ordersTotal++;
                         }
 
@@ -301,34 +261,32 @@ const User = () => {
 
             setTotalPuntuation(puntuation);
             setTotalOrders(ordersTotal);
-            setName(name)
-            setCode(code)
-            setProcess(process)
+
             puntuation = 0;
             ordersTotal = 0;
+
         });
 
-    }, []);
+    }, [todoRef]);
+
+
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(232)
+
 
         if ((e.target.value) === "" && startDate === null && endDate === null) {
             onValue(todoRef, (snapshot) => {
                 let puntuation = 0;
                 let ordersTotal = 0;
                 const data = snapshot.val();
-                const newOrdersList = [];
-                code = data.code;
-                name = data.name;
-                process = data.process;
 
                 for (let id in data) {
                     if (id === "orders") {
-                        setOrdersConstList(data[id]);
-                        setOrdersList(data[id]);
-                        newOrdersList.push({ id, ...data[id] });
+
                     }
                 }
+                setOrdersConstList(data);
+                setOrdersList(data);
 
 
                 //get total puntuation from orders by splitting the order code by X and getting the [1] index which is the puntuation
@@ -348,11 +306,8 @@ const User = () => {
                 setTotalOrders(ordersTotal);
                 puntuation = 0;
                 ordersTotal = 0;
-                setName(name)
-                setCode(code)
-                setProcess(process)
+
             });
-            console.log(234)
 
         } else {
             let puntuation = 0;
@@ -361,72 +316,133 @@ const User = () => {
             var newOrdersList: any = [];
 
 
-
             //filter ordersList order.code and corteUser based on splitted[i]
 
             //split splitted[i] by space
             const splitted = e.target.value.split(" ");
-            console.log(23)
             for (let i = 0; i < splitted.length; i++) {
+                // eslint-disable-next-line array-callback-return
                 for (let id in ordersConstList) {
+
                     for (let id2 in ordersConstList[id]) {
+
                         for (let id3 in ordersConstList[id][id2]) {
-                            console.log("test")
+
                             if (ordersConstList[id][id2][id3].code !== undefined) {
                                 if (ordersConstList[id][id2][id3].code.toLowerCase().includes(splitted[i].toLowerCase())) {
-                                    console.log("includes code")
-                                    if (datesList.length > 0) {
-                                        for (let date in datesList) {
-                                            if (date !== null && ordersConstList[id][id2][id3].started !== undefined) {
-                                                if (ordersConstList[id][id2][id3].started.includes(datesList[date].toLowerCase())) {
-                                                    newOrdersList[id] = ordersConstList[id];
-                                                }
-                                            } else if (date !== null && ordersConstList[id][id2][id3].ended !== undefined) {
-                                                if (ordersConstList[id][id2][id3].ended.includes(datesList[date].toLowerCase())) {
-                                                    newOrdersList[id] = ordersConstList[id];
-                                                }
-                                            } else {
-                                                newOrdersList[id] = ordersConstList[id];
-                                            }
-                                        }
-                                        
-                                    } else {
-                                        newOrdersList[id] = ordersConstList[id];
-
-                                    }
-                                } else  if (ordersConstList[id][id2][id3].process !== undefined) {
-                                    if (ordersConstList[id][id2][id3].process.toLowerCase().includes(splitted[i].toLowerCase())) {
+                                    if (ordersConstList[id][id2][id3].user.toLowerCase().includes(splitted[i].toLowerCase())) {
                                         if (datesList.length > 0) {
+
                                             for (let date in datesList) {
                                                 if (date !== null && ordersConstList[id][id2][id3].started !== undefined) {
-                                                    if (ordersConstList[id][id2][id3].started.includes(datesList[date].toLowerCase())) {
+                                                    if (ordersConstList[id][id2][id3].started.toLowerCase().includes(datesList[date].toLowerCase())) {
                                                         newOrdersList[id] = ordersConstList[id];
+
                                                     }
-                                                } else if (date !== null && ordersConstList[id][id2][id3].ended !== undefined) {
-                                                    if (ordersConstList[id][id2][id3].ended.includes(datesList[date].toLowerCase())) {
+                                                }
+                                                else if (date !== null && ordersConstList[id][id2][id3].ended !== undefined) {
+                                                    if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(datesList[date].toLowerCase())) {
                                                         newOrdersList[id] = ordersConstList[id];
+
                                                     }
                                                 } else {
                                                     newOrdersList[id] = ordersConstList[id];
+
                                                 }
                                             }
-                                            
                                         } else {
                                             newOrdersList[id] = ordersConstList[id];
 
                                         }
+
+
+                                    } else {
+                                        if (datesList.length > 0) {
+
+                                            for (let date in datesList) {
+                                                if (date !== null && ordersConstList[id][id2][id3].started !== undefined) {
+                                                    if (ordersConstList[id][id2][id3].started.toLowerCase().includes(datesList[date].toLowerCase())) {
+                                                        newOrdersList[id] = ordersConstList[id];
+
+                                                    }
+                                                }
+                                                else if (date !== null && ordersConstList[id][id2][id3].ended !== undefined) {
+                                                    if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(datesList[date].toLowerCase())) {
+                                                        newOrdersList[id] = ordersConstList[id];
+
+                                                    }
+                                                } else {
+                                                    newOrdersList[id] = ordersConstList[id];
+
+                                                }
+                                            }
+                                        } else {
+                                                newOrdersList[id] = ordersConstList[id];
+                                            
+                                        }
                                     }
+                                } else if (ordersConstList[id][id2][id3].user !== undefined) {
+                                    if (ordersConstList[id][id2][id3].user.toLowerCase().includes(splitted[i].toLowerCase())) {
+                                        if (ordersConstList[id][id2][id3].started !== undefined) {
+                                            if (datesList.length > 0) {
+                                                for (let date in datesList) {
 
+                                                    if (ordersConstList[id][id2][id3].started.toLowerCase().includes(datesList[date].toLowerCase())) {
+                                                        newOrdersList[id] = ordersConstList[id];
+
+                                                    }
+                                                    else if (ordersConstList[id][id2][id3].ended !== undefined) {
+                                                        if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(datesList[date].toLowerCase())) {
+                                                            newOrdersList[id] = ordersConstList[id];
+
+                                                        }
+                                                    }
+                                                }
+
+                                            } else {
+                                                newOrdersList[id] = ordersConstList[id];
+
+                                            }
+
+                                        }
+                                    } else if (splitted[i] === "" && ordersConstList[id][id2][id3].started !== undefined) {
+
+                                        if (datesList.length > 0) {
+                                            for (let date in datesList) {
+
+                                                if (ordersConstList[id][id2][id3].started.toLowerCase().includes(datesList[date].toLowerCase())) {
+                                                    newOrdersList[id] = ordersConstList[id];
+
+                                                }
+                                                else if (ordersConstList[id][id2][id3].ended !== undefined) {
+                                                    if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(datesList[date].toLowerCase())) {
+                                                        newOrdersList[id] = ordersConstList[id];
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
-                            }
-                            //}
-                        }
-                        //}
-                    }
-                    //}
-                }
 
+                            }
+
+                        }
+
+                    }
+
+                }
             }
+
+
+
+
+
+
+
+
+
+
+
             // eslint-disable-next-line array-callback-return
             for (let id in newOrdersList) {
                 for (let id2 in newOrdersList[id]) {
@@ -450,7 +466,6 @@ const User = () => {
 
 
     };
-
     return (
 
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
@@ -460,6 +475,7 @@ const User = () => {
             <div>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <Form style={{ display: 'flex', width: '70vw' }}>
+
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <Stack spacing={3}>
                                 <DesktopDatePicker
@@ -481,18 +497,15 @@ const User = () => {
                                 />
                             </Stack>
                         </LocalizationProvider>
+
                         <Form.Control aria-label={'orderSearch'} type="text"
-                            placeholder="Buscar per data inici, fi, codi o procés" onChange={handleChange} />
+                            placeholder="Buscar per codi, data o nom" onChange={handleChange} />
 
                     </Form>
                 </div>
             </div>
 
-            <h1>Usuari</h1>
-            <p>Nom: {namee}</p>
-            <p>Ordre actual: {codee}</p>
-            <p>Procés actual: {processs}</p>
-            <h2>Dates d'ordres:</h2>
+            <h1>{number}</h1>
 
             <p>Total puntuació: {totalPuntuation}</p>
             <p>Total ordres: {totalOrders}</p>
@@ -534,7 +547,7 @@ const User = () => {
                                                                                 <div id={"collapse" + key} style={show2 ? { display: "block" } : { display: 'none' }} className="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                                                                                     <div className="accordion-body">
                                                                                         <p>Codi: {value.code}</p>
-                                                                                        <p>Procés: {value.process}</p>
+                                                                                        <p>Usuari: {value.user}</p>
                                                                                         <p>Inici: {value.started}</p>
                                                                                         <p>Fi: {value.ended}</p>
 
@@ -568,4 +581,4 @@ const User = () => {
 
     );
 };
-export default User;
+export default Process;

@@ -1,13 +1,13 @@
 import { useRef, useState, useEffect } from "react";
-import { TransportersData } from "../types";
-import Navbar from "./Navbar";
+import { TransportersData } from "../../types";
+import Navbar from "../Navbar";
 import { useNavigate } from "react-router-dom";
 import Button from '@mui/material/Button';
 import "./styles/Transport.css"
 import Alert from '@mui/material/Alert';
 import { TextField } from "@mui/material";
 import { getDatabase, ref, push, set, onValue } from "firebase/database";
-import firebaseApp from "../firebase";
+import firebaseApp from "../../firebase";
 //import firebase storage
 import { getStorage, ref as refStorage, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { pdfjs } from 'react-pdf';

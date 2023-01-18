@@ -9,17 +9,19 @@ import {
   HashRouter,
   Route,
  } from 'react-router-dom';
- import Usuaris from "./components/Usuaris";
- import Processes from "./components/Processes";
- import Process from "./components/Process";
+ import Usuaris from "./components/user/Usuaris";
+ import Processes from "./components/process/Processes";
+ import Process from "./components/process/Process";
 import Ordres from "./components/Ordres";
-import User from "./components/User";
-import Transport from "./components/Transport"
-import Transporters from "./components/Transporters"
-import AddTransportOrder from "./components/AddTransportOrder"
-import Incidencies from "./components/Incidencies"
-import AddIncidencia from "./components/AddIncidencia"
-import Admins from "./components/Admins"
+import User from "./components/user/User";
+import Transport from "./components/transports/Transport"
+import Transporters from "./components/transports/Transporters"
+import AddTransportOrder from "./components/transports/AddTransportOrder"
+import Incidencies from "./components/incidencies/Incidencies"
+import AddIncidencia from "./components/incidencies/AddIncidencia"
+import IncidenciesObertes from "./components/incidencies/IncidenciesObertes"
+import EditInconformitat from "./components/incidencies/EditInconformitat"
+import Admins from "./components/admins/Admins"
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -54,6 +56,8 @@ root.render(
   <Route path="/addtransportorder" element={<AddTransportOrder />} />
   <Route path="/incidencies" element={<Incidencies />} />
   <Route path="/addincidencia" element={<AddIncidencia />} />
+  <Route path="/incidenciesobertes" element={<IncidenciesObertes />} />
+  <Route path="/editinconformitat" element={<EditInconformitat />} />
   <Route path="/admins" element={<Admins />} />
 </Routes>
 </HashRouter>

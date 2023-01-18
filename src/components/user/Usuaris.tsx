@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { getDatabase, ref, onValue } from "firebase/database";
-import firebaseApp from "../firebase";
-import { Users } from "../types";
-import Navbar from "./Navbar";
+import firebaseApp from "../../firebase";
+import { Users } from "../../types";
+import Navbar from "../Navbar";
 import { useNavigate } from "react-router-dom";
 
 

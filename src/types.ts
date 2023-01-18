@@ -101,9 +101,9 @@ export interface ComandaType {
 
 export interface Incidencia {
   key: string;
-  ncNum: string;
-  id: number;
-  admin: string;
+  ncNum: number;
+  date: string;
+  adminId: string;
   comandaType: string;
   formaRegistre: string;
   comandaNum: string;
@@ -121,6 +121,7 @@ export interface Incidencia {
   serveioproducte: string;
   downloadURL: string;
   fileTitle: string;
+  state: string;
 }
 
 export const comandaTypeObject: ComandaType[] = [

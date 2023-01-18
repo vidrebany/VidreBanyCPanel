@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { TransportersData } from "../types";
-import Navbar from "./Navbar";
-import firebaseApp from "../firebase";
+import { TransportersData } from "../../types";
+import Navbar from "../Navbar";
+import firebaseApp from "../../firebase";
 import { getDatabase, ref, onValue, push, set, remove } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import Stack from '@mui/material/Stack';
