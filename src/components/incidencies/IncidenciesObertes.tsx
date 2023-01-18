@@ -157,7 +157,7 @@ const IncidenciesObertes = () => {
                                     </Stack>
                                     <Stack spacing={1} direction="column">
                                         <Stack spacing={1} direction="row">
-                                            <Stack spacing={2} direction="column">
+                                            <Stack spacing={2 } direction="column">
                                                 <p><b>Tipus: </b>{incidencia.serveioproducte}</p>
                                                 <p><b>{incidencia.comandaType}:</b> {incidencia.comandaNum}</p>
 
