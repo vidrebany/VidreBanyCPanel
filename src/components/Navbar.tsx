@@ -10,10 +10,10 @@ const Navbar = () => {
       
       <NavbarReact bg="light" expand="lg">
       <Container>
-        <NavbarReact.Brand href="/">VidreBany</NavbarReact.Brand>
+        <NavbarReact.Brand href="#/">VidreBany</NavbarReact.Brand>
         <NavbarReact.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="/">Inici</Nav.Link>
+            <Nav.Link href="#/">Inici</Nav.Link>
             <Nav.Link href="#/processes">Processos</Nav.Link>
             <Nav.Link href="#/users">Usuaris</Nav.Link>
             <Nav.Link href="#/edit">Ordres</Nav.Link>
