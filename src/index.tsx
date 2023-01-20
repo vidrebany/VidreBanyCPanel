@@ -13,6 +13,7 @@ import {
  import Processes from "./components/process/Processes";
  import Process from "./components/process/Process";
 import Ordres from "./components/Ordres";
+import OrdresRefactored from "./components/OrdresRefactored";
 import User from "./components/user/User";
 import Transport from "./components/transports/Transport"
 import Transporters from "./components/transports/Transporters"
@@ -49,6 +50,7 @@ root.render(
   <Route path="/processes" element={<Processes />} />
   <Route path="/users" element={<Usuaris />} />
   <Route path="/edit" element={<Ordres />} />
+  <Route path="/editrefactored" element={<OrdresRefactored />} />
   <Route path="/user" element={<User />} />
   <Route path="/process" element={<Process />} />
   <Route path="/transport" element={<Transport />} />

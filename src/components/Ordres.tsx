@@ -264,12 +264,14 @@ const Ordres = () => {
                     for (let i = 0; i < splitted.length; i++) {
                         if (orderStringify.includes(splitted[i].toLowerCase())) {
                             temp++;
+                            alert("includes")
                         }
                     }
                     if (temp === splitted.length) {
 
                         for (let i = 0; i < datesList.length; i++) {
                             if (orderStringify.includes(datesList[i])) {
+                                alert(true)
                                 return true;
                             }
                         }
