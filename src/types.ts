@@ -9,33 +9,47 @@ export type Users = {
 
 export type Orders = {
   code: string;
+  corte: boolean;
   corteUser: string;
   corteStarted: string;
   corteEnded: string;
+  cajones: boolean;
   cajonesUser: string;
   cajonesStarted: string;
   cajonesEnded: string;
+  unero: boolean;
   uneroUser: string;
   uneroStarted: string;
   uneroEnded: string;
+  montaje: boolean;
   montajeUser: string;
   montajeStarted: string;
   montajeEnded: string;
+  espejos: boolean;
   espejosUser: string;
   espejosStarted: string;
   espejosEnded: string;
+  admin: boolean;
   adminUser: string;
   adminStarted: string;
   adminEnded: string;
+  canteado: boolean;
   canteadoUser: string;
   canteadoStarted: string;
   canteadoEnded: string;
+  mecanizado: boolean;
   mecanizadoUser: string;
   mecanizadoStarted: string;
   mecanizadoEnded: string;
+  embalaje: boolean;
   embalajeUser: string;
   embalajeStarted: string;
   embalajeEnded: string;
+  laca: boolean;
+  lacaUser: string;
+  lacaStarted: string;
+  lacaEnded: string;
+  
 }
 
 export interface Transports {
