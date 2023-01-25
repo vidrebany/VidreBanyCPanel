@@ -64,36 +64,34 @@ const Process = () => {
             //filter ordersList order.code and corteUser based on splitted[i]
 
             //split splitted[i] by space
-                // eslint-disable-next-line array-callback-return
-                for (let id in ordersConstList) {
+            // eslint-disable-next-line array-callback-return
+            for (let id in ordersConstList) {
 
-                    for (let id2 in ordersConstList[id]) {
+                for (let id2 in ordersConstList[id]) {
 
-                        for (let id3 in ordersConstList[id][id2]) {
+                    for (let id3 in ordersConstList[id][id2]) {
 
 
 
-                            if (ordersConstList[id][id2][id3].code !== undefined) {
+                        if (ordersConstList[id][id2][id3].code !== undefined) {
 
-                                if (ordersConstList[id][id2][id3].user !== undefined) {
-                                   if (ordersConstList[id][id2][id3].started !== undefined) {
+                            if (ordersConstList[id][id2][id3].user !== undefined) {
+                                if (ordersConstList[id][id2][id3].started !== undefined) {
 
-                                        if (dates.length > 0) {
-                                            for (let date in dates) {
+                                    if (dates.length > 0) {
+                                        for (let date in dates) {
 
-                                                if (ordersConstList[id][id2][id3].started.toLowerCase().includes(dates[date].toLowerCase())) {
+                                            if (ordersConstList[id][id2][id3].started.toLowerCase().includes(dates[date].toLowerCase())) {
+                                                newOrdersList[id] = ordersConstList[id];
+                                            }
+                                            else if (ordersConstList[id][id2][id3].ended !== undefined) {
+                                                if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(dates[date].toLowerCase())) {
                                                     newOrdersList[id] = ordersConstList[id];
-                                                }
-                                                else if (ordersConstList[id][id2][id3].ended !== undefined) {
-                                                    if (ordersConstList[id][id2][id3].ended.toLowerCase().includes(dates[date].toLowerCase())) {
-                                                        newOrdersList[id] = ordersConstList[id];
-                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
-
                             }
 
                         }
@@ -101,7 +99,9 @@ const Process = () => {
                     }
 
                 }
-            
+
+            }
+
 
 
 
@@ -267,7 +267,7 @@ const Process = () => {
 
         });
 
-    }, [todoRef]);
+    }, []);
 
 
 
@@ -308,8 +308,8 @@ const Process = () => {
                 ordersTotal = 0;
 
             });
-
         } else {
+
             let puntuation = 0;
             let ordersTotal = 0;
             //get total puntuation from ordersConstList by splitting the order code by X and getting the [1] index which is the puntuation
@@ -377,8 +377,8 @@ const Process = () => {
                                                 }
                                             }
                                         } else {
-                                                newOrdersList[id] = ordersConstList[id];
-                                            
+                                            newOrdersList[id] = ordersConstList[id];
+
                                         }
                                     }
                                 } else if (ordersConstList[id][id2][id3].user !== undefined) {

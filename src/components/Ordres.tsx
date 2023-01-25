@@ -1,7 +1,7 @@
 import Navbar from './Navbar';
 import { Orders } from "../types";
 import { useEffect, useState } from "react";
-import { getDatabase, ref, set, onValue, remove, update, get } from "firebase/database";
+import { getDatabase, ref, set, onValue, remove, update } from "firebase/database";
 import firebaseApp from "../firebase";
 import dayjs, { Dayjs } from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -57,8 +57,8 @@ const Ordres = () => {
     
                 for (let id in orders) {
                     if (JSON.stringify(orders[id]).toLocaleLowerCase().includes(searchText.toLocaleLowerCase()) &&
-                    (startDate === null || dayjs(orders[id].adminStarted).isAfter(startDate) || dayjs(orders[id].corteStarted).isAfter(startDate)) &&
-                    (endDate === null || dayjs(orders[id].adminEnded).isBefore(endDate) || dayjs(orders[id].corteEnded).isBefore(endDate))) {
+                    (startDate === null || dayjs(orders[id].adminStarted).isAfter(startDate) || dayjs(orders[id].corteStarted).isAfter(startDate) || dayjs(orders[id].canteadoStarted).isAfter(startDate) || dayjs(orders[id].mecanizadoStarted).isAfter(startDate) || dayjs(orders[id].lacaStarted).isAfter(startDate) || dayjs(orders[id].cajonesStarted).isAfter(startDate) || dayjs(orders[id].uneroStarted).isAfter(startDate) || dayjs(orders[id].montajeStarted).isAfter(startDate)  || dayjs(orders[id].espejosStarted).isAfter(startDate) || dayjs(orders[id].embalajeStarted).isAfter(startDate)) &&
+                    (endDate === null || dayjs(orders[id].adminEnded).isBefore(endDate) || dayjs(orders[id].corteEnded).isBefore(endDate) || dayjs(orders[id].canteadoEnded).isBefore(endDate) || dayjs(orders[id].mecanizadoEnded).isBefore(endDate) || dayjs(orders[id].lacaEnded).isBefore(endDate) || dayjs(orders[id].cajonesEnded).isBefore(endDate) || dayjs(orders[id].uneroEnded).isBefore(endDate) || dayjs(orders[id].montajeEnded).isBefore(endDate) || dayjs(orders[id].espejosEnded).isBefore(endDate) || dayjs(orders[id].embalajeEnded).isBefore(endDate))) {
                         newOrdersList.push({ id, ...orders[id] });
 
                     }

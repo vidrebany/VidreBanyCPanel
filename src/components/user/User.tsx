@@ -371,10 +371,8 @@ const User = () => {
                 for (let id in ordersConstList) {
                     for (let id2 in ordersConstList[id]) {
                         for (let id3 in ordersConstList[id][id2]) {
-                            console.log("test")
                             if (ordersConstList[id][id2][id3].code !== undefined) {
                                 if (ordersConstList[id][id2][id3].code.toLowerCase().includes(splitted[i].toLowerCase())) {
-                                    console.log("includes code")
                                     if (datesList.length > 0) {
                                         for (let date in datesList) {
                                             if (date !== null && ordersConstList[id][id2][id3].started !== undefined) {
