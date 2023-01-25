@@ -50,7 +50,6 @@ const User = () => {
         //set dates list
 
         if (startDate != null && newEndDate != null) {
-            var value = "";
 
             var dates = getDates(startDate, newEndDate);
             setDatesList(dates);
@@ -62,6 +61,7 @@ const User = () => {
             //get total puntuation from ordersConstList by splitting the order code by X and getting the [1] index which is the puntuation
             var newOrdersList: any = [];
 
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             temp++;
 
             //filter ordersList order.code and corteUser based on splitted[i]
@@ -310,7 +310,6 @@ const User = () => {
 
     }, []);
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(232)
 
         if ((e.target.value) === "" && startDate === null && endDate === null) {
             onValue(todoRef, (snapshot) => {
@@ -352,7 +351,6 @@ const User = () => {
                 setCode(code)
                 setProcess(process)
             });
-            console.log(234)
 
         } else {
             let puntuation = 0;
@@ -366,7 +364,6 @@ const User = () => {
 
             //split splitted[i] by space
             const splitted = e.target.value.split(" ");
-            console.log(23)
             for (let i = 0; i < splitted.length; i++) {
                 for (let id in ordersConstList) {
                     for (let id2 in ordersConstList[id]) {

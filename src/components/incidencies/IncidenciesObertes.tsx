@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 import "./styles/IncidenciesObertes.css"
 import { getStorage, ref as refStorage, deleteObject } from "firebase/storage";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
 
 const IncidenciesObertes = () => {
@@ -126,15 +126,15 @@ const IncidenciesObertes = () => {
         <div className="container" style={{ textAlign: 'center' }}>
             <Navbar />
             <div>
-                <h1 style={{ textAlign: 'center' }}>Inconformitats</h1>
+                <h1 style={{ textAlign: 'center' }}>No conformitats</h1>
             </div>
 
             {/*Sepparate from Navbar 150px*/}
 
-            <h3>Llista inconformitats obertes</h3>
+            <h3>Llista no conformitats obertes</h3>
             <Stack spacing={2} direction="row">
                 <Button onClick={() => navigate('/incidencies')} variant="contained">Tornar</Button>
-                <Button onClick={() => navigate('/addincidencia')} variant="contained">Nova inconformitat</Button>
+                <Button onClick={() => navigate('/addincidencia')} variant="contained">Nova no conformitat</Button>
             </Stack>
 
             {/*Map inconformitatsList in case it's not null*/}
@@ -201,11 +201,11 @@ const IncidenciesObertes = () => {
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle id="alert-dialog-title">
-                    {"Estás segur/a que vols eliminar aquesta inconformitat?"}
+                    {"Estás segur/a que vols eliminar aquesta no conformitat?"}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        En eliminar aquesta inconformitat, tots els seus registres i arxius es perdran.
+                        En eliminar aquesta no conformitat, tots els seus registres i arxius es perdran.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

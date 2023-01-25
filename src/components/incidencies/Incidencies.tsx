@@ -15,11 +15,11 @@ const Incidencies = () => {
         return (
             <div>
                 <Navbar />
-                <h1>Inconformitats</h1>
+                <h1>No conformitats</h1>
                 <Stack className="Stack" spacing={4} direction="column">
-                    <Button onClick={() => navigate('/addincidencia')} variant="contained">Nova Inconformitat</Button>
-                    <Button onClick={() => navigate('/incidenciesobertes')} variant="contained">INCONFORMITATS Obertes</Button>
-                    <Button onClick={() => navigate('/incidenciestancades')} variant="contained">Inconformitats Tancades</Button>
+                    <Button onClick={() => navigate('/addincidencia')} variant="contained">Nova No conformitat</Button>
+                    <Button onClick={() => navigate('/incidenciesobertes')} variant="contained">NO CONFORMITATS Obertes</Button>
+                    <Button onClick={() => navigate('/incidenciestancades')} variant="contained">No conformitats Tancades</Button>
                 </Stack>
             </div>
         );

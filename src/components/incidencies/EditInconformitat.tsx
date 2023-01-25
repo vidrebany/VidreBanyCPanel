@@ -463,7 +463,7 @@ const EditInconformitat = () => {
                 style={{ display: 'none' }}
                 accept="*"
                 multiple={false} />
-            <h1>Editar inconformitat</h1>
+            <h1>Editar no conformitat</h1>
             <Button onClick={() => navigate('/incidenciesobertes')} variant="contained">Tornar</Button>
 
             <Stack className="MasterStack" spacing={4} direction="column">
@@ -736,7 +736,7 @@ const EditInconformitat = () => {
                 {/*Input for document*/}
             </Stack>
             <Stack style={{ margin: "30px" }} className="StackCheck" spacing={1} direction="row">
-                <Button onClick={() => editIncidencia()} variant="contained">EDITAR INCONFORMITAT</Button>
+                <Button onClick={() => editIncidencia()} variant="contained">EDITAR NO CONFORMITAT</Button>
             </Stack>
 
             <Dialog
@@ -746,7 +746,7 @@ const EditInconformitat = () => {
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle id="alert-dialog-title">
-                    {"Estás segur/a que vols eliminar aquesta inconformitat?"}
+                    {"Estás segur/a que vols eliminar aquesta no conformitat?"}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">

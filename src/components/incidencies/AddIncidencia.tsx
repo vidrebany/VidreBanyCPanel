@@ -347,7 +347,7 @@ const Incidencies = () => {
                 style={{ display: 'none' }}
                 accept="*"
                 multiple={false} />
-            <h1>Afegir nova inconformitat</h1>
+            <h1>Afegir nova no conformitat</h1>
             <Button onClick={() => navigate('/incidencies')} variant="contained">Tornar</Button>
 
             <Stack className="MasterStack" spacing={4} direction="column">
@@ -391,7 +391,7 @@ const Incidencies = () => {
             </Stack>
 
             {/*NC (field for Número Comanda*/}
-            <Stack className="Stack" spacing={1} direction="row">
+            <Stack className="Stack" spacing={1} direction={{xs: "column", sm: 'row'}}>
                 <Stack spacing={1} direction="column">
 
                     <h6>NC:</h6>
@@ -451,7 +451,7 @@ const Incidencies = () => {
 
             <h3>Dades distribuïdor:</h3>
             {/*C. Distribuidor (field for distributor code)*/}
-            <Stack className="Stack" spacing={1} direction="row">
+            <Stack className="Stack" spacing={1} direction={{xs: "column", sm: 'row'}}>
                 <h6>Codi:</h6>
                 <TextField
                     id="outlined-multiline-static"
@@ -486,7 +486,7 @@ const Incidencies = () => {
 
             <h3>Dades trucador:</h3>
             {/*Nom trucador*/}
-            <Stack className="Stack" spacing={1} direction="row">
+            <Stack className="Stack" spacing={1} direction={{xs: "column", sm: 'row'}}>
                 <h6>Nom:</h6>
                 <TextField
                     id="outlined-multiline-static"
@@ -520,7 +520,7 @@ const Incidencies = () => {
             </Stack>
             <h3>Dades client final:</h3>
             {/*Nom trucador*/}
-            <Stack className="Stack" spacing={1} direction="row">
+            <Stack className="Stack" spacing={1} direction={{xs: "column", sm: 'row'}}>
                 {/*Direcció client final */}
                 <h6>Direcció:</h6>
                 <TextField
@@ -621,7 +621,7 @@ const Incidencies = () => {
                 {/*Enviar button*/}
             </Stack>
             <Stack style={{ margin: "30px" }} className="StackCheck" spacing={1} direction="row">
-                <Button onClick={() => submitIncidencia()} variant="contained">NOVA INCONFORMITAT</Button>
+                <Button onClick={() => submitIncidencia()} variant="contained">NOVA NO CONFORMITAT</Button>
             </Stack>
         </div >
     );
