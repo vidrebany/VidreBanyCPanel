@@ -28,7 +28,7 @@ const Incidencies = () => {
     );
 
     const [adminId, setAdminId] = useState(''); const [comandaType, setComandaType] = useState(''); const [adminsList, setAdminsList] = useState<AdminsData[]>([]); const [formaRegistre, setFormaRegistre] = useState('');
-
+    const [adminName, setAdminName] = useState('');
 
     const [comandaNum, setComandaNum] = useState('');
 
@@ -55,6 +55,9 @@ const Incidencies = () => {
     };
     const handleRegistradorSelectChange = (event: SelectChangeEvent) => {
         setAdminId(event.target.value as string);
+        let adminName = adminsList.find(admin => admin.id === event.target.value)?.name;
+        setAdminName(adminName || '');
+
 
     };
     const handleDateChange = (newValue: Dayjs | null) => {
@@ -340,6 +343,34 @@ const Incidencies = () => {
 
     }
 
+    function startSendEmail(): void {
+        //send mail to correuTrucador and correuDistribuidor
+        /*Estimado cliente,
+        Le confirmamos que su notificación con referencia NC{ncNum}
+        ha sido correctamente registrada y que en un plazo de 24-48 horas
+        recibirá una respuesta al respecto.
+        Comentarios no conformidad:
+        {comentarisNC}
+        
+        Muy atentamente,
+        {adminName}
+        */
+        const mailBody = "Estimado cliente,\nLe confirmamos que su notificación con referencia NC" + ncNum + "\nha sido correctamente registrada y que en un plazo de 24-48 horas\nrecibirá una respuesta al respecto.\n\nComentarios no conformidad:\n" + comentarisNC + "\n\nMuy atentamente,\n" + adminName;
+        const mailSubject = `Notificación NC${ncNum} registrada`;
+        //mail to correuTrucador and correuDistribuidor
+        sendEmail(correuTrucador, correuDistribuidor, mailSubject, mailBody);
+    }
+
+    function sendEmail(correuTrucador: string, correuDistribuidor: string, mailSubject: string, mailBody: string) {
+        const mail = {
+            to: `${correuTrucador},${correuDistribuidor}`,
+            subject: mailSubject,
+            body: encodeURIComponent(mailBody)
+        }
+        window.open(`mailto:${mail.to}?subject=${mail.subject}&body=${mail.body}`, '_blank');
+        
+    }
+
     return (
         <div>
             <Navbar />
@@ -621,6 +652,9 @@ const Incidencies = () => {
                 {/*Enviar button*/}
             </Stack>
             <Stack style={{ margin: "30px" }} className="StackCheck" spacing={1} direction="row">
+                <Button onClick={() => startSendEmail()} variant="contained">ENVIAR MAIL</Button>
+            </Stack>
+            <Stack style={{ margin: "30px" }} className="StackCheck" spacing={1} direction="row">
                 <Button onClick={() => submitIncidencia()} variant="contained">NOVA NO CONFORMITAT</Button>
             </Stack>
         </div >
@@ -629,3 +663,5 @@ const Incidencies = () => {
 }
 
 export default Incidencies;
+
+
