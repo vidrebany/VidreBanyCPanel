@@ -61,6 +61,7 @@ const InconformitatsTancades = () => {
                             downloadURL: data[key].downloadURL,
                             fileTitle: data[key].fileTitle,
                             resolucio: data[key].resolucio || '',
+                            resolucioTimestamp: data[key].resolucioTimestamp || '',
                             state: data[key].state,
                         }
                         inconformitatsListTemp.push(incidencia);
@@ -175,7 +176,7 @@ const InconformitatsTancades = () => {
                                         </Stack>
 
                                         <p><b>Comentaris: </b>{"\n" + incidencia.comentarisNC}</p>
-                                        {incidencia.state !== "pendent" ? <p><b>Resolució: </b>{"\n" + incidencia.resolucio}</p> : <p></p>}
+                                        {incidencia.state !== "pendent" ? <p><b>Resolució ({dayjs(parseInt(incidencia.resolucioTimestamp)).format("DD/MM/YYYY - HH:mm").toString()}):</b>{"\n" + incidencia.resolucio}</p> : <p></p>}
                                         {incidencia.downloadURL !== "" ? <a href={`${incidencia.downloadURL}`} rel="noreferrer" target="_blank">{incidencia.fileTitle}</a> : <p>No hi ha fitxer adjunt</p>}
 
 

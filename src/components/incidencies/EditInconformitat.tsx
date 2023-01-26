@@ -38,9 +38,13 @@ const EditInconformitat = () => {
     const [incidencia, setIncidencia] = useState<Incidencia>();
 
     const [timestamp, setTimestamp] = useState(dayjs().valueOf.toString());
+    const [resolutionTimestamp, setResolutionTimestamp] = useState(dayjs().valueOf.toString());
 
     //get current date and time (in day month year minutes and hours format) using dayjs and transforming to Dayjs type
     const [date, setDate] = useState<Dayjs | null>(
+        dayjs(),
+    );
+    const [resolutionDate, setResolutionDate] = useState<Dayjs | null>(
         dayjs(),
     );
 
@@ -74,7 +78,7 @@ const EditInconformitat = () => {
         onValue(incidenciesRef, (snapshot) => {
             const data = snapshot.val();
             let incidenciaTemp: Incidencia = {
-                key: data.key ? data.key : null,
+                key: data.key ? data.key : '',
                 ncNum: data.ncNum,
                 //check if date is not undefined, if it is, set it to current date
                 date: data.date,
@@ -97,6 +101,7 @@ const EditInconformitat = () => {
                 downloadURL: data.downloadURL,
                 fileTitle: data.fileTitle,
                 resolucio: data.resolucio || '',
+                resolucioTimestamp: data.resolucioTimestamp || '',
                 state: data.state,
             }
             setIncidencia(incidenciaTemp);
@@ -132,6 +137,13 @@ const EditInconformitat = () => {
             setProducteChecked(incidenciaTemp.serveioproducte === 'producte');
             setState(incidenciaTemp.state);
             setResolution(incidenciaTemp.resolucio);
+
+            if (incidenciaTemp.resolucioTimestamp) {
+                setResolutionDate(dayjs(parseInt(incidenciaTemp.resolucioTimestamp)));
+                setResolutionTimestamp(incidenciaTemp.resolucioTimestamp);
+            }
+
+
             setResolvedChecked(incidenciaTemp.state === 'resolta');
             setUnresolvedChecked(incidenciaTemp.state === 'pendent');
 
@@ -167,10 +179,15 @@ const EditInconformitat = () => {
         setAdminId(event.target.value as string);
 
     };
-    const handleDateChange = (newValue: Dayjs | null) => {
+    const handleDateChange = (newValue: Dayjs | null) => {        
         setDate(newValue);
         let timestamp = newValue?.valueOf();
         setTimestamp(timestamp?.toString() || '');
+    };
+    const handleResolutionDateChange = (newValue: Dayjs | null) => {
+        setResolutionDate(newValue);
+        let resolutionTimestamp = newValue?.valueOf();
+        setResolutionTimestamp(resolutionTimestamp?.toString() || '');
     };
     const handleServeiCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (producteChecked) {
@@ -351,6 +368,7 @@ const EditInconformitat = () => {
                             downloadURL: downloadURLTemp,
                             fileTitle: fileTitleTemp,
                             resolucio: resolution || '',
+                            resolucioTimestamp: resolutionTimestamp || '',
                             state: resolvedChecked ? 'resolta' : 'pendent',
                         };
                         await set(dbRef, incidencia);
@@ -397,6 +415,7 @@ const EditInconformitat = () => {
                                         downloadURL: downloadURL,
                                         fileTitle: fileTitle,
                                         resolucio: resolution || '',
+                                        resolucioTimestamp: resolutionTimestamp || '',
                                         state: state,
                                     };
                                     set(dbRef, incidencia);
@@ -787,8 +806,8 @@ const EditInconformitat = () => {
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DateTimePicker
                                 label="Date&Time picker"
-                                value={date}
-                                onChange={handleDateChange}
+                                value={resolutionDate}
+                                onChange={handleResolutionDateChange}
                                 inputFormat="DD/MM/YYYY HH:mm"
                                 renderInput={(params) => <TextField {...params} />}
                             />

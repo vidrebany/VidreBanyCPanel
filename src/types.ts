@@ -136,6 +136,7 @@ export interface Incidencia {
   downloadURL: string;
   fileTitle: string;
   resolucio: string;
+  resolucioTimestamp: string;
   state: string;
 }
 

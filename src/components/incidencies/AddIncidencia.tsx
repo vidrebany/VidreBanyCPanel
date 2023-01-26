@@ -27,6 +27,16 @@ const Incidencies = () => {
     }
     );
 
+    const [resolutionTimestamp, setResolutionTimestamp] = useState(dayjs().valueOf.toString());
+    //get current date and time (in day month year minutes and hours format) using dayjs and transforming to Dayjs type
+    const [resolutionDate, setResolutionDate] = useState<Dayjs | null>(() => {
+        setResolutionTimestamp(dayjs().valueOf().toString());
+        return dayjs();
+
+    });
+
+
+
     const [adminId, setAdminId] = useState(''); const [comandaType, setComandaType] = useState(''); const [adminsList, setAdminsList] = useState<AdminsData[]>([]); const [formaRegistre, setFormaRegistre] = useState('');
     const [adminName, setAdminName] = useState('');
 
@@ -43,7 +53,7 @@ const Incidencies = () => {
     const [comentarisNC, setComentarisNC] = useState('');
 
     const [serveiChecked, setServeiChecked] = useState(false); const [producteChecked, setProducteChecked] = useState(false);
-    
+
     const [resolvedChecked, setResolvedChecked] = useState(false);
     const [unresolvedChecked, setUnresolvedChecked] = useState(true);
 
@@ -71,6 +81,13 @@ const Incidencies = () => {
         let timestamp = newValue?.valueOf();
         setTimestamp(timestamp?.toString() || '');
     };
+
+    const handleResolutionDateChange = (newValue: Dayjs | null) => {
+        setResolutionDate(newValue);
+        let resolutionTimestamp = newValue?.valueOf();
+        setResolutionTimestamp(resolutionTimestamp?.toString() || '');
+    };
+
     const handleServeiCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (producteChecked) {
             setProducteChecked(false);
@@ -78,7 +95,7 @@ const Incidencies = () => {
         setServeiChecked(event.target.checked);
 
     };
-    
+
     const handleProducteCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (serveiChecked) {
             setServeiChecked(false);
@@ -285,6 +302,7 @@ const Incidencies = () => {
                                 downloadURL: '',
                                 fileTitle: '',
                                 resolucio: resolution || '',
+                                resolucioTimestamp: resolutionTimestamp || '',
                                 state: resolvedChecked ? 'resolta' : 'pendent',
                             };
                             set(newIncidenciaRef, incidencia);
@@ -337,8 +355,9 @@ const Incidencies = () => {
                                         downloadURL: downloadURL,
                                         fileTitle: fileTitle,
                                         resolucio: resolution || '',
+                                        resolucioTimestamp: resolutionTimestamp || '',
                                         state: resolvedChecked ? 'resolta' : 'pendent',
-                                
+
                                     };
                                     set(newIncidenciaRef, incidencia);
 
@@ -616,7 +635,7 @@ const Incidencies = () => {
 
             <h3>Dades producte:</h3>
             <Stack className="Stack" spacing={1} direction="column">
-                <Stack sx={{ display: producteDisplay }} spacing={1} direction="row">
+                <Stack sx={{ display: producteDisplay }} spacing={1}  direction={{ xs: "column", sm: 'row' }}>
                     <Stack spacing={1} direction="column">
 
                         <h6>Ref. producte:</h6>
@@ -682,9 +701,9 @@ const Incidencies = () => {
             </Stack>
 
             <Stack className="Stack" spacing={1} direction="column">
-                <Stack sx={{ display: resolutionDisplay }} spacing={1} direction="row">
-                    {/*Tlf*/}
-                    <Stack spacing={1} direction="column">
+                <Stack sx={{ display: resolutionDisplay }} spacing={1} direction={{ xs: "column", sm: 'row' }}>
+                   {/*Resolution*/}
+                   <Stack spacing={1} direction="column">
                         <h6>Resolució:</h6>
                         <TextField
                             id="outlined-multiline-static"
@@ -699,6 +718,19 @@ const Incidencies = () => {
                             }}
                         />
                     </Stack>
+                    <Stack spacing={1} direction="column">
+                        <h6>Data resolució:</h6>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DateTimePicker
+                                label="Date&Time picker"
+                                value={resolutionDate}
+                                onChange={handleResolutionDateChange}
+                                inputFormat="DD/MM/YYYY HH:mm"
+                                renderInput={(params) => <TextField {...params} />}
+                            />
+                        </LocalizationProvider>
+                    </Stack>
+
                 </Stack>
                 <Stack spacing={1} direction="row">
 
