@@ -37,8 +37,8 @@ const EditInconformitat = () => {
     //get one Incidencia interface object
     const [incidencia, setIncidencia] = useState<Incidencia>();
 
-    const [timestamp, setTimestamp] = useState('');
-    
+    const [timestamp, setTimestamp] = useState(dayjs().valueOf.toString());
+
     //get current date and time (in day month year minutes and hours format) using dayjs and transforming to Dayjs type
     const [date, setDate] = useState<Dayjs | null>(
         dayjs(),
@@ -54,6 +54,7 @@ const EditInconformitat = () => {
     const [nomTrucador, setNomTrucador] = useState(''); const [correuTrucador, setCorreuTrucador] = useState(''); const [tlfTrucador, setTlfTrucador] = useState('');
 
     const [direccioClientFinal, setDireccioClientFinal] = useState(''); const [tlfClientFinal, setTlfClientFinal] = useState('');
+    const [resolution, setResolution] = useState('');
 
     const [refProducte, setRefProducte] = useState(''); const [descrProducte, setDescrProducte] = useState('');
 
@@ -64,6 +65,9 @@ const EditInconformitat = () => {
     const [producteDisplay, setProducteDisplay] = useState('none');
     const [error, setError] = useState('');
     const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
+    const [resolutionDisplay, setResolutionDisplay] = useState('none');
+    const [resolvedChecked, setResolvedChecked] = useState(false);
+    const [unresolvedChecked, setUnresolvedChecked] = useState(true);
 
 
     useEffect(() => {
@@ -92,6 +96,7 @@ const EditInconformitat = () => {
                 serveioproducte: data.serveioproducte,
                 downloadURL: data.downloadURL,
                 fileTitle: data.fileTitle,
+                resolucio: data.resolucio || '',
                 state: data.state,
             }
             setIncidencia(incidenciaTemp);
@@ -106,13 +111,12 @@ const EditInconformitat = () => {
             setAdminId(incidenciaTemp.adminId);
             setComandaType(incidenciaTemp.comandaType);
             setFormaRegistre(incidenciaTemp.formaRegistre);
-            setDate(() => {
-                if (incidenciaTemp.date) {
-                    return dayjs(parseInt(incidenciaTemp.date));
-                } else {
-                    return dayjs();
-                }
-            });
+
+            if (incidenciaTemp.date) {
+                setDate(dayjs(parseInt(incidenciaTemp.date)));
+                setTimestamp(incidenciaTemp.date);
+            }
+
             setNcNum(incidenciaTemp.ncNum);
             setComandaNum(incidenciaTemp.comandaNum);
             setCodiDistribuidor(incidenciaTemp.codiDistribuidor);
@@ -127,6 +131,10 @@ const EditInconformitat = () => {
             setServeiChecked(incidenciaTemp.serveioproducte === 'servei');
             setProducteChecked(incidenciaTemp.serveioproducte === 'producte');
             setState(incidenciaTemp.state);
+            setResolution(incidenciaTemp.resolucio);
+            setResolvedChecked(incidenciaTemp.state === 'resolta');
+            setUnresolvedChecked(incidenciaTemp.state === 'pendent');
+
             if (incidenciaTemp.serveioproducte === 'producte') {
                 setProducteDisplay('');
                 setRefProducte(incidenciaTemp.refProducte);
@@ -176,6 +184,21 @@ const EditInconformitat = () => {
             setServeiChecked(false);
         }
         setProducteChecked(event.target.checked);
+
+    };
+    const handleResolvedChecked = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (unresolvedChecked) {
+            setUnresolvedChecked(false);
+        }
+        setResolvedChecked(event.target.checked);
+
+    };
+
+    const handleUnresolvedCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (resolvedChecked) {
+            setResolvedChecked(false);
+        }
+        setUnresolvedChecked(event.target.checked);
 
     };
 
@@ -252,6 +275,16 @@ const EditInconformitat = () => {
         }
     }, [producteChecked])
 
+    useEffect(() => {
+
+        if (resolvedChecked) {
+            setResolutionDisplay('');
+        } else {
+            setResolutionDisplay('none');
+            setRefProducte('');
+            setDescrProducte('');
+        }
+    }, [resolvedChecked])
 
 
 
@@ -317,7 +350,8 @@ const EditInconformitat = () => {
                             serveioproducte: serveioproducte,
                             downloadURL: downloadURLTemp,
                             fileTitle: fileTitleTemp,
-                            state: state,
+                            resolucio: resolution || '',
+                            state: resolvedChecked ? 'resolta' : 'pendent',
                         };
                         await set(dbRef, incidencia);
 
@@ -362,6 +396,7 @@ const EditInconformitat = () => {
                                         serveioproducte: serveioproducte,
                                         downloadURL: downloadURL,
                                         fileTitle: fileTitle,
+                                        resolucio: resolution || '',
                                         state: state,
                                     };
                                     set(dbRef, incidencia);
@@ -464,7 +499,7 @@ const EditInconformitat = () => {
                 accept="*"
                 multiple={false} />
             <h1>Editar no conformitat</h1>
-            <Button onClick={() => navigate('/incidenciesobertes')} variant="contained">Tornar</Button>
+            <Button onClick={() => resolvedChecked ? navigate('/inconformitatstancades') : navigate('/incidenciesobertes')} variant="contained">Tornar</Button>
 
             <Stack className="MasterStack" spacing={4} direction="column">
 
@@ -507,7 +542,7 @@ const EditInconformitat = () => {
             </Stack>
 
             {/*NC (field for Número Comanda*/}
-            <Stack className="Stack" spacing={1} direction="row">
+            <Stack className="Stack" spacing={1} direction={{ xs: "column", sm: 'row' }}>
                 <Stack spacing={1} direction="column">
 
                     <h6>NC:</h6>
@@ -567,7 +602,7 @@ const EditInconformitat = () => {
 
             <h3>Dades distribuïdor:</h3>
             {/*C. Distribuidor (field for distributor code)*/}
-            <Stack className="Stack" spacing={1} direction="row">
+            <Stack className="Stack" spacing={1} direction={{ xs: "column", sm: 'row' }}>
                 <h6>Codi:</h6>
                 <TextField
                     id="outlined-multiline-static"
@@ -602,7 +637,7 @@ const EditInconformitat = () => {
 
             <h3>Dades trucador:</h3>
             {/*Nom trucador*/}
-            <Stack className="Stack" spacing={1} direction="row">
+            <Stack className="Stack" spacing={1} direction={{ xs: "column", sm: 'row' }}>
                 <h6>Nom:</h6>
                 <TextField
                     id="outlined-multiline-static"
@@ -636,7 +671,7 @@ const EditInconformitat = () => {
             </Stack>
             <h3>Dades client final:</h3>
             {/*Nom trucador*/}
-            <Stack className="Stack" spacing={1} direction="row">
+            <Stack className="Stack" spacing={1} direction={{ xs: "column", sm: 'row' }}>
                 {/*Direcció client final */}
                 <h6>Direcció:</h6>
                 <TextField
@@ -664,7 +699,7 @@ const EditInconformitat = () => {
 
             <h3>Dades producte:</h3>
             <Stack className="Stack" spacing={1} direction="column">
-                <Stack sx={{ display: producteDisplay }} spacing={1} direction="row">
+                <Stack sx={{ display: producteDisplay }} spacing={1} direction={{ xs: "column", sm: 'row' }}>
                     <Stack spacing={1} direction="column">
 
                         <h6>Ref. producte:</h6>
@@ -677,7 +712,7 @@ const EditInconformitat = () => {
                             onChange={(e) => setRefProducte(e.target.value)}
                         />
                     </Stack>
-                    {/*Tlf*/}
+                    {/*Descr. product*/}
                     <Stack spacing={1} direction="column">
                         <h6>Descripció:</h6>
                         <TextField
@@ -725,6 +760,59 @@ const EditInconformitat = () => {
                         onChange={(e) => {
                             setComentarisNC(e.target.value)
                         }}
+                    />
+                </Stack>
+            </Stack>
+
+            <Stack className="Stack" spacing={1} direction="column">
+                <Stack sx={{ display: resolutionDisplay }} spacing={1} direction={{ xs: "column", sm: 'row' }}>
+                    {/*Resolution*/}
+                    <Stack spacing={1} direction="column">
+                        <h6>Resolució:</h6>
+                        <TextField
+                            id="outlined-multiline-static"
+                            label="Resolució no conformitat"
+                            type="text"
+                            multiline
+                            rows={2}
+                            value={resolution}
+                            variant="outlined"
+                            onChange={(e) => {
+                                setResolution(e.target.value)
+                            }}
+                        />
+                    </Stack>
+                    <Stack spacing={1} direction="column">
+                        <h6>Data resolució:</h6>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DateTimePicker
+                                label="Date&Time picker"
+                                value={date}
+                                onChange={handleDateChange}
+                                inputFormat="DD/MM/YYYY HH:mm"
+                                renderInput={(params) => <TextField {...params} />}
+                            />
+                        </LocalizationProvider>
+                    </Stack>
+
+
+
+
+
+                </Stack>
+                <Stack spacing={1} direction="row">
+
+                    <h6 style={{ marginTop: "10px" }}>Resolt:</h6>
+                    <Checkbox
+                        checked={resolvedChecked}
+                        onChange={handleResolvedChecked}
+                        inputProps={{ 'aria-label': 'controlled' }}
+                    />
+                    <h6 style={{ marginTop: "10px" }}>Sense resoldre:</h6>
+                    <Checkbox
+                        checked={unresolvedChecked}
+                        onChange={handleUnresolvedCheck}
+                        inputProps={{ 'aria-label': 'controlled' }}
                     />
                 </Stack>
             </Stack>

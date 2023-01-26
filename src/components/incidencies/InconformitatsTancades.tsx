@@ -12,7 +12,7 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } 
 import dayjs from 'dayjs';
 
 
-const IncidenciesObertes = () => {
+const InconformitatsTancades = () => {
     const navigate = useNavigate();
 
     //firebase database
@@ -35,7 +35,7 @@ const IncidenciesObertes = () => {
             let inconformitatsListTemp: Incidencia[] = [];
             for (const key in data) {
                 if (data.hasOwnProperty(key)) {
-                    if (data[key].state === "pendent") {
+                    if (data[key].state === "resolta") {
 
 
                         let incidencia: Incidencia = {
@@ -132,7 +132,7 @@ const IncidenciesObertes = () => {
 
             {/*Sepparate from Navbar 150px*/}
 
-            <h3>Llista no conformitats pendents</h3>
+            <h3>Llista no conformitats resoltes</h3>
             <Stack spacing={2} direction="row">
                 <Button onClick={() => navigate('/incidencies')} variant="contained">Tornar</Button>
                 <Button onClick={() => navigate('/addincidencia')} variant="contained">Nova no conformitat</Button>
@@ -221,6 +221,6 @@ const IncidenciesObertes = () => {
     );
 };
 
-export default IncidenciesObertes;
+export default InconformitatsTancades;
 
 

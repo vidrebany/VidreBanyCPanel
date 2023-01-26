@@ -17,9 +17,9 @@ const Incidencies = () => {
                 <Navbar />
                 <h1>No conformitats</h1>
                 <Stack className="Stack" spacing={4} direction="column">
-                    <Button onClick={() => navigate('/addincidencia')} variant="contained">Nova No conformitat</Button>
-                    <Button onClick={() => navigate('/incidenciesobertes')} variant="contained">NO CONFORMITATS Obertes</Button>
-                    <Button onClick={() => navigate('/incidenciestancades')} variant="contained">No conformitats Tancades</Button>
+                    <Button onClick={() => navigate('/addincidencia')} variant="contained">Nova no conformitat</Button>
+                    <Button onClick={() => navigate('/incidenciesobertes')} variant="contained">No conformitats Obertes</Button>
+                    <Button onClick={() => navigate('/inconformitatstancades')} variant="contained">No conformitats Tancades</Button>
                 </Stack>
             </div>
         );

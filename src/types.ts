@@ -49,7 +49,7 @@ export type Orders = {
   lacaUser: string;
   lacaStarted: string;
   lacaEnded: string;
-  
+
 }
 
 export interface Transports {
@@ -135,6 +135,7 @@ export interface Incidencia {
   serveioproducte: string;
   downloadURL: string;
   fileTitle: string;
+  resolucio: string;
   state: string;
 }
 

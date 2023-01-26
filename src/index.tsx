@@ -21,6 +21,7 @@ import AddTransportOrder from "./components/transports/AddTransportOrder"
 import Incidencies from "./components/incidencies/Incidencies"
 import AddIncidencia from "./components/incidencies/AddIncidencia"
 import IncidenciesObertes from "./components/incidencies/IncidenciesObertes"
+import InconformitatsTancades from "./components/incidencies/InconformitatsTancades"
 import EditInconformitat from "./components/incidencies/EditInconformitat"
 import Admins from "./components/admins/Admins"
 
@@ -59,6 +60,7 @@ root.render(
   <Route path="/incidencies" element={<Incidencies />} />
   <Route path="/addincidencia" element={<AddIncidencia />} />
   <Route path="/incidenciesobertes" element={<IncidenciesObertes />} />
+  <Route path="/inconformitatstancades" element={<InconformitatsTancades />} />
   <Route path="/editinconformitat" element={<EditInconformitat />} />
   <Route path="/admins" element={<Admins />} />
 </Routes>

@@ -20,7 +20,7 @@ const Incidencies = () => {
     const [timestamp, setTimestamp] = useState('');
 
     //get current date and time (in day month year minutes and hours format) using dayjs and transforming to Dayjs type
-    const [date, setDate] = useState<Dayjs | null>( () =>{
+    const [date, setDate] = useState<Dayjs | null>(() => {
         setTimestamp(dayjs().valueOf().toString());
         return dayjs();
 
@@ -39,11 +39,17 @@ const Incidencies = () => {
     const [direccioClientFinal, setDireccioClientFinal] = useState(''); const [tlfClientFinal, setTlfClientFinal] = useState('');
 
     const [refProducte, setRefProducte] = useState(''); const [descrProducte, setDescrProducte] = useState('');
-
+    const [resolution, setResolution] = useState('');
     const [comentarisNC, setComentarisNC] = useState('');
 
     const [serveiChecked, setServeiChecked] = useState(false); const [producteChecked, setProducteChecked] = useState(false);
+    
+    const [resolvedChecked, setResolvedChecked] = useState(false);
+    const [unresolvedChecked, setUnresolvedChecked] = useState(true);
+
     const [producteDisplay, setProducteDisplay] = useState('none');
+    const [resolutionDisplay, setResolutionDisplay] = useState('none');
+
     const [error, setError] = useState('');
 
 
@@ -72,11 +78,28 @@ const Incidencies = () => {
         setServeiChecked(event.target.checked);
 
     };
+    
     const handleProducteCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (serveiChecked) {
             setServeiChecked(false);
         }
         setProducteChecked(event.target.checked);
+
+    };
+
+    const handleResolvedChecked = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (unresolvedChecked) {
+            setUnresolvedChecked(false);
+        }
+        setResolvedChecked(event.target.checked);
+
+    };
+
+    const handleUnresolvedCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (resolvedChecked) {
+            setResolvedChecked(false);
+        }
+        setUnresolvedChecked(event.target.checked);
 
     };
 
@@ -141,6 +164,17 @@ const Incidencies = () => {
             setDescrProducte('');
         }
     }, [producteChecked])
+
+    useEffect(() => {
+
+        if (resolvedChecked) {
+            setResolutionDisplay('');
+        } else {
+            setResolutionDisplay('none');
+            setRefProducte('');
+            setDescrProducte('');
+        }
+    }, [resolvedChecked])
 
 
     //get no conformitats list
@@ -250,7 +284,8 @@ const Incidencies = () => {
                                 serveioproducte: serveioproducte,
                                 downloadURL: '',
                                 fileTitle: '',
-                                state: "oberta",
+                                resolucio: resolution || '',
+                                state: resolvedChecked ? 'resolta' : 'pendent',
                             };
                             set(newIncidenciaRef, incidencia);
 
@@ -301,7 +336,9 @@ const Incidencies = () => {
                                         serveioproducte: serveioproducte,
                                         downloadURL: downloadURL,
                                         fileTitle: fileTitle,
-                                        state: "oberta",
+                                        resolucio: resolution || '',
+                                        state: resolvedChecked ? 'resolta' : 'pendent',
+                                
                                     };
                                     set(newIncidenciaRef, incidencia);
 
@@ -368,7 +405,7 @@ const Incidencies = () => {
             body: encodeURIComponent(mailBody)
         }
         window.open(`mailto:${mail.to}?subject=${mail.subject}&body=${mail.body}`, '_blank');
-        
+
     }
 
     return (
@@ -422,7 +459,7 @@ const Incidencies = () => {
             </Stack>
 
             {/*NC (field for Número Comanda*/}
-            <Stack className="Stack" spacing={1} direction={{xs: "column", sm: 'row'}}>
+            <Stack className="Stack" spacing={1} direction={{ xs: "column", sm: 'row' }}>
                 <Stack spacing={1} direction="column">
 
                     <h6>NC:</h6>
@@ -482,7 +519,7 @@ const Incidencies = () => {
 
             <h3>Dades distribuïdor:</h3>
             {/*C. Distribuidor (field for distributor code)*/}
-            <Stack className="Stack" spacing={1} direction={{xs: "column", sm: 'row'}}>
+            <Stack className="Stack" spacing={1} direction={{ xs: "column", sm: 'row' }}>
                 <h6>Codi:</h6>
                 <TextField
                     id="outlined-multiline-static"
@@ -517,7 +554,7 @@ const Incidencies = () => {
 
             <h3>Dades trucador:</h3>
             {/*Nom trucador*/}
-            <Stack className="Stack" spacing={1} direction={{xs: "column", sm: 'row'}}>
+            <Stack className="Stack" spacing={1} direction={{ xs: "column", sm: 'row' }}>
                 <h6>Nom:</h6>
                 <TextField
                     id="outlined-multiline-static"
@@ -551,7 +588,7 @@ const Incidencies = () => {
             </Stack>
             <h3>Dades client final:</h3>
             {/*Nom trucador*/}
-            <Stack className="Stack" spacing={1} direction={{xs: "column", sm: 'row'}}>
+            <Stack className="Stack" spacing={1} direction={{ xs: "column", sm: 'row' }}>
                 {/*Direcció client final */}
                 <h6>Direcció:</h6>
                 <TextField
@@ -644,7 +681,42 @@ const Incidencies = () => {
                 </Stack>
             </Stack>
 
-            {/*Servicio (checkbox)*/}
+            <Stack className="Stack" spacing={1} direction="column">
+                <Stack sx={{ display: resolutionDisplay }} spacing={1} direction="row">
+                    {/*Tlf*/}
+                    <Stack spacing={1} direction="column">
+                        <h6>Resolució:</h6>
+                        <TextField
+                            id="outlined-multiline-static"
+                            label="Resolució no conformitat"
+                            type="text"
+                            multiline
+                            rows={2}
+                            value={resolution}
+                            variant="outlined"
+                            onChange={(e) => {
+                                setResolution(e.target.value)
+                            }}
+                        />
+                    </Stack>
+                </Stack>
+                <Stack spacing={1} direction="row">
+
+                    <h6 style={{ marginTop: "10px" }}>Resolt:</h6>
+                    <Checkbox
+                        checked={resolvedChecked}
+                        onChange={handleResolvedChecked}
+                        inputProps={{ 'aria-label': 'controlled' }}
+                    />
+                    <h6 style={{ marginTop: "10px" }}>Sense resoldre:</h6>
+                    <Checkbox
+                        checked={unresolvedChecked}
+                        onChange={handleUnresolvedCheck}
+                        inputProps={{ 'aria-label': 'controlled' }}
+                    />
+                </Stack>
+            </Stack>
+
             <Stack style={{ margin: "30px" }} className="StackCheck" spacing={1} direction="row">
 
                 <Button onClick={inputFileClick} variant="contained">{fileTitle}</Button>
