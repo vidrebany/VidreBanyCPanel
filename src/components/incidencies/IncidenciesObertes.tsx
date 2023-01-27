@@ -188,7 +188,7 @@ const IncidenciesObertes = () => {
                                 <div className="listItemContentRight">
                                     <button onClick={() => navigate(`/editinconformitat/`, { state: { incidenciaKey: incidencia.key } })}>Editar</button>
                                     <button onClick={() => beginDeleteIncidencia(incidencia.key, incidencia.downloadURL)}>Eliminar</button>
-                                    <button onClick={() => navigate(`/viewtransportorder/${incidencia.key}`)}>Veure</button>
+                                    {/*<button onClick={() => navigate(`/viewtransportorder/${incidencia.key}`)}>Veure</button>*/}
                                 </div>
                             </div>
                         </div>
