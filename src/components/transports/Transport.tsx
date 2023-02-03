@@ -28,6 +28,7 @@ const Transport = () => {
                 if (data.hasOwnProperty(key)) {
                     let transportOrder: Transports = {
                         id: data[key].id,
+                        albaraNum: data[key].albaraNum,
                         address: data[key].address,
                         clientNum: data[key].clientNum,
                         date: data[key].date,
@@ -81,9 +82,10 @@ const Transport = () => {
                 {transportList.map((transport) => {
                     return (
                         <div className="transportCard" key={transport.id}>
-                            <h3>{transport.clientNum} {transport.transName}</h3>
-                            <p>Adreça: {transport.address}
+                            <h3>{transport.albaraNum} {transport.transName}</h3>
+                            <p>{transport.address}
                             </p>
+                            <p><b>{transport.status}</b></p>
                         </div>
                     );
                 })}

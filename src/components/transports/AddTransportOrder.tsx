@@ -66,6 +66,7 @@ const AddTransportOrder = () => {
 
     const [pdfText, setPdfText] = useState('');
     const [addressTxt, setAddressTxt] = useState('');
+    const [albaraNum, setAlbaraNum] = useState('');
     const [clientNum, setClientNum] = useState('');
     const [fileTitle, setFileTitle] = useState('PUJAR PDF');
     const [firstTel, setFirstTel] = useState('');
@@ -85,6 +86,20 @@ const AddTransportOrder = () => {
         let dadesDiv = document.querySelector(".dadesDiv") as HTMLDivElement;
 
         console.log(pdfText);
+
+        //numero albara
+        const albaraRegex = /\d+\n\s\n/g;
+
+        const albaraMatch = pdfText.match(albaraRegex);
+
+        if (albaraMatch) {
+            //remove \n from albaraMatch
+            const albarMatchString = albaraMatch[0].replace(/\n/g, "");
+            //remove space from albarMatchString
+            const albarMatchString2 = albarMatchString.replace(/\s/g, "");
+
+            setAlbaraNum(albarMatchString2);
+        }
 
         //numero client
         const regex = /(\d+\n\s\n\d+\/\d+\/\d+\n\s\n)\d+/g;
@@ -279,6 +294,7 @@ const AddTransportOrder = () => {
                             }
                             set(newTransportRef, {
                                 id: key,
+                                albaraNum: albaraNum,
                                 clientNum: clientNum,
                                 address: addressTxt,
                                 firstTel: firstTel,
@@ -356,6 +372,15 @@ const AddTransportOrder = () => {
                     </Select>
                 </FormControl>
 
+                <TextField style={{ margin: "10px" }}
+                    id="outlined-multiline-static"
+                    label="Num. albarà"
+                    rows={4}
+                    value={albaraNum}
+                    variant="outlined"
+
+                    onChange={(e) => setAlbaraNum(e.target.value)}
+                />
                 <TextField style={{ margin: "10px" }}
                     id="outlined-multiline-static"
                     label="Num. client"

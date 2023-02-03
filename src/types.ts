@@ -54,6 +54,7 @@ export type Orders = {
 
 export interface Transports {
   address: string;
+  albaraNum: string;
   clientNum: string;
   date: string;
   firstTel: string;
