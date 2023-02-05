@@ -353,7 +353,10 @@ const AddTransportOrder = () => {
             {/*Sepparate from Navbar 150px*/}
 
             <h3>Pujar PDF</h3>
+            <Button onClick={() => navigate('/transport')} variant="contained">Tornar</Button>
+            <br></br>
             <Button onClick={inputFileClick} variant="contained">{fileTitle}</Button>
+
             <div className="dadesDiv">
                 <p><b></b></p>
                 <FormControl fullWidth>

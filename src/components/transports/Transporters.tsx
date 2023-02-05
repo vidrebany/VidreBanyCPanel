@@ -112,6 +112,7 @@ const Transporters = () => {
             <h3>Llista transportistes</h3>
             <Stack spacing={2} direction="column">
                 <Button id="addButton" onClick={() => showFields()} variant="contained">Afegir transportista</Button>
+                <Button onClick={() => navigate('/transport')} variant="contained">Tornar</Button>
                 <TextField className="textField" style={{ margin: "10px" }}
                     id="outlined-multiline-static"
                     label="Nom trans."

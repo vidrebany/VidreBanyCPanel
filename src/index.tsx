@@ -23,6 +23,7 @@ import AddIncidencia from "./components/incidencies/AddIncidencia"
 import IncidenciesObertes from "./components/incidencies/IncidenciesObertes"
 import InconformitatsTancades from "./components/incidencies/InconformitatsTancades"
 import EditInconformitat from "./components/incidencies/EditInconformitat"
+import EditTransport from "./components/transports/EditTransport"
 import Admins from "./components/admins/Admins"
 
 const root = ReactDOM.createRoot(
@@ -63,6 +64,7 @@ root.render(
   <Route path="/inconformitatstancades" element={<InconformitatsTancades />} />
   <Route path="/editinconformitat" element={<EditInconformitat />} />
   <Route path="/admins" element={<Admins />} />
+  <Route path="/transport/edittransport" element={ <EditTransport/> } />
 </Routes>
 </HashRouter>
 );

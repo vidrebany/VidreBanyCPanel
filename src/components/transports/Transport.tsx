@@ -6,7 +6,11 @@ import { getDatabase, ref, onValue } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import { TransportationOptions } from "./components/TransportationOptions";
 import "./styles/Transport.css"
+
+
+
 const Transport = () => {
     const navigate = useNavigate();
 
@@ -17,6 +21,7 @@ const Transport = () => {
 
     //transport list useState that has a list of Transports[] objects
     const [transportList, setTransportList] = useState<Transports[]>([]);
+    
 
     //get transport list
     useEffect(() => {
@@ -48,9 +53,9 @@ const Transport = () => {
             //alert(JSON.stringify(transportListTemp[0].id)); 
 
 
-  
-                setTransportList(transportListTemp);
-            
+
+            setTransportList(transportListTemp);
+
 
 
         });
@@ -86,6 +91,12 @@ const Transport = () => {
                             <p>{transport.address}
                             </p>
                             <p><b>{transport.status}</b></p>
+                            {/*More options button on top right of transportCard*/}
+                            
+                            <TransportationOptions transport={transport}/>
+
+
+
                         </div>
                     );
                 })}
