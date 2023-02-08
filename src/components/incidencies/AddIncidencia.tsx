@@ -1,13 +1,13 @@
 import Navbar from "../Navbar";
 import "./styles/AddIncidencia.css"
-import { Button, Stack, Checkbox, FormControlLabel, TextField, Select, SelectChangeEvent, MenuItem, InputLabel, FormControl } from '@mui/material';
+import { Button, Stack, Checkbox, TextField, Select, SelectChangeEvent, MenuItem, InputLabel, FormControl } from '@mui/material';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers/';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { AdminsData, Incidencia, formaRegistreObject, comandaTypeObject } from "../../types";
 import { useRef, useState, useEffect } from "react";
 
-import { getDatabase, ref, push, set, DatabaseReference, onValue } from "firebase/database";
-import { getStorage, ref as refStorage, deleteObject, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { getDatabase, ref, push, set, onValue } from "firebase/database";
+import { getStorage, ref as refStorage, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import firebaseApp from "../../firebase";
 
 import { useNavigate } from "react-router-dom";
@@ -61,6 +61,10 @@ const Incidencies = () => {
     const [resolutionDisplay, setResolutionDisplay] = useState('none');
 
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        alert(error);
+    }, [error]);
 
 
     const handleFormaRegistreSelectChange = (event: SelectChangeEvent) => {
@@ -401,17 +405,7 @@ const Incidencies = () => {
 
     function startSendEmail(): void {
         //send mail to correuTrucador and correuDistribuidor
-        /*Estimado cliente,
-        Le confirmamos que su notificación con referencia NC{ncNum}
-        ha sido correctamente registrada y que en un plazo de 24-48 horas
-        recibirá una respuesta al respecto.
-        Comentarios no conformidad:
-        {comentarisNC}
-        
-        Muy atentamente,
-        {adminName}
-        */
-        const mailBody = "Estimado cliente,\nLe confirmamos que su notificación con referencia NC" + ncNum + "\nha sido correctamente registrada y que en un plazo de 24-48 horas\nrecibirá una respuesta al respecto.\n\nComentarios no conformidad:\n" + comentarisNC + "\n\nMuy atentamente,\n" + adminName;
+        const mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + "ha sido correctamente registrada y que en un plazo de 24-48 horas recibirá una respuesta al respecto.\n\nMuy atentamente,\n" + adminName;
         const mailSubject = `Notificación NC${ncNum} registrada`;
         //mail to correuTrucador and correuDistribuidor
         sendEmail(correuTrucador, correuDistribuidor, mailSubject, mailBody);

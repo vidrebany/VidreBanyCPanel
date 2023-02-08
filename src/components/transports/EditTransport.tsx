@@ -9,13 +9,11 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import { useRef, useState, useEffect } from "react";
-import { getDatabase, ref, push, set, onValue, update } from "firebase/database";
+import { useState, useEffect } from "react";
+import { getDatabase, ref, onValue, update } from "firebase/database";
 import { TransportersData } from "../../types";
 import firebaseApp from "../../firebase";
-import { pdfjs } from 'react-pdf';
-import { getStorage, ref as refStorage, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { TextItem } from "pdfjs-dist/types/src/display/api";
+import { Checkbox, FormControlLabel } from '@mui/material';
 
 
 
@@ -34,11 +32,20 @@ export default function EditTransport() {
     const db = getDatabase(firebaseApp);
     const [transportista, setTransportista] = useState('');
     const [transList, setTransList] = useState<TransportersData[]>([]);
+    const [transportsPending, setTransportsPending] = useState<boolean>(false);
+
     const handleSelectChange = (event: SelectChangeEvent) => {
         setTransportista(event.target.value as string);
-        alert(event.target.value)
-
     };
+
+    const handleTransportsPendingChange = () => {
+        if (transportsPending) {
+            setTransportsPending(false);
+        } else {
+            setTransportsPending(true);
+        }
+    };
+
     var mounted = false;
 
     //get transport list
@@ -78,13 +85,11 @@ export default function EditTransport() {
         setFirstTel(transport.firstTel);
         setSecondTel(transport.secondTel);
         setObservations(transport.observations);
+        setTransportsPending(transport.status === "pendiente" ? true : false);
     }, []);
 
-    //set worker
-    pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 
-    const [pdfText, setPdfText] = useState('');
     const [addressTxt, setAddressTxt] = useState('');
     const [albaraNum, setAlbaraNum] = useState('');
     const [clientNum, setClientNum] = useState('');
@@ -131,11 +136,12 @@ export default function EditTransport() {
                 observations: observations,
                 date: new Date().toLocaleDateString(),
                 time: new Date().toLocaleTimeString(),
-                status: "pendiente",
+                status: transportsPending ? "pendiente" : "finalizada",
                 transId: transportista,
-                transName: transName});
+                transName: transName
+            });
 
-            
+
         } catch (error: any) {
             alert("error: " + error.message);
             setError(error.message);
@@ -157,7 +163,7 @@ export default function EditTransport() {
             <Alert className="alert" severity="success">Copiat</Alert>
 
             <div>
-                <h1 style={{ textAlign: 'center' }}>Afegir comanda transport</h1>
+                <h1 style={{ textAlign: 'center' }}>Editar comanda transport</h1>
             </div>
 
             {/*Sepparate from Navbar 150px*/}
@@ -168,7 +174,7 @@ export default function EditTransport() {
             <Button onClick={() => window.open(transport.pdfUrl, "_blank")} variant="contained">Veure PDF</Button>
 
             <p><b></b></p>
-            <FormControl fullWidth>
+            <FormControl>
                 <InputLabel id="demo-simple-select-label">Transportista</InputLabel>
                 <Select
                     value={transportista}
@@ -246,7 +252,28 @@ export default function EditTransport() {
 
                 onChange={(e) => setObservations(e.target.value)}
             />
-            <Button onClick={() => uploadTransport()} variant="contained">Afegir comanda</Button>
+
+            <div className="display-flex flex-direction-row">
+                <FormControlLabel
+                    label="Pendents"
+                    control={
+                        <Checkbox
+                            checked={transportsPending}
+                            onChange={handleTransportsPendingChange}
+                        />
+                    }
+                />
+                <FormControlLabel
+                    label="Finalitzats"
+                    control={
+                        <Checkbox
+                            checked={!transportsPending}
+                            onChange={handleTransportsPendingChange}
+                        />
+                    }
+                />
+            </div>
+            <Button onClick={() => uploadTransport()} variant="contained">Editar comanda</Button>
 
         </div>
     )

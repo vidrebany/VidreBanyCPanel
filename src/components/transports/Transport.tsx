@@ -8,6 +8,7 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import { TransportationOptions } from "./components/TransportationOptions";
 import "./styles/Transport.css"
+import { Checkbox, FormControlLabel } from '@mui/material';
 
 
 
@@ -21,7 +22,8 @@ const Transport = () => {
 
     //transport list useState that has a list of Transports[] objects
     const [transportList, setTransportList] = useState<Transports[]>([]);
-    
+    const [transportsPending, setTransportsPending] = useState<boolean>(false);
+
 
     //get transport list
     useEffect(() => {
@@ -46,11 +48,14 @@ const Transport = () => {
                         transId: data[key].transId,
                         transName: data[key].transName,
                     }
-                    transportListTemp.push(transportOrder);
+                    if (transportsPending && transportOrder.status === "pendiente") {
+                        transportListTemp.push(transportOrder);
+                    } else if (!transportsPending && transportOrder.status === "finalizada") {
+                        transportListTemp.push(transportOrder);
+                    }
                 }
             }
 
-            //alert(JSON.stringify(transportListTemp[0].id)); 
 
 
 
@@ -59,7 +64,16 @@ const Transport = () => {
 
 
         });
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [transportsPending]);
+
+    const handleTransportsPendingChange = () => {
+        if (transportsPending) {
+            setTransportsPending(false);
+        } else {
+            setTransportsPending(true);
+        }
+    };
 
 
 
@@ -79,27 +93,49 @@ const Transport = () => {
             <h3>Lista commandes</h3>
             <Stack spacing={2} direction="column">
                 <Button onClick={() => navigate('/addtransportorder')} variant="contained">Afegir comanda</Button>
-                <Button onClick={() => navigate('/transporters')} variant="contained">Transportistes</Button>
+                <Button onClick={() => navigate('/transporters')} variant="contained">Veure Transportistes</Button>
+                <div className="display-flex flex-direction-row">
+                    <FormControlLabel
+                        label="Pendents"
+                        control={
+                            <Checkbox
+                                checked={transportsPending}
+                                onChange={handleTransportsPendingChange}
+                            />
+                        }
+                    />
+                    <FormControlLabel
+                        label="Finalitzats"
+                        control={
+                            <Checkbox
+                                checked={!transportsPending}
+                                onChange={handleTransportsPendingChange}
+                            />
+                        }
+                    />
+                </div>
+
             </Stack>
             <div className="listView">
 
                 {/*Map transportList*/}
-                {transportList.map((transport) => {
-                    return (
-                        <div className="transportCard" key={transport.id}>
-                            <h3>{transport.albaraNum} {transport.transName}</h3>
-                            <p>{transport.address}
-                            </p>
-                            <p><b>{transport.status}</b></p>
-                            {/*More options button on top right of transportCard*/}
-                            
-                            <TransportationOptions transport={transport}/>
+                {transportList.length > 0 ?
+                    transportList.map((transport) => {
+                        return (
+                            <div className="transportCard" key={transport.id}>
+                                <h3>{transport.albaraNum} {transport.transName}</h3>
+                                <p>{transport.address}
+                                </p>
+                                <p><b>{transport.status}</b></p>
+                                {/*More options button on top right of transportCard*/}
+
+                                <TransportationOptions transport={transport} />
 
 
 
-                        </div>
-                    );
-                })}
+                            </div>
+                        );
+                    }) : <p>No hi ha comandes</p>}
 
 
             </div>

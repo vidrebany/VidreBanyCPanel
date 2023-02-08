@@ -6,14 +6,13 @@ import { MouseEvent } from "react";
 import { useState } from "react";
 import "./TransportationOptionsStyle.css"
 import { Transports } from "../../../types";
-import {Link, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 
 
 const options = [
     'Mostrar PDF',
     'Editar Dades',
-    'Reiniciar',
     'Eliminar',
 ];
 
@@ -47,9 +46,6 @@ export const TransportationOptions: React.FC<TransportationOptionsProps> = ({ tr
                 navigate(`/transport/edittransport/`, {state: {transport}})
                 break;
             case 2:
-                alert("Reiniciar");
-                break;
-            case 3:
                 alert("Eliminar");
                 break;
             default:
