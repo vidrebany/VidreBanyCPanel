@@ -87,6 +87,26 @@ export interface TecnicData {
   id: string;
 }
 
+export interface ServeiTecnic {
+  key: string;
+  tecnicId: string;
+  tecnicName: string;
+  currentDate: number;
+  codeDistributor: string;
+  nameDistributor: string;
+  emailDistributor: string;
+  albaraType: string;
+  albaraNumber: string;
+  isMesura: boolean;
+  description: string;
+  finalClientName: string;
+  finalClientPhone: string;
+  finalClientAddress: string;
+  albaraFile: string;
+  documents: string[];
+  actionDate: number|undefined|null;
+}
+
 export interface FormaRegistre {
   key: number;
   name: string;

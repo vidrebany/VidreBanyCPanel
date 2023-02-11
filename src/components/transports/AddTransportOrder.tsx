@@ -155,7 +155,7 @@ const AddTransportOrder = () => {
         }
 
 
-     
+
 
 
 
@@ -236,25 +236,25 @@ const AddTransportOrder = () => {
 
 
 
-/*
-    function copyData(data: string): void {
-        navigator.clipboard.writeText(data);
-
-        //show the Alert for 3 seconds (from hidden to visible)
-
-        //select Alert element
-        let alert = document.querySelector('.alert') as HTMLDivElement;
-        if (alert) {
-            alert.style.visibility = "visible";
-            setTimeout(() => {
-                alert.style.visibility = "hidden";
-            }, 3000);
+    /*
+        function copyData(data: string): void {
+            navigator.clipboard.writeText(data);
+    
+            //show the Alert for 3 seconds (from hidden to visible)
+    
+            //select Alert element
+            let alert = document.querySelector('.alert') as HTMLDivElement;
+            if (alert) {
+                alert.style.visibility = "visible";
+                setTimeout(() => {
+                    alert.style.visibility = "hidden";
+                }, 3000);
+            }
+    
+    
+    
         }
-
-
-
-    }
-*/
+    */
     function uploadTransport(): void {
         //get realtime database ref and push
 

@@ -1,20 +1,33 @@
-import { useState } from "react";
+import { getDownloadURL, getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fileURLToPath } from "url";
 import Navbar from "../Navbar";
+import firebaseApp from "../../firebase";
+import { ServeiTecnic, TecnicData } from "../../types";
+import { getDatabase, onValue, push, ref as databaseRef, set } from "firebase/database";
 
 
 const AddServeiTecnic = () => {
 
     const navigate = useNavigate();
+    const storage = getStorage(firebaseApp);
+    const db = getDatabase(firebaseApp);
+    //storageRef
+    const serveiTecnicRef = databaseRef(db, 'serveiTecnic/');
+    const tecnicsRef = databaseRef(db, 'tecnics/');
+
+    const [tecnicId, setTecnicId] = useState('');
+    const [tecnicName, setTecnicName] = useState('');
+    const [tecnicsList, setTecnicsList] = useState<TecnicData[]>([]);
+
 
     //create currentDate for datetime-local input
     const [currentDate, setCurrentDate] = useState(new Date().toISOString().slice(0, 16));
     const [codeDistributor, setCodeDistributor] = useState('');
     const [nameDistributor, setNameDistributor] = useState('');
     const [emailDistributor, setEmailDistributor] = useState('');
-    const [documentType, setDocumentType] = useState('');
-    const [documentNumber, setDocumentNumber] = useState('');
+    const [albaraType, setAlbaraType] = useState('');
+    const [albaraNumber, setAlbaraNumber] = useState('');
     const [isMesura, setIsMesura] = useState(true);
     const [description, setDescription] = useState('');
     const [finalClientName, setFinalClientName] = useState('');
@@ -26,6 +39,95 @@ const AddServeiTecnic = () => {
     const [documents, setDocuments] = useState<FileList | null>(null);
 
     const [actionDate, setActionDate] = useState('');
+
+
+
+    //get tecnics list
+    useEffect(() => {
+        onValue(tecnicsRef, (snapshot) => {
+            const data = snapshot.val();
+
+            let tecnicsListTemp: TecnicData[] = [];
+            for (const key in data) {
+                if (data.hasOwnProperty(key)) {
+                    let tecnicData: TecnicData = {
+                        id: data[key].id,
+                        name: data[key].name,
+                    }
+                    tecnicsListTemp.push(tecnicData);
+                }
+            }
+
+
+
+            setTecnicsList(tecnicsListTemp);
+
+
+
+
+
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    function handleSelectTecnic(value: string) {
+        setTecnicId(value);
+        const form = document.querySelector('.selectedTecnic') as HTMLFormElement;
+        const selectedOption = form.options[form.selectedIndex];
+        const tecnicName = selectedOption.text;
+        setTecnicName(tecnicName);
+    }
+
+    async function addServeiTecnic() {
+        var albaraUrl;
+        var documentsUrl = [];
+        const currentDateTimestamp = new Date(currentDate).getTime();
+        const actionDateTimestamp = new Date(actionDate).getTime();
+
+        if (albaraFile) {
+            const albaraRef = storageRef(storage, `albarans/${albaraFile.name}`);
+            await uploadBytes(albaraRef, albaraFile);
+            albaraUrl = await getDownloadURL(albaraRef);
+        }
+        if (documents) {
+            for (let i = 0; i < documents.length; i++) {
+                const documentsRef = storageRef(storage, `documents/${documents[i].name}`);
+                await uploadBytes(documentsRef, documents[i]);
+                documentsUrl.push(await getDownloadURL(documentsRef));
+            }
+        }
+
+        const newServeiTecnicRef = push(serveiTecnicRef);
+
+        const key = newServeiTecnicRef.key;
+
+
+        const serveiTecnic: ServeiTecnic = {
+            key: key || '',
+            tecnicId: tecnicId,
+            tecnicName: tecnicName,
+            currentDate: currentDateTimestamp,
+            codeDistributor: codeDistributor,
+            nameDistributor: nameDistributor,
+            emailDistributor: emailDistributor,
+            albaraType: albaraType,
+            albaraNumber: albaraNumber,
+            isMesura: isMesura,
+            description: description,
+            finalClientName: finalClientName,
+            finalClientPhone: finalClientPhone,
+            finalClientAddress: finalClientAddress,
+            albaraFile: albaraUrl || '',
+            documents: documentsUrl,
+            actionDate: actionDateTimestamp|| 0,
+        }
+
+        set(newServeiTecnicRef, serveiTecnic);
+
+        navigate('/tecnic/', { state: { message: 'Servei tècnic afegit correctament.' } });
+
+
+    }
 
     const handleCheckbox = () => {
         setIsMesura(!isMesura);
@@ -45,6 +147,18 @@ const AddServeiTecnic = () => {
 
             <form>
                 <div className="form-group">
+                    <label htmlFor="deployableList">Tècnic encarregat del servei:</label>
+                    <select className="form-control selectedTecnic" id="deployableList" onChange={(e) => handleSelectTecnic(e.target.value)}>
+                        <option value="">Selecciona un tècnic</option>
+                        {tecnicsList.map((tecnic) => {
+                            return (
+                                <option key={tecnic.id} value={tecnic.id}>{tecnic.name}
+                                </option>
+                            )
+                        })}
+                    </select>
+                </div>
+                <div className="form-group">
                     <label htmlFor="currentDate">Data actual:</label>
                     <input type="datetime-local" onChange={(e) => setCurrentDate(e.target.value)} value={currentDate} className="form-control" id="currentDate" />
                 </div>
@@ -62,15 +176,15 @@ const AddServeiTecnic = () => {
                 </div>
                 <div className="form-group">
                     <label htmlFor="deployableList">Tipus Document:</label>
-                    <select onChange={(e) => setDocumentType(e.target.value)} className="form-control" id="deployableList">
-                        <option selected={documentType === "Albaran"}>Albaran</option>
-                        <option selected={documentType === "Pedido"}>Pedido</option>
-                        <option selected={documentType === "Pedido Cliente"}>Pedido Cliente</option>
+                    <select value={albaraType} onChange={(e) => setAlbaraType(e.target.value)} className="form-control" id="deployableList">
+                        <option>Albaran</option>
+                        <option>Pedido</option>
+                        <option>Pedido Cliente</option>
                     </select>
                 </div>
                 <div className="form-group">
                     <label htmlFor="numberInput">Nº Document:</label>
-                    <input type="number" value={documentNumber} onChange={(e) => setDocumentNumber(e.target.value)} placeholder="01234" className="form-control" id="numberInput" />
+                    <input type="number" value={albaraNumber} onChange={(e) => setAlbaraNumber(e.target.value)} placeholder="01234" className="form-control" id="numberInput" />
                 </div>
                 <div className="form-group form-check w-auto m-2 d-flex justify-space-between">
                     <input checked={isMesura} onChange={() => handleCheckbox()} type="checkbox" className="form-check-input mx-2" id="installation" />
@@ -95,22 +209,24 @@ const AddServeiTecnic = () => {
                     <input type="text" value={finalClientAddress} onChange={(e) => setFinalClientAddress(e.target.value)} className="form-control" id="finalClientAddress" />
                 </div>
                 <div className="form-group uploadAlbara">
-                    <label htmlFor="documentsInput">Adjuntar albarà: </label><br/>
+                    <label htmlFor="documentsInput">Adjuntar albarà: </label><br />
                     <input type="file" className="form-control-file" id="documentsInput" onChange={(e) => setAlbaraFile(e.target.files?.item(0) || null)} />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="documentsInput">Documents: </label><br/>
+                    <label htmlFor="documentsInput">Documents: </label><br />
                     <input type="file" multiple className="form-control-file" id="documentsInput" onChange={(e) => setDocuments(e.target.files)} />
                 </div>
                 <div className="form-group">
                     <label htmlFor="actionDate">Data d'acció prevista:</label>
                     <input type="datetime-local" value={actionDate} onChange={(e) => setActionDate(e.target.value)} className="form-control" id="actionDate" />
                 </div>
-                <button type="submit" className="btn btn-primary">Crear servei tècnic</button>
+                <button onClick={() => addServeiTecnic()} className="btn btn-primary">Crear servei tècnic</button>
             </form>
 
         </div>
     );
+
+
 
 }
 

@@ -7,6 +7,9 @@ import { useState } from "react";
 import "./TransportationOptionsStyle.css"
 import { Transports } from "../../../types";
 import {useNavigate} from 'react-router-dom';
+import { getDatabase, ref, remove } from 'firebase/database';
+import { deleteObject, getStorage, ref as storageRef } from 'firebase/storage';
+import firebaseApp from '../../../firebase';
 
 
 
@@ -25,7 +28,8 @@ export const TransportationOptions: React.FC<TransportationOptionsProps> = ({ tr
     const navigate = useNavigate();
     const [selectedIndex, setSelectedIndex] = useState(0);
 
-
+    const db = getDatabase(firebaseApp);
+    const storage = getStorage(firebaseApp);
 
 
     const ITEM_HEIGHT = 48;
@@ -46,7 +50,7 @@ export const TransportationOptions: React.FC<TransportationOptionsProps> = ({ tr
                 navigate(`/transport/edittransport/`, {state: {transport}})
                 break;
             case 2:
-                alert("Eliminar");
+                deleteTransport();
                 break;
             default:
                 break;
@@ -57,6 +61,26 @@ export const TransportationOptions: React.FC<TransportationOptionsProps> = ({ tr
     const handleOptionsClose = () => {
         setAnchorEl(null);
     };
+
+    function deleteTransport() {
+        const transportRef = ref(db, "/transport/" + transport.id);
+        const pdfUrl = transport.pdfUrl;
+
+        //delete albara file from firebase storage
+        if (pdfUrl !== '') {
+            try {
+                let storageRefFromDownloadURL = storageRef(storage, pdfUrl);
+                deleteObject(storageRefFromDownloadURL).then(() => {
+                    console.log("deleted pdf")
+                });
+            } catch (error) {
+                console.log("error deleting: " + error)
+            }
+        }
+
+        remove(transportRef);
+
+    }
 
     return (
         <div className="moreOptions">

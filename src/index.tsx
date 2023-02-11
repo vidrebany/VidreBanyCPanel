@@ -25,7 +25,7 @@ import InconformitatsTancades from "./components/incidencies/InconformitatsTanca
 import EditInconformitat from "./components/incidencies/EditInconformitat"
 import EditTransport from "./components/transports/EditTransport"
 import Admins from "./components/admins/Admins"
-import ServeiTecnic from "./components/tecnic/ServeiTecnic"
+import ServeisTecnics from "./components/tecnic/ServeisTecnics"
 import AddServeiTecnic from "./components/tecnic/AddServeiTecnic"
 import TecnicsList from "./components/tecnic/TecnicsList"
 
@@ -68,7 +68,7 @@ root.render(
       <Route path="/editinconformitat" element={<EditInconformitat />} />
       <Route path="/admins" element={<Admins />} />
       <Route path="/transport/edittransport" element={<EditTransport />} />
-      <Route path="/tecnic" element={<ServeiTecnic />} />
+      <Route path="/tecnic" element={<ServeisTecnics />} />
       <Route path="/tecnic/addserveitecnic" element={<AddServeiTecnic />} />
       <Route path="/tecnic/tecnicslist" element={<TecnicsList />} />
     </Routes>

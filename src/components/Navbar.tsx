@@ -20,7 +20,7 @@ const Navbar = () => {
                 <Nav.Link href="#/transport">Transports</Nav.Link>
                 <Nav.Link href="#/incidencies">No conformitats</Nav.Link>
                 <Nav.Link href="#/admins">Administradors</Nav.Link>
-                <Nav.Link href="#/serveitecnic">Servei Tècnic</Nav.Link>
+                <Nav.Link href="#/tecnic">Servei Tècnic</Nav.Link>
               </Nav>
             </NavbarReact.Collapse>
           <NavbarReact.Toggle aria-controls="basic-navbar-nav" />
