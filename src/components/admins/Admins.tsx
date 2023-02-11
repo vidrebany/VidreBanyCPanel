@@ -12,7 +12,6 @@ import Alert from "@mui/material/Alert";
 
 
 const Admins = () => {
-    const navigate = useNavigate();
 
     //firebase database
     const db = getDatabase(firebaseApp);
@@ -22,6 +21,7 @@ const Admins = () => {
     //admin list useState that has a list of AdminsData[] objects
     const [adminList, setAdminList] = useState<AdminsData[]>([]);
     const [adminName, setAdminName] = useState('');
+    const [addAdminHidden, setAddAdminHidden] = useState(true);
 
     //get admin list
     useEffect(() => {
@@ -41,33 +41,30 @@ const Admins = () => {
 
 
 
-                setAdminList(adminListTemp);
+            setAdminList(adminListTemp);
 
-            
+
 
 
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [adminList]);
 
 
 
 
-
-
-
     function showFields(): void {
-        const textField = document.querySelectorAll(".textField") as NodeListOf<HTMLElement>;
-        const addButton = document.getElementById("addButton") as HTMLElement;
-        if (textField) {
-            for (let i = 0; i < textField.length; i++) {
-                if (textField[i].style.visibility === "collapse") {
-                    textField[i].style.visibility = "visible";
-                    textField[i].style.height = "auto";
-                } else {
-                    textField[i].style.visibility = "collapse";
-                    textField[i].style.height = "0px";
-                }
-            }
+
+        const addAdminDiv = document.querySelectorAll(".addAdmin")[0] as HTMLElement;
+        if (addAdminHidden) {
+            setAddAdminHidden(false);
+            addAdminDiv.style.visibility = "visible";
+            addAdminDiv.style.height = "auto";
+
+        } else {
+            setAddAdminHidden(true);
+            addAdminDiv.style.visibility = "collapse";
+            addAdminDiv.style.height = "0px";
         }
     }
 
@@ -96,7 +93,7 @@ const Admins = () => {
 
     function deleteAdmin(id: string): void {
         const dbRef = ref(db, '/admins/' + id);
-        remove(dbRef);      
+        remove(dbRef);
     }
 
     return (
@@ -112,31 +109,33 @@ const Admins = () => {
             <h3>Lista administradors</h3>
             <Stack spacing={2} direction="column">
                 <Button id="addButton" onClick={() => showFields()} variant="contained">Afegir admin</Button>
-                <TextField className="textField" style={{ margin: "10px" }}
-                    id="outlined-multiline-static"
-                    label="Nom admin."
-                    rows={4}
-                    value={adminName}
-                    variant="outlined"
-                    onChange={(e) => setAdminName(e.target.value)}
-                />
-                <Button className="textField" onClick={() => addNewAdmin()} variant="contained">Afegir nou</Button>
+                <div className="addAdmin d-flex flex-column" style={{ 'visibility': 'collapse', 'height' : '0' }}>
+                    <TextField style={{ margin: "10px" }}
+                        id="outlined-multiline-static"
+                        label="Nom admin."
+                        rows={4}
+                        value={adminName}
+                        variant="outlined"
+                        onChange={(e) => setAdminName(e.target.value)}
+                    />
+                    <Button onClick={() => addNewAdmin()} variant="contained">Afegir nou</Button>
+                </div>
 
             </Stack>
             <div className="listView">
 
                 {/*Map adminList*/}
                 {adminList.map((admin) => {
-                    
+
 
                     return (
                         <div className="adminCard" key={admin.id}>
                             <p>{admin.name}</p>
                             <img
-                            style={{ position: 'absolute', right: 0, bottom: 10 }} role={'button'} width={"30px"}
-                            onClick={() => deleteAdmin(admin.id)}
-                            src={"https://www.shareicon.net/data/128x128/2015/09/06/96798_trash_512x512.png"}
-                            alt={"trashcan"}></img>
+                                style={{ position: 'absolute', right: 0, bottom: 10 }} role={'button'} width={"30px"}
+                                onClick={() => deleteAdmin(admin.id)}
+                                src={"https://www.shareicon.net/data/128x128/2015/09/06/96798_trash_512x512.png"}
+                                alt={"trashcan"}></img>
                         </div>
                     );
                 })}

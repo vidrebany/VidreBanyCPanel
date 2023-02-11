@@ -62,8 +62,13 @@ const Incidencies = () => {
 
     const [error, setError] = useState('');
 
+
     useEffect(() => {
-        alert(error);
+        var isMounted = false;
+        if (isMounted) {
+            alert("Error: " + error);
+        }
+        isMounted = true;
     }, [error]);
 
 
@@ -629,7 +634,7 @@ const Incidencies = () => {
 
             <h3>Dades producte:</h3>
             <Stack className="Stack" spacing={1} direction="column">
-                <Stack sx={{ display: producteDisplay }} spacing={1}  direction={{ xs: "column", sm: 'row' }}>
+                <Stack sx={{ display: producteDisplay }} spacing={1} direction={{ xs: "column", sm: 'row' }}>
                     <Stack spacing={1} direction="column">
 
                         <h6>Ref. producte:</h6>
@@ -696,8 +701,8 @@ const Incidencies = () => {
 
             <Stack className="Stack" spacing={1} direction="column">
                 <Stack sx={{ display: resolutionDisplay }} spacing={1} direction={{ xs: "column", sm: 'row' }}>
-                   {/*Resolution*/}
-                   <Stack spacing={1} direction="column">
+                    {/*Resolution*/}
+                    <Stack spacing={1} direction="column">
                         <h6>Resolució:</h6>
                         <TextField
                             id="outlined-multiline-static"

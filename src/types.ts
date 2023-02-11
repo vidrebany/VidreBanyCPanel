@@ -81,6 +81,12 @@ export interface AdminsData {
   id: string;
 }
 
+export interface TecnicData {
+  name: string;
+  [key: string]: string;
+  id: string;
+}
+
 export interface FormaRegistre {
   key: number;
   name: string;

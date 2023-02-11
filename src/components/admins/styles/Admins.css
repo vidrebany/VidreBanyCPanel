@@ -40,11 +40,7 @@
     text-align: left;
 
   }
-
-  .textField {
-    visibility: collapse;
-    height: 0px;
-  }
+  
   .listView {
     border: 1px solid rgb(131, 131, 131);
     border-radius: 10px;

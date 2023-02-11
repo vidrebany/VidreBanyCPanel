@@ -1,5 +1,4 @@
 // Import this if you are using react-bootstrap library
-import { Button } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
 import "./App.css";
@@ -23,6 +22,7 @@ function App() {
           <button type="button" className="btn btn-primary" onClick={() => navigate('/transport')}>TRANSPORTS</button>
           <button type="button" className="btn btn-primary" onClick={() => navigate('/incidencies')}>NO CONFORMITATS</button>
           <button type="button" className="btn btn-primary" onClick={() => navigate('/admins')}>ADMINISTRADORS</button>
+          <button type="button" className="btn btn-primary" onClick={() => navigate('/tecnic')}>SERVEI TÈCNIC</button>
       </div>
     </div>
   );
