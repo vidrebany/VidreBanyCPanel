@@ -4,6 +4,7 @@ import viteTsconfigPaths from 'vite-tsconfig-paths';
 import svgrPlugin from 'vite-plugin-svgr';
 
 export default defineConfig({
+    base: "/VidreBanyCPanel/",
     plugins: [react(), viteTsconfigPaths(), svgrPlugin()],
     build: {
         outDir: "build",

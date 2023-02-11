@@ -1,5 +1,5 @@
 import { Alert } from "@mui/material";
-import { getDatabase, onValue, push, ref, set } from "firebase/database";
+import { getDatabase, onValue, push, ref, remove, set } from "firebase/database";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import firebaseApp from "../../firebase";
@@ -28,6 +28,7 @@ const TecnicsList = () => {
 
     function addNewTecnic(): void {
         showAddTecnic();
+        setTecnicName('');
 
         const newTecnicRef = push(tecnicsRef);
         const key = newTecnicRef.key;
@@ -73,7 +74,13 @@ const TecnicsList = () => {
 
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tecnicsList]);
+    }, []);
+
+    function deleteTecnic(id: string): void {
+        const dbRef = ref(db, '/tecnics/' + id);
+        remove(dbRef);
+    }
+
 
     return (
         <div className="container">
@@ -90,17 +97,19 @@ const TecnicsList = () => {
                 </div>
             </div>
             {/*List all tecnics in a card-like manner*/}
-            <div className="row">
+            <div className="col">
                 {tecnicsList.map((tecnic) => {
                     return (
-                        <div className="col-12 col-md-6 col-lg-4 col-xl-3">
+                        <div className="row m-2" key={tecnic.id}>
                             <div className="card">
                                 <div className="card-body">
-                                    <h5 className="card-title">{tecnic.name}</h5>
-                                    <button type="button" className="btn btn-primary">Editar</button>
-                                    <button type="button" className="btn btn-danger">Eliminar</button>
-                                    <button type="button" className="btn btn-success">Veure serveis</button>
-                                    <button type="button" className="btn btn-warning">Afegir servei</button>
+                                    <div className="d-flex flex-row align-items-center justify-content-center">
+                                        <h5 className="card-title">{tecnic.name}</h5>
+                                    </div>
+                                    <div className="d-flex flex-row align-items-center justify-content-center">
+                                        <button type="button" className="btn btn-secondary">Veure serveis</button>
+                                        <button type="button" className="btn btn-danger" onClick={() => deleteTecnic(tecnic.id)}>Eliminar</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
