@@ -97,16 +97,21 @@ const ServeisTecnics = () => {
             <Alert className="alert" severity="success">Èxit</Alert>
             <h3>Administració servei tècnic</h3>
             <button type="button" className="btn btn-primary" onClick={() => navigate("/tecnic/tecnicslist")}>Llistat professionals tècnics</button>
-            <button type="button" className="btn btn-primary" onClick={() => navigate("/tecnic/addserveitecnic")}>Afegir servei tècnic</button>
+            <button type="button" className="btn btn-primary" onClick={() => navigate("/tecnic/addserveitecnic", { state: { btnTitle: 'Crear servei tècnic', alertMessage: 'Servei tècnic afegit correctament.' } })}>Afegir servei tècnic</button>
             {/*List all serveis tecnics list in a card-like manner*/}
             <div className="col">
                 {serveisTecnicsList.map((serveiTecnic) => {
                     return (
                         <div className="card m-2" key={serveiTecnic.key}>
                             <div className="card-body">
-                                <h5 className="card-title">{serveiTecnic.codeDistributor}</h5>
+                                <div className="d-flex justify-content-between">
+                                    <h5 className="card-title">{serveiTecnic.codeDistributor}</h5>
+                                    <h5 className="card-title">{serveiTecnic.tecnicName}</h5>
+
+                                </div>
                                 <p className="card-text">{serveiTecnic.description}</p>
-                                <button type="button" className="btn btn-primary" onClick={() => navigate("/tecnic/updateserveitecnic", { state: { serveiTecnic: serveiTecnic } })}>Editar</button>
+                                <button type="button" className="btn btn-primary" onClick={() => navigate("/tecnic/viewserveitecnic", { state: { serveiTecnic: serveiTecnic } })}>Veure</button>
+                                <button type="button" className="btn btn-primary" onClick={() => navigate("/tecnic/addserveitecnic", { state: { serveiTecnic: serveiTecnic, btnTitle: 'Editar servei tècnic', alertMessage: 'Servei tècnic actualitzat correctament.' } })}>Editar</button>
                                 <button type="button" className="btn btn-primary" onClick={() => deleteServeiTecnic(serveiTecnic)}>Eliminar</button>
                             </div>
                         </div>

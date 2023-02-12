@@ -1,35 +1,21 @@
-import { deleteObject, getDownloadURL, getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
+import { getDownloadURL, getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../Navbar";
 import firebaseApp from "../../firebase";
 import { ServeiTecnic, TecnicData } from "../../types";
-import { getDatabase, onValue, push, ref as databaseRef, set, update } from "firebase/database";
+import { getDatabase, onValue, push, ref as databaseRef, set } from "firebase/database";
 
 
-const AddServeiTecnic = () => {
+const UpdateServeiTecnic = () => {
 
     const navigate = useNavigate();
     const storage = getStorage(firebaseApp);
-    const location = useLocation();
-
-    function useForceUpdate() {
-        const [value, setValue] = useState(0); // integer state
-        return () => setValue(value => value + 1); // update state to force render
-        // A function that increment 👆🏻 the previous state like here 
-        // is better than directly setting `setValue(value + 1)`
-    }
-
-
-    const serveiTecnicLocation: ServeiTecnic = location.state.serveiTecnic;
-    const btnTitle = location.state.btnTitle;
-    const alertMessage = location.state.alertMessage;
-
-
     const db = getDatabase(firebaseApp);
-
     //storageRef
+    const serveiTecnicRef = databaseRef(db, 'serveiTecnic/');
     const tecnicsRef = databaseRef(db, 'tecnics/');
+
     const [tecnicId, setTecnicId] = useState('');
     const [tecnicName, setTecnicName] = useState('');
     const [tecnicsList, setTecnicsList] = useState<TecnicData[]>([]);
@@ -40,7 +26,7 @@ const AddServeiTecnic = () => {
     const [codeDistributor, setCodeDistributor] = useState('');
     const [nameDistributor, setNameDistributor] = useState('');
     const [emailDistributor, setEmailDistributor] = useState('');
-    const [albaraType, setAlbaraType] = useState('Albaran');
+    const [albaraType, setAlbaraType] = useState('');
     const [albaraNumber, setAlbaraNumber] = useState('');
     const [isMesura, setIsMesura] = useState(true);
     const [description, setDescription] = useState('');
@@ -49,63 +35,11 @@ const AddServeiTecnic = () => {
     const [finalClientAddress, setFinalClientAddress] = useState('');
     //typed useState for albaraFile for a single file input
     const [albaraFile, setAlbaraFile] = useState<File | null>(null);
-    const [albaraFileName, setAlbaraFileName] = useState('');
-    const [albaraFileUrl, setAlbaraFileUrl] = useState('');
     //typed useState for documents for a multiple file input
     const [documents, setDocuments] = useState<FileList | null>(null);
-    const [documentsNames, setDocumentsNames] = useState<string[]>([]);
-    const [documentsUrls, setDocumentsUrls] = useState<string[]>([]);
+
     const [actionDate, setActionDate] = useState('');
 
-
-    useEffect(() => {
-        if (serveiTecnicLocation) {
-
-            //parse serveiTecnic.currentDate to datetime-local input
-            const date = new Date(serveiTecnicLocation.currentDate);
-            const currentDateISO = date.toISOString().slice(0, 16);
-            if (currentDateISO) {
-                setCurrentDate(currentDateISO);
-            }
-            //parse serveiTecnic.actionDate to datetime-local input
-            if (serveiTecnicLocation.actionDate) {
-                const dateAction = new Date(serveiTecnicLocation.actionDate);
-                const actionDateISO = dateAction.toISOString().slice(0, 16);
-                setActionDate(actionDateISO);
-            }
-            //get file name from storage using albaraFile url
-            if (serveiTecnicLocation.albaraFile) {
-                setAlbaraFileName(serveiTecnicLocation.albaraFileName);
-            }
-            //get file names from storage using documents url
-            if (serveiTecnicLocation.documents) {
-                let documentsNamesTemp: string[] = [];
-                for (let i = 0; i < serveiTecnicLocation.documentsNames.length; i++) {
-                    const documentName = serveiTecnicLocation.documentsNames[i];
-                    documentsNamesTemp.push(documentName);
-                }
-                setDocumentsNames(documentsNamesTemp);
-            }
-
-            setTecnicId(serveiTecnicLocation.tecnicId);
-            setTecnicName(serveiTecnicLocation.tecnicName);
-            setCodeDistributor(serveiTecnicLocation.codeDistributor);
-            setNameDistributor(serveiTecnicLocation.nameDistributor);
-            setEmailDistributor(serveiTecnicLocation.emailDistributor);
-            setAlbaraType(serveiTecnicLocation.albaraType);
-            setAlbaraNumber(serveiTecnicLocation.albaraNumber);
-            setIsMesura(serveiTecnicLocation.isMesura);
-            setDescription(serveiTecnicLocation.description);
-            setFinalClientName(serveiTecnicLocation.finalClientName);
-            setFinalClientPhone(serveiTecnicLocation.finalClientPhone);
-            setFinalClientAddress(serveiTecnicLocation.finalClientAddress);
-            setAlbaraFileUrl(serveiTecnicLocation.albaraFile);
-            setDocumentsUrls(serveiTecnicLocation.documents || []);
-        }
-
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [serveiTecnicLocation])
 
 
     //get tecnics list
@@ -144,59 +78,28 @@ const AddServeiTecnic = () => {
         setTecnicName(tecnicName);
     }
 
-    async function addServeiTecnic() {
-        const currentDateTimestamp = new Date(currentDate).getTime() + 60 * 60 * 1000;
-        const actionDateTimestamp = new Date(actionDate).getTime() + 60 * 60 * 1000;
-        var albaraFileUrlTemp = albaraFileUrl;
-        var albaraFileNameTemp = albaraFileName;
+    async function updateServeiTecnic() {
+        var albaraUrl;
+        var documentsUrl = [];
+        const currentDateTimestamp = new Date(currentDate).getTime();
+        const actionDateTimestamp = new Date(actionDate).getTime();
 
         if (albaraFile) {
-            const albaraRef = storageRef(storage, `albarans/${currentDateTimestamp + albaraFile.name}`);
+            const albaraRef = storageRef(storage, `albarans/${albaraFile.name}`);
             await uploadBytes(albaraRef, albaraFile);
-            albaraFileUrlTemp = await getDownloadURL(albaraRef);
-            albaraFileNameTemp = albaraFile.name;
-            setAlbaraFileUrl(albaraFileUrlTemp);
-            setAlbaraFileName(albaraFile.name);
-
-            if (albaraFileUrl !== '') {
-                try {
-                    let storageRefFromDownloadURL = storageRef(storage, albaraFileUrl);
-                    deleteObject(storageRefFromDownloadURL).then(() => {
-                        console.log("deleted albara")
-                    });
-                } catch (error) {
-                    console.log("error deleting: " + error)
-                }
-            }
+            albaraUrl = await getDownloadURL(albaraRef);
         }
-
         if (documents) {
-            var documentsUrlsTemp = documentsUrls;
-            var documentsNamesTemp = documentsNames;
             for (let i = 0; i < documents.length; i++) {
-                const documentsRef = storageRef(storage, `documents/${currentDateTimestamp + documents[i].name}`);
+                const documentsRef = storageRef(storage, `documents/${documents[i].name}`);
                 await uploadBytes(documentsRef, documents[i]);
-                const documentUrl = await getDownloadURL(documentsRef);
-                documentsUrlsTemp.push(documentUrl);
-                documentsNamesTemp.push(documents[i].name);
+                documentsUrl.push(await getDownloadURL(documentsRef));
             }
-            setDocumentsUrls(documentsUrlsTemp);
-            setDocumentsNames(documentsNamesTemp);
         }
 
-        var key;
-        var serveiTecnicRef;
+        const newServeiTecnicRef = push(serveiTecnicRef);
 
-        if (serveiTecnicLocation) {
-            key = serveiTecnicLocation.key;
-            serveiTecnicRef = databaseRef(db, `serveiTecnic/${key}`);
-        } else {
-            //push to get new key
-            serveiTecnicRef = push(databaseRef(db, 'serveiTecnic'));
-            key = serveiTecnicRef.key;
-        }
-
-
+        const key = newServeiTecnicRef.key;
 
 
         const serveiTecnic: ServeiTecnic = {
@@ -214,16 +117,14 @@ const AddServeiTecnic = () => {
             finalClientName: finalClientName,
             finalClientPhone: finalClientPhone,
             finalClientAddress: finalClientAddress,
-            albaraFile: albaraFileUrlTemp || '',
-            albaraFileName: albaraFileNameTemp,
-            documents: documentsUrls || [],
-            documentsNames: documentsNames,
-            actionDate: actionDateTimestamp || 0,
+            albaraFile: albaraUrl || '',
+            documents: documentsUrl,
+            actionDate: actionDateTimestamp|| 0,
         }
 
-        set(serveiTecnicRef, serveiTecnic);
+        set(newServeiTecnicRef, serveiTecnic);
 
-        navigate('/tecnic/', { state: { message: alertMessage } });
+        navigate('/tecnic/', { state: { message: 'Servei tècnic afegit correctament.' } });
 
 
     }
@@ -234,56 +135,6 @@ const AddServeiTecnic = () => {
         if (uploadAlbara) {
             uploadAlbara.classList.toggle("collapse");
         }
-    }
-
-    async function deleteAlbara(albaraFileUrl: string) {
-        const albaraRef = storageRef(storage, albaraFileUrl);
-        await deleteObject(albaraRef);
-        setAlbaraFileUrl('');
-        setAlbaraFileName('');
-
-        await update(databaseRef(db, `serveiTecnic/${serveiTecnicLocation.key}`), {
-            albaraFile: '',
-            albaraFileName: '',
-        });
-    }
-
-    function deleteDocument(documentIndex: number) {
-
-        console.log(documentsUrls)
-
-        const documentsUrlsTemp = documentsUrls;
-        const documentsNamesTemp = documentsNames;
-
-
-
-
-        const documentRef = storageRef(storage, documentsUrlsTemp[documentIndex]);
-
-        try {
-            deleteObject(documentRef).then(() => {
-                console.log("deleted document")
-            });
-        } catch (error) {
-            console.log("error deleting: " + error)
-        }
-
-        documentsUrlsTemp.splice(documentIndex, 1);
-        documentsNamesTemp.splice(documentIndex, 1);
-
-        setDocumentsUrls(documentsUrlsTemp);
-        setDocumentsNames(documentsNamesTemp);
-
-
-
-        update(databaseRef(db, `serveiTecnic/${serveiTecnicLocation.key}`), {
-            documents: documentsUrlsTemp,
-            documentsNames: documentsNamesTemp,
-        })
-
-
-        location.state.message = alertMessage;
-
     }
 
     return (
@@ -297,7 +148,7 @@ const AddServeiTecnic = () => {
             <form>
                 <div className="form-group">
                     <label htmlFor="deployableList">Tècnic encarregat del servei:</label>
-                    <select value={tecnicId} className="form-control selectedTecnic" id="deployableList" onChange={(e) => handleSelectTecnic(e.target.value)}>
+                    <select className="form-control selectedTecnic" id="deployableList" onChange={(e) => handleSelectTecnic(e.target.value)}>
                         <option value="">Selecciona un tècnic</option>
                         {tecnicsList.map((tecnic) => {
                             return (
@@ -361,45 +212,15 @@ const AddServeiTecnic = () => {
                     <label htmlFor="documentsInput">Adjuntar albarà: </label><br />
                     <input type="file" className="form-control-file" id="documentsInput" onChange={(e) => setAlbaraFile(e.target.files?.item(0) || null)} />
                 </div>
-                {/*Display albaraFileName text*/}
-                {albaraFileName && <div className="form-group">
-                    <ul className="list-group">
-                        <li className="list-group-item">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <a href={albaraFileUrl} target="_blank" rel="noreferrer">{albaraFileName}</a>
-                                <button onClick={() => deleteAlbara(albaraFileUrl)} className="btn btn-danger btn-sm float-right">Eliminar</button>
-                            </div>
-                        </li>
-                    </ul>
-                </div>}
-
-
                 <div className="form-group">
                     <label htmlFor="documentsInput">Documents: </label><br />
                     <input type="file" multiple className="form-control-file" id="documentsInput" onChange={(e) => setDocuments(e.target.files)} />
                 </div>
-                {/*Display documentsNames list*/}
-                {documentsUrls.length > 0 && <div className="form-group">
-                    <label htmlFor="documentsNames">Noms dels documents: </label><br />
-                    <ul className="list-group">
-                        {documentsNames.map((documentName, index) => {
-                            return (
-                                <li key={index} className="list-group-item">
-                                    {/*create a link to documentsUrls[index] and a delete button with onclick action*/}
-                                    <div className="d-flex justify-content-between align-items-center">
-                                        <a href={documentsUrls[index]} target="_blank" rel="noreferrer">{documentName}</a>
-                                        <button onClick={() => deleteDocument(index)} className="btn btn-danger btn-sm float-right">Eliminar</button>
-                                    </div>
-                                </li>
-                            )
-                        })}
-                    </ul>
-                </div>}
                 <div className="form-group">
                     <label htmlFor="actionDate">Data d'acció prevista:</label>
                     <input type="datetime-local" value={actionDate} onChange={(e) => setActionDate(e.target.value)} className="form-control" id="actionDate" />
                 </div>
-                <button onClick={() => addServeiTecnic()} className="btn btn-primary">{btnTitle}</button>
+                <button onClick={() => updateServeiTecnic()} className="btn btn-primary">Crear servei tècnic</button>
             </form>
 
         </div>
@@ -409,4 +230,4 @@ const AddServeiTecnic = () => {
 
 }
 
-export default AddServeiTecnic;
+export default UpdateServeiTecnic;

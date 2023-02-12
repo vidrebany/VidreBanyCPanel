@@ -103,7 +103,9 @@ export interface ServeiTecnic {
   finalClientPhone: string;
   finalClientAddress: string;
   albaraFile: string;
+  albaraFileName: string;
   documents: string[];
+  documentsNames: string[];
   actionDate: number|undefined|null;
 }
 
