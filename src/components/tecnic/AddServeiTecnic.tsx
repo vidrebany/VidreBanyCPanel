@@ -49,6 +49,7 @@ const AddServeiTecnic = () => {
     const [documentsNames, setDocumentsNames] = useState<string[]>([]);
     const [documentsUrls, setDocumentsUrls] = useState<string[]>([]);
     const [actionDate, setActionDate] = useState('');
+    const [stateServei, setStateServei] = useState('Pendent');
 
 
     useEffect(() => {
@@ -94,6 +95,7 @@ const AddServeiTecnic = () => {
             setFinalClientAddress(serveiTecnicLocation.finalClientAddress);
             setAlbaraFileUrl(serveiTecnicLocation.albaraFile);
             setDocumentsUrls(serveiTecnicLocation.documents || []);
+            setStateServei(serveiTecnicLocation.stateServei);
         }
 
 
@@ -212,6 +214,7 @@ const AddServeiTecnic = () => {
             documents: documentsUrls || [],
             documentsNames: documentsNames,
             actionDate: actionDateTimestamp || 0,
+            stateServei: stateServei,
         }
 
         set(serveiTecnicRef, serveiTecnic);
@@ -392,7 +395,16 @@ const AddServeiTecnic = () => {
                     <label htmlFor="actionDate">Data d'acció prevista:</label>
                     <input type="datetime-local" value={actionDate} onChange={(e) => setActionDate(e.target.value)} className="form-control" id="actionDate" />
                 </div>
-                <button onClick={() => addServeiTecnic()} className="btn btn-primary">{btnTitle}</button>
+                {/*Create a dropdown that has the options: "Finalitzat, Pendent, Per revisar"*/}
+                <div className="form-group">
+                    <label htmlFor="status">Estat:</label>
+                    <select value={stateServei} onChange={(e) => setStateServei(e.target.value)} className="form-control" id="status">
+                        <option>Pendent</option>
+                        <option>Per revisar</option>
+                        <option>Finalitzat</option>
+                    </select>
+                </div>
+                <button onClick={() => addServeiTecnic()} className="btn btn-primary m-5">{btnTitle}</button>
             </form>
 
         </div>

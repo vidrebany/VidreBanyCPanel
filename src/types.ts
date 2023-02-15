@@ -107,6 +107,7 @@ export interface ServeiTecnic {
   documents: string[];
   documentsNames: string[];
   actionDate: number|undefined|null;
+  stateServei: string;
 }
 
 export interface FormaRegistre {
