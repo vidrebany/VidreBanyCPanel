@@ -28,6 +28,7 @@ import Admins from "./components/admins/Admins"
 import ServeisTecnics from "./components/tecnic/ServeisTecnics"
 import AddServeiTecnic from "./components/tecnic/AddServeiTecnic"
 import TecnicsList from "./components/tecnic/TecnicsList"
+import ViewServeiTecnic from './components/tecnic/ViewServeiTecnic';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -71,6 +72,7 @@ root.render(
       <Route path="/tecnic" element={<ServeisTecnics />} />
       <Route path="/tecnic/addserveitecnic" element={<AddServeiTecnic />} />
       <Route path="/tecnic/tecnicslist" element={<TecnicsList />} />
+      <Route path="/tecnic/viewserveitecnic" element={<ViewServeiTecnic />} />
     </Routes>
   </HashRouter>
 );
