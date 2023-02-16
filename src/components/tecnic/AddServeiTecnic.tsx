@@ -335,9 +335,9 @@ const AddServeiTecnic = () => {
                 </div>
                 <div className="form-group form-check w-auto m-2 d-flex justify-space-between">
                     <input checked={isMesura} onChange={() => handleCheckbox()} type="checkbox" className="form-check-input mx-2" id="installation" />
-                    <label className="form-check-label" htmlFor="installation">Instal·lació</label>
+                    <label className="form-check-label" htmlFor="installation">Presa de mesures</label>
                     <input checked={!isMesura} onChange={() => handleCheckbox()} type="checkbox" className="mx-2 form-check-input" id="measureTaking" />
-                    <label className="form-check-label" htmlFor="measureTaking">Presa mesures</label>
+                    <label className="form-check-label" htmlFor="measureTaking">Instal·lació</label>
                 </div>
                 <div className="form-group">
                     <label htmlFor="descriptionText">Descripció:</label>

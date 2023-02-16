@@ -95,8 +95,14 @@ const ViewServeiTecnic = () => {
             <Navbar />
             {/*Display responsively all servei tecnic data*/}
             <h1>Dades servei tècnic</h1>
-            <div className="col">
+            <div className="w-100 d-flex justify-content-between align-items-center">
+                <button type="button" className="btn btn-primary" onClick={() => navigate('/tecnic')}>Tornar</button>
+                <h3><span className={stateServei === 'Pendent' ? 'badge bg-danger' : stateServei === 'Per revisar' ? 'badge bg-warning' : 'badge bg-success'}>{stateServei}</span></h3>
+                <button type="button" className="btn btn-primary" onClick={() => navigate("/tecnic/addserveitecnic", { state: { serveiTecnic: serveiTecnicLocation, btnTitle: 'Editar servei tècnic', alertMessage: 'Servei tècnic actualitzat correctament.' } })}>Editar</button>
+            </div>
+            <div className="col mb-5">
                 <div className="row">
+                    <h6>Tècnic</h6>
                     <div className="col-6">
                         <div className="form-group">
                             <label htmlFor="tecnicId">Tècnic ID</label>
@@ -113,6 +119,7 @@ const ViewServeiTecnic = () => {
                     </div>
                 </div>
                 <div className="row">
+                    <h6>Dates</h6>
                     <div className="col-6">
                         <div className="form-group">
                             <label htmlFor="currentDate">Data</label>
@@ -128,35 +135,100 @@ const ViewServeiTecnic = () => {
                         </div>
                     </div>
                 </div>
-                <div className="form-group">
-                    <label htmlFor="codeDistributor">Codi distribuidor</label>
-                    <input type="text" className="form-control" id="codeDistributor" value={codeDistributor} readOnly />
-                    <small className="form-text text-muted">Codi del distribuidor.</small>
+                <div className="row">
+                    <h6>Distribuidor</h6>
+                    <div className="col-md-4 col-sm-12 form-group">
+                        <label htmlFor="codeDistributor">Codi distribuidor</label>
+                        <input type="text" className="form-control" id="codeDistributor" value={codeDistributor} readOnly />
+                        <small className="form-text text-muted">Codi del distribuidor.</small>
+                    </div>
+                    <div className="col-md-4 col-sm-12 form-group">
+                        <label htmlFor="nameDistributor">Nom distribuidor</label>
+                        <input type="text" className="form-control" id="nameDistributor" value={nameDistributor} readOnly />
+                        <small className="form-text text-muted">Nom del distribuidor.</small>
+                    </div>
+                    <div className="col-md-4 col-sm-12 form-group">
+                        <label htmlFor="emailDistributor">Email distribuidor</label>
+                        <input type="text" className="form-control" id="emailDistributor" value={emailDistributor} readOnly />
+                        <small className="form-text text-muted">Email del distribuidor.</small>
+                    </div>
+                </div>
+                <div className="row">
+                    <h6>Client final</h6>
+                    <div className="col-md-4 col-sm-12 form-group">
+                        <label htmlFor="finalClientName">Nom client final</label>
+                        <input type="text" className="form-control" id="finalClientName" value={finalClientName} readOnly />
+                        <small className="form-text text-muted">Nom del client final.</small>
+                    </div>
+                    <div className="col-md-4 col-sm-12 form-group">
+                        <label htmlFor="finalClientPhone">Telèfon client final</label>
+                        <input type="text" className="form-control" id="finalClientPhone" value={finalClientPhone} readOnly />
+                        <small className="form-text text-muted">Núm de telèfon client final.</small>
+                    </div>
+                    <div className="col-md-4 col-sm-12 form-group">
+                        <label htmlFor="finalClientAddress">Adreça client final</label>
+                        <input type="text" className="form-control" id="finalClientAddress" value={finalClientAddress} readOnly />
+                        <small className="form-text text-muted">Direcció del client final.</small>
+                    </div>
+                </div>
+                <div className="row">
+                    <h6>Informació albarà</h6>
+                    <div className="col-6">
+                        <div className="form-group">
+                            <label htmlFor="albaraType">Tipus albara</label>
+                            <input type="text" className="form-control" id="albaraType" value={albaraType} readOnly />
+                            <small className="form-text text-muted">Tipus d'albara.</small>
+                        </div>
+                    </div>
+                    <div className="col-6">
+                        <div className="form-group">
+                            <label htmlFor="albaraNumber">Número albara</label>
+                            <input type="text" className="form-control" id="albaraNumber" value={albaraNumber} readOnly />
+                            <small className="form-text text-muted">Número d'albara.</small>
+                        </div>
+                    </div>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="nameDistributor">Nom distribuidor</label>
-                    <input type="text" className="form-control" id="nameDistributor" value={nameDistributor} readOnly />
-                    <small className="form-text text-muted">Nom del distribuidor.</small>
+                    <label htmlFor="isMesura">Tipus</label>
+                    <input type="text" className="form-control" id="isMesura" value={isMesura ? 'Mesures' : 'Instal·lació'} readOnly />
+                    <small className="form-text text-muted">Indica si el tipus de servei.</small>
                 </div>
+                {/*Text for description (it has to be multiple lines) */}
                 <div className="form-group">
-                    <label htmlFor="emailDistributor">Email distribuidor</label>
-                    <input type="text" className="form-control" id="emailDistributor" value={emailDistributor} readOnly />
-                    <small className="form-text text-muted">Email del distribuidor.</small>
+                    <label htmlFor="description">Descripció</label>
+                    <textarea className="form-control" id="description" rows={3} value={description} readOnly></textarea>
+                    <small className="form-text text-muted">Descripció del servei.</small>
                 </div>
-                <div className="form-group">
-                    <label htmlFor="albaraType">Tipus albara</label>
-                    <input type="text" className="form-control" id="albaraType" value={albaraType} readOnly />
-                    <small className="form-text text-muted">Tipus d'albara.</small>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="albaraNumber">Número albara</label>
-                    <input type="text" className="form-control" id="albaraNumber" value={albaraNumber} readOnly />
-                    <small className="form-text text-muted">Número d'albara.</small>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="isMesura">Mesura</label>
-                    <input type="text" className="form-control" id="isMesura" value={isMesura ? 'Sí' : 'No'} readOnly />
-                    <small className="form-text text-muted">Indica si el servei és una mesura.</small>
+                <div className="row">
+                    <div className="col-6">
+                        <h6>Document albarà:</h6>
+                        {albaraFileName && <div className="form-group">
+                            <ul className="list-group">
+                                <li className="list-group-item">
+                                    <div className="d-flex justify-content-between align-items-center">
+                                        <a href={albaraFileUrl} target="_blank" rel="noreferrer">{albaraFileName}</a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>}
+                    </div>
+                    <div className="col-6">
+                        <h6>Documents aportats per administrador:</h6>
+                        {documentsUrls.length > 0 && <div className="form-group">
+                            <ul className="list-group">
+                                {documentsNames.map((documentName, index) => {
+                                    return (
+                                        <li key={index} className="list-group-item">
+                                            {/*create a link to documentsUrls[index] and a delete button with onclick action*/}
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                <a href={documentsUrls[index]} target="_blank" rel="noreferrer">{documentName}</a>
+                                            </div>
+                                        </li>
+                                    )
+                                })}
+                            </ul>
+                        </div>}
+                    </div>
                 </div>
             </div>
         </div >

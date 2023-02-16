@@ -21,6 +21,8 @@ const ServeisTecnics = () => {
     const [isPendent, setIsPendent] = useState(true);
     const [isPerRevisar, setIsPerRevisar] = useState(false);
     const [isFinalitzat, setIsFinalitzat] = useState(false);
+    const [isMesura, setIsMesura] = useState(true);
+    const [isInstalacio, setIsInstalacio] = useState(false);
 
     var message = "";
     if (location.state) {
@@ -41,6 +43,26 @@ const ServeisTecnics = () => {
             setIsPendent(false);
             setIsPerRevisar(false);
             setIsFinalitzat(!isFinalitzat);
+        }
+    }
+
+    const handleTypeCheckbox = (e: string) => {
+        //make only one of the checkboxes can be checked at a time, if the same checkbox is checked twice, it will be unchecked
+        if (e === "isMesura") {
+            setIsMesura(!isMesura);
+            setIsInstalacio(false);
+        } else if (e === "isInstalacio") {
+            setIsMesura(false);
+            setIsInstalacio(!isInstalacio);
+        } else if (e !== "isMesura" && e === "isInstalacio") {
+            setIsMesura(false);
+            setIsInstalacio(true);
+        } else if (e !== "isMesura" && e !== "isInstalacio") {
+            setIsMesura(true);
+            setIsInstalacio(true);
+        } else {
+            setIsMesura(true);
+            setIsInstalacio(true);
         }
     }
 
@@ -71,11 +93,7 @@ const ServeisTecnics = () => {
 
                     let serveiTecnicData: ServeiTecnic = data[key];
 
-                    if (isPendent && serveiTecnicData.stateServei === "Pendent") {
-                        serveisTecnicsListTemp.push(serveiTecnicData);
-                    } else if (isPerRevisar && serveiTecnicData.stateServei === "Per revisar") {
-                        serveisTecnicsListTemp.push(serveiTecnicData);
-                    } else if (isFinalitzat && serveiTecnicData.stateServei === "Finalitzat") {
+                    if (filterTypeServei(serveiTecnicData) && filterStateServei(serveiTecnicData)) {
                         serveisTecnicsListTemp.push(serveiTecnicData);
                     }
 
@@ -86,7 +104,37 @@ const ServeisTecnics = () => {
 
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isPendent, isPerRevisar, isFinalitzat]);
+    }, [isPendent, isPerRevisar, isFinalitzat, isMesura, isInstalacio]);
+
+    function filterStateServei(serveiTecnicData: ServeiTecnic) {
+        if ((isPendent && !isPerRevisar && !isFinalitzat) || (!isPendent && isPerRevisar && !isFinalitzat) || (!isPendent && !isPerRevisar && isFinalitzat)) {
+
+            if (isPendent && serveiTecnicData.stateServei === "Pendent") {
+                return true;
+            } else if (isPerRevisar && serveiTecnicData.stateServei === "Per revisar") {
+                return true;
+            } else if (isFinalitzat && serveiTecnicData.stateServei === "Finalitzat") {
+                return true;
+            }
+        } else {
+            return true;
+        }
+        return false;
+    }
+
+    function filterTypeServei(serveiTecnicData: ServeiTecnic) {
+        if ((isMesura && !isInstalacio) || (!isMesura && isInstalacio)) {
+            if (isMesura && isInstalacio && serveiTecnicData.isMesura === true) {
+                return true;
+            } else if (!isMesura && serveiTecnicData.isMesura === false) {
+                return true;
+            }
+        } else {
+            return true;
+        }
+
+        return false;
+    }
 
     function deleteServeiTecnic(serveiTecnic: ServeiTecnic) {
         const serveiTecnicRef = ref(db, "/serveiTecnic/" + serveiTecnic.key);
@@ -123,7 +171,7 @@ const ServeisTecnics = () => {
 
     }
 
-    
+
 
 
     return (
@@ -141,13 +189,22 @@ const ServeisTecnics = () => {
                 <input checked={isFinalitzat} value="isFinalitzat" onChange={(e) => handleCheckbox(e.target.value)} type="checkbox" className="mx-2 form-check-input" id="measureTaking" />
                 <label className="form-check-label" htmlFor="measureTaking">Finalitzats</label>
             </div>
+            <div className="form-group form-check w-auto m-2 d-flex justify-space-between">
+                <input checked={isMesura} value="isMesura" onChange={(e) => handleTypeCheckbox(e.target.value)} type="checkbox" className="form-check-input mx-2" id="installation" />
+                <label className="form-check-label" htmlFor="installation">Presa mesures</label>
+                <input checked={isInstalacio} value="isInstalacio" onChange={(e) => handleTypeCheckbox(e.target.value)} type="checkbox" className="mx-2 form-check-input" id="measureTaking" />
+                <label className="form-check-label" htmlFor="measureTaking">Instal·lació</label>
+            </div>
             {/*List all serveis tecnics list in a card-like manner*/}
             <div className="col">
                 {serveisTecnicsList.map((serveiTecnic) => {
                     return (
                         <div className="card m-2" key={serveiTecnic.key}>
                             <div className="card-body">
-                                <p className="card-title">{serveiTecnic.stateServei}</p>
+                                <div className="d-flex justify-content-between">
+                                    <p className="card-title">{serveiTecnic.stateServei}</p>
+                                    <p className="card-title">{serveiTecnic.isMesura ? 'Mesura' : 'Instal·lació'}</p>
+                                </div>
                                 <div className="d-flex justify-content-between">
                                     <h5 className="card-title">{serveiTecnic.codeDistributor}</h5>
                                     <h5 className="card-title">{serveiTecnic.tecnicName}</h5>
