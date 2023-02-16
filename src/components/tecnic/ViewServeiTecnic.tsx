@@ -200,7 +200,7 @@ const ViewServeiTecnic = () => {
                     <small className="form-text text-muted">Descripció del servei.</small>
                 </div>
                 <div className="row">
-                    <div className="col-6">
+                    <div className="col-md-6">
                         <h6>Document albarà:</h6>
                         {albaraFileName && <div className="form-group">
                             <ul className="list-group">
@@ -212,7 +212,7 @@ const ViewServeiTecnic = () => {
                             </ul>
                         </div>}
                     </div>
-                    <div className="col-6">
+                    <div className="col-md-6">
                         <h6>Documents aportats per administrador:</h6>
                         {documentsUrls.length > 0 && <div className="form-group">
                             <ul className="list-group">
