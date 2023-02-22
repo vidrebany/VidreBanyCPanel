@@ -96,8 +96,6 @@ const AddServeiTecnic = () => {
             setAlbaraFileUrl(serveiTecnicLocation.albaraFile);
             setDocumentsUrls(serveiTecnicLocation.documents || []);
             setStateServei(serveiTecnicLocation.stateServei);
-        } else {
-            navigate('/tecnic');
         }
 
 

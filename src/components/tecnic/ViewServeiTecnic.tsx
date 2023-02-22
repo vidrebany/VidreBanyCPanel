@@ -25,11 +25,9 @@ const ViewServeiTecnic = () => {
     const [finalClientPhone, setFinalClientPhone] = useState('');
     const [finalClientAddress, setFinalClientAddress] = useState('');
     //typed useState for albaraFile for a single file input
-    const [albaraFile, setAlbaraFile] = useState<File | null>(null);
     const [albaraFileName, setAlbaraFileName] = useState('');
     const [albaraFileUrl, setAlbaraFileUrl] = useState('');
     //typed useState for documents for a multiple file input
-    const [documents, setDocuments] = useState<FileList | null>(null);
     const [documentsNames, setDocumentsNames] = useState<string[]>([]);
     const [documentsUrls, setDocumentsUrls] = useState<string[]>([]);
     const [actionDate, setActionDate] = useState('');
