@@ -25,6 +25,7 @@ const AddServeiTecnic = () => {
     const tecnicsRef = databaseRef(db, 'tecnics/');
     const [tecnicId, setTecnicId] = useState('');
     const [tecnicName, setTecnicName] = useState('');
+    const [comentarisTecnic, setComentarisTecnic] = useState('');
     const [tecnicsList, setTecnicsList] = useState<TecnicData[]>([]);
 
 
@@ -47,7 +48,9 @@ const AddServeiTecnic = () => {
     //typed useState for documents for a multiple file input
     const [documents, setDocuments] = useState<FileList | null>(null);
     const [documentsNames, setDocumentsNames] = useState<string[]>([]);
+    const [documentsTecnicNames, setDocumentsTecnicNames] = useState<string[]>([]);
     const [documentsUrls, setDocumentsUrls] = useState<string[]>([]);
+    const [documentsTecnicUrls, setDocumentsTecnicUrls] = useState<string[]>([]);
     const [actionDate, setActionDate] = useState('');
     const [stateServei, setStateServei] = useState('Pendent');
 
@@ -80,9 +83,18 @@ const AddServeiTecnic = () => {
                 }
                 setDocumentsNames(documentsNamesTemp);
             }
+            if (serveiTecnicLocation.documentsTecnic && serveiTecnicLocation.documentsTecnicNames) {
+                let documentsTecnicNamesTemp: string[] = [];
+                for (let i = 0; i < serveiTecnicLocation.documentsTecnicNames.length; i++) {
+                    const documentTecnicName = serveiTecnicLocation.documentsTecnicNames[i];
+                    documentsTecnicNamesTemp.push(documentTecnicName);
+                }
+                setDocumentsTecnicNames(documentsTecnicNamesTemp);
+            }
 
             setTecnicId(serveiTecnicLocation.tecnicId);
             setTecnicName(serveiTecnicLocation.tecnicName);
+            setComentarisTecnic(serveiTecnicLocation.comentarisTecnic);
             setCodeDistributor(serveiTecnicLocation.codeDistributor);
             setNameDistributor(serveiTecnicLocation.nameDistributor);
             setEmailDistributor(serveiTecnicLocation.emailDistributor);
@@ -95,6 +107,7 @@ const AddServeiTecnic = () => {
             setFinalClientAddress(serveiTecnicLocation.finalClientAddress);
             setAlbaraFileUrl(serveiTecnicLocation.albaraFile);
             setDocumentsUrls(serveiTecnicLocation.documents || []);
+            setDocumentsTecnicUrls(serveiTecnicLocation.documentsTecnic || []);
             setStateServei(serveiTecnicLocation.stateServei);
         }
 
@@ -160,7 +173,7 @@ const AddServeiTecnic = () => {
                         console.log("deleted albara")
                     });
                 } catch (error) {
-                    console.log("error deleting: " + error)
+                    console.log(error)
                 }
             }
         }
@@ -198,6 +211,7 @@ const AddServeiTecnic = () => {
             key: key || '',
             tecnicId: tecnicId,
             tecnicName: tecnicName,
+            comentarisTecnic: comentarisTecnic,
             currentDate: currentDateTimestamp,
             codeDistributor: codeDistributor,
             nameDistributor: nameDistributor,
@@ -212,7 +226,9 @@ const AddServeiTecnic = () => {
             albaraFile: albaraFileUrlTemp || '',
             albaraFileName: albaraFileNameTemp,
             documents: documentsUrls || [],
+            documentsTecnic: documentsTecnicUrls || [],
             documentsNames: documentsNames,
+            documentsTecnicNames: documentsTecnicNames,
             actionDate: actionDateTimestamp || 0,
             stateServei: stateServei,
         }
@@ -244,15 +260,25 @@ const AddServeiTecnic = () => {
         });
     }
 
-    function deleteDocument(documentIndex: number) {
+    function deleteDocument(documentIndex: number, documentType: string) {
 
         console.log(documentsUrls)
 
-        const documentsUrlsTemp = documentsUrls;
-        const documentsNamesTemp = documentsNames;
+        var documentsUrlsTemp;
+        var documentsNamesTemp;
+        
+        switch(documentType) {
+        case "admin": 
+            documentsUrlsTemp = documentsUrls;
+            documentsNamesTemp = documentsNames;
+            break;
+        case "tecnic":
+            documentsUrlsTemp = documentsTecnicUrls;
+            documentsNamesTemp = documentsTecnicNames;
+            break;
+        }
 
-
-
+        if (!documentsUrlsTemp || !documentsNamesTemp) return;
 
         const documentRef = storageRef(storage, documentsUrlsTemp[documentIndex]);
 
@@ -261,7 +287,7 @@ const AddServeiTecnic = () => {
                 console.log("deleted document")
             });
         } catch (error) {
-            console.log("error deleting: " + error)
+            console.log(error)
         }
 
         documentsUrlsTemp.splice(documentIndex, 1);
@@ -271,11 +297,17 @@ const AddServeiTecnic = () => {
         setDocumentsNames(documentsNamesTemp);
 
 
-
-        update(databaseRef(db, `serveiTecnic/${serveiTecnicLocation.key}`), {
-            documents: documentsUrlsTemp,
-            documentsNames: documentsNamesTemp,
-        })
+        if (documentType === "admin") {
+            update(databaseRef(db, `serveiTecnic/${serveiTecnicLocation.key}`), {
+                documents: documentsUrlsTemp,
+                documentsNames: documentsNamesTemp,
+            })
+        } else {
+            update(databaseRef(db, `serveiTecnic/${serveiTecnicLocation.key}`), {
+                documentsTecnic: documentsUrlsTemp,
+                documentsTecnicNames: documentsNamesTemp,
+            })
+        }
 
 
         location.state.message = alertMessage;
@@ -339,7 +371,7 @@ const AddServeiTecnic = () => {
                 </div>
                 <div className="form-group">
                     <label htmlFor="descriptionText">Descripció:</label>
-                    <textarea className="form-control" value={description} onChange={(e) => setDescription(e.target.value)} rows={5} id="descriptionText"></textarea>
+                    <textarea className="form-control" value={description} onChange={(e) => setDescription(e.target.value)} rows={5} id="descriptionText"/>
                 </div>
                 <div className="form-group">
                     <label htmlFor="finalClientName">Nom Client Final:</label>
@@ -380,17 +412,37 @@ const AddServeiTecnic = () => {
                     <ul className="list-group">
                         {documentsNames.map((documentName, index) => {
                             return (
-                                <li key={index} className="list-group-item">
+                                <li key={documentName} className="list-group-item">
                                     {/*create a link to documentsUrls[index] and a delete button with onclick action*/}
                                     <div className="d-flex justify-content-between align-items-center">
                                         <a href={documentsUrls[index]} target="_blank" rel="noreferrer">{documentName}</a>
-                                        <button onClick={() => deleteDocument(index)} className="btn btn-danger btn-sm float-right">Eliminar</button>
+                                        <button onClick={() => deleteDocument(index, "admin")} className="btn btn-danger btn-sm float-right">Eliminar</button>
                                     </div>
                                 </li>
                             )
                         })}
                     </ul>
                 </div>}
+                {documentsTecnicUrls.length > 0 && <div className="form-group">
+                    <label htmlFor="documentsNames">Documents aportats per tècnic: </label><br />
+                    <ul className="list-group">
+                        {documentsTecnicNames.map((documentTecnicName, index) => {
+                            return (
+                                <li key={documentTecnicName} className="list-group-item">
+                                    {/*create a link to documentsUrls[index] and a delete button with onclick action*/}
+                                    <div className="d-flex justify-content-between align-items-center">
+                                        <a href={documentsTecnicUrls[index]} target="_blank" rel="noreferrer">{documentTecnicName}</a>
+                                        <button onClick={() => deleteDocument(index, "tecnic")} className="btn btn-danger btn-sm float-right">Eliminar</button>
+                                    </div>
+                                </li>
+                            )
+                        })}
+                    </ul>
+                </div>}
+                <div className="form-group">
+                    <label htmlFor="descriptionText">Comentaris tècnic:</label>
+                    <textarea className="form-control" value={serveiTecnicLocation.comentarisTecnic} rows={3} id="descriptionText"/>
+                </div>
                 <div className="form-group">
                     <label htmlFor="actionDate">Data d'acció prevista:</label>
                     <input type="datetime-local" value={actionDate} onChange={(e) => setActionDate(e.target.value)} className="form-control" id="actionDate" />
@@ -406,6 +458,7 @@ const AddServeiTecnic = () => {
                 </div>
                 <button onClick={() => addServeiTecnic()} className="btn btn-primary m-5">{btnTitle}</button>
             </form>
+
 
         </div>
     );

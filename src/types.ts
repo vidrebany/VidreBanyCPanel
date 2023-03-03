@@ -91,6 +91,7 @@ export interface ServeiTecnic {
   key: string;
   tecnicId: string;
   tecnicName: string;
+  comentarisTecnic: string;
   currentDate: number;
   codeDistributor: string;
   nameDistributor: string;
@@ -106,6 +107,8 @@ export interface ServeiTecnic {
   albaraFileName: string;
   documents: string[];
   documentsNames: string[];
+  documentsTecnic: string[];
+  documentsTecnicNames: string[];
   actionDate: number|undefined|null;
   stateServei: string;
 }

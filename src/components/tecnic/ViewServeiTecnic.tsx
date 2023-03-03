@@ -21,6 +21,7 @@ const ViewServeiTecnic = () => {
     const [albaraNumber, setAlbaraNumber] = useState('');
     const [isMesura, setIsMesura] = useState(true);
     const [description, setDescription] = useState('');
+    const [comentarisTecnic, setComentarisTecnic] = useState('');
     const [finalClientName, setFinalClientName] = useState('');
     const [finalClientPhone, setFinalClientPhone] = useState('');
     const [finalClientAddress, setFinalClientAddress] = useState('');
@@ -29,7 +30,9 @@ const ViewServeiTecnic = () => {
     const [albaraFileUrl, setAlbaraFileUrl] = useState('');
     //typed useState for documents for a multiple file input
     const [documentsNames, setDocumentsNames] = useState<string[]>([]);
+    const [documentsTecnicNames, setDocumentsTecnicNames] = useState<string[]>([]);
     const [documentsUrls, setDocumentsUrls] = useState<string[]>([]);
+    const [documentsTecnicUrls, setDocumentsTecnicUrls] = useState<string[]>([]);
     const [actionDate, setActionDate] = useState('');
     const [stateServei, setStateServei] = useState('Pendent');
 
@@ -62,6 +65,15 @@ const ViewServeiTecnic = () => {
                 }
                 setDocumentsNames(documentsNamesTemp);
             }
+            //get file names from storage using documents url
+            if (serveiTecnicLocation.documentsTecnic) {
+                let documentsTecnicNamesTemp: string[] = [];
+                for (let i = 0; i < serveiTecnicLocation.documentsTecnicNames.length; i++) {
+                    const documentTecnicName = serveiTecnicLocation.documentsTecnicNames[i];
+                    documentsTecnicNamesTemp.push(documentTecnicName);
+                }
+                setDocumentsTecnicNames(documentsTecnicNamesTemp);
+            }
 
             setTecnicId(serveiTecnicLocation.tecnicId);
             setTecnicName(serveiTecnicLocation.tecnicName);
@@ -72,11 +84,13 @@ const ViewServeiTecnic = () => {
             setAlbaraNumber(serveiTecnicLocation.albaraNumber);
             setIsMesura(serveiTecnicLocation.isMesura);
             setDescription(serveiTecnicLocation.description);
+            setComentarisTecnic(serveiTecnicLocation.comentarisTecnic);
             setFinalClientName(serveiTecnicLocation.finalClientName);
             setFinalClientPhone(serveiTecnicLocation.finalClientPhone);
             setFinalClientAddress(serveiTecnicLocation.finalClientAddress);
             setAlbaraFileUrl(serveiTecnicLocation.albaraFile);
             setDocumentsUrls(serveiTecnicLocation.documents || []);
+            setDocumentsTecnicUrls(serveiTecnicLocation.documentsTecnic || []);
             setStateServei(serveiTecnicLocation.stateServei);
         } else {
             navigate("/tecnic");
@@ -219,7 +233,35 @@ const ViewServeiTecnic = () => {
                                         <li key={index} className="list-group-item">
                                             {/*create a link to documentsUrls[index] and a delete button with onclick action*/}
                                             <div className="d-flex justify-content-between align-items-center">
-                                                <a href={documentsUrls[index]} target="_blank" rel="noreferrer">{documentName}</a>
+                                                <a href={documentsUrls[index]} target="_blank" rel="noreferrer">
+                                                    {documentName}
+                                                </a>
+                                            </div>
+                                        </li>
+                                    )
+                                })}
+                            </ul>
+                        </div>}
+                    </div>
+                </div>
+
+                <div className="row">
+                    <div className="col-md-6">
+                        <h6>Comentaris tècnic</h6>
+                        <textarea className="form-control" id="description" rows={3} value={comentarisTecnic} readOnly></textarea>
+                    </div>
+                    <div className="col-md-6">
+                        <h6>Documents aportats per tècnic:</h6>
+                        {documentsTecnicUrls.length > 0 && <div className="form-group">
+                            <ul className="list-group">
+                                {documentsTecnicNames.map((documentTecnicName, index) => {
+                                    return (
+                                        <li key={index} className="list-group-item">
+                                            {/*create a link to documentsUrls[index] and a delete button with onclick action*/}
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                <a href={documentsTecnicUrls[index]} target="_blank" rel="noreferrer">
+                                                    {documentTecnicName}
+                                                </a>
                                             </div>
                                         </li>
                                     )
