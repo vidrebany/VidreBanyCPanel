@@ -441,7 +441,7 @@ const AddServeiTecnic = () => {
                 </div>}
                 <div className="form-group">
                     <label htmlFor="descriptionText">Comentaris tècnic:</label>
-                    <textarea className="form-control" value={serveiTecnicLocation.comentarisTecnic} rows={3} id="descriptionText"/>
+                    <textarea className="form-control" value={serveiTecnicLocation.comentarisTecnic} readOnly rows={3} id="descriptionText"/>
                 </div>
                 <div className="form-group">
                     <label htmlFor="actionDate">Data d'acció prevista:</label>
