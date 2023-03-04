@@ -93,6 +93,7 @@ export interface ServeiTecnic {
   tecnicName: string;
   comentarisTecnic: string;
   currentDate: number;
+  revisionDate: number;
   codeDistributor: string;
   nameDistributor: string;
   emailDistributor: string;
@@ -100,6 +101,7 @@ export interface ServeiTecnic {
   albaraNumber: string;
   isMesura: boolean;
   description: string;
+  revision: string;
   finalClientName: string;
   finalClientPhone: string;
   finalClientAddress: string;

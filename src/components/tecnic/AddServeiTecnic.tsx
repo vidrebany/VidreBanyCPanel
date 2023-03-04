@@ -30,7 +30,9 @@ const AddServeiTecnic = () => {
 
 
     //create currentDate for datetime-local input
-    const [currentDate, setCurrentDate] = useState(new Date().toISOString().slice(0, 16));
+    let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+    const [currentDate, setCurrentDate] = useState((new Date(Date.now() - tzoffset)).toISOString().slice(0, 16));
+    const [revisionDate, setRevisionDate] = useState((new Date(Date.now() - tzoffset)).toISOString().slice(0, 16));
     const [codeDistributor, setCodeDistributor] = useState('');
     const [nameDistributor, setNameDistributor] = useState('');
     const [emailDistributor, setEmailDistributor] = useState('');
@@ -38,6 +40,7 @@ const AddServeiTecnic = () => {
     const [albaraNumber, setAlbaraNumber] = useState('');
     const [isMesura, setIsMesura] = useState(true);
     const [description, setDescription] = useState('');
+    const [revision, setRevision] = useState('');
     const [finalClientName, setFinalClientName] = useState('');
     const [finalClientPhone, setFinalClientPhone] = useState('');
     const [finalClientAddress, setFinalClientAddress] = useState('');
@@ -59,14 +62,20 @@ const AddServeiTecnic = () => {
         if (serveiTecnicLocation) {
 
             //parse serveiTecnic.currentDate to datetime-local input
-            const date = new Date(serveiTecnicLocation.currentDate);
+            const date = new Date(serveiTecnicLocation.currentDate + 60 * 60 * 1000);
             const currentDateISO = date.toISOString().slice(0, 16);
             if (currentDateISO) {
                 setCurrentDate(currentDateISO);
             }
+
+            if (serveiTecnicLocation.revisionDate) {
+                const dateRevision = new Date(serveiTecnicLocation.revisionDate + 60 * 60 * 1000);
+                const revisionDateISO = dateRevision.toISOString().slice(0, 16);
+                setRevisionDate(revisionDateISO);
+            }
             //parse serveiTecnic.actionDate to datetime-local input
             if (serveiTecnicLocation.actionDate) {
-                const dateAction = new Date(serveiTecnicLocation.actionDate);
+                const dateAction = new Date(serveiTecnicLocation.actionDate + 60 * 60 * 1000);
                 const actionDateISO = dateAction.toISOString().slice(0, 16);
                 setActionDate(actionDateISO);
             }
@@ -102,6 +111,7 @@ const AddServeiTecnic = () => {
             setAlbaraNumber(serveiTecnicLocation.albaraNumber);
             setIsMesura(serveiTecnicLocation.isMesura);
             setDescription(serveiTecnicLocation.description);
+            setRevision(serveiTecnicLocation.revision);
             setFinalClientName(serveiTecnicLocation.finalClientName);
             setFinalClientPhone(serveiTecnicLocation.finalClientPhone);
             setFinalClientAddress(serveiTecnicLocation.finalClientAddress);
@@ -153,8 +163,9 @@ const AddServeiTecnic = () => {
     }
 
     async function addServeiTecnic() {
-        const currentDateTimestamp = new Date(currentDate).getTime() + 60 * 60 * 1000;
-        const actionDateTimestamp = new Date(actionDate).getTime() + 60 * 60 * 1000;
+        const currentDateTimestamp = new Date(currentDate).getTime();
+        const revisionDateTimestamp = new Date(revisionDate).getTime();
+        const actionDateTimestamp = new Date(actionDate).getTime();
         var albaraFileUrlTemp = albaraFileUrl;
         var albaraFileNameTemp = albaraFileName;
 
@@ -213,6 +224,7 @@ const AddServeiTecnic = () => {
             tecnicName: tecnicName,
             comentarisTecnic: comentarisTecnic,
             currentDate: currentDateTimestamp,
+            revisionDate: revisionDateTimestamp,
             codeDistributor: codeDistributor,
             nameDistributor: nameDistributor,
             emailDistributor: emailDistributor,
@@ -220,6 +232,7 @@ const AddServeiTecnic = () => {
             albaraNumber: albaraNumber,
             isMesura: isMesura,
             description: description,
+            revision: revision,
             finalClientName: finalClientName,
             finalClientPhone: finalClientPhone,
             finalClientAddress: finalClientAddress,
@@ -266,16 +279,16 @@ const AddServeiTecnic = () => {
 
         var documentsUrlsTemp;
         var documentsNamesTemp;
-        
-        switch(documentType) {
-        case "admin": 
-            documentsUrlsTemp = documentsUrls;
-            documentsNamesTemp = documentsNames;
-            break;
-        case "tecnic":
-            documentsUrlsTemp = documentsTecnicUrls;
-            documentsNamesTemp = documentsTecnicNames;
-            break;
+
+        switch (documentType) {
+            case "admin":
+                documentsUrlsTemp = documentsUrls;
+                documentsNamesTemp = documentsNames;
+                break;
+            case "tecnic":
+                documentsUrlsTemp = documentsTecnicUrls;
+                documentsNamesTemp = documentsTecnicNames;
+                break;
         }
 
         if (!documentsUrlsTemp || !documentsNamesTemp) return;
@@ -371,7 +384,7 @@ const AddServeiTecnic = () => {
                 </div>
                 <div className="form-group">
                     <label htmlFor="descriptionText">Descripció:</label>
-                    <textarea className="form-control" value={description} onChange={(e) => setDescription(e.target.value)} rows={5} id="descriptionText"/>
+                    <textarea className="form-control" value={description} onChange={(e) => setDescription(e.target.value)} rows={5} id="descriptionText" />
                 </div>
                 <div className="form-group">
                     <label htmlFor="finalClientName">Nom Client Final:</label>
@@ -439,10 +452,12 @@ const AddServeiTecnic = () => {
                         })}
                     </ul>
                 </div>}
-                <div className="form-group">
-                    <label htmlFor="descriptionText">Comentaris tècnic:</label>
-                    <textarea className="form-control" value={serveiTecnicLocation.comentarisTecnic} readOnly rows={3} id="descriptionText"/>
-                </div>
+                {serveiTecnicLocation &&
+                    <div className="form-group">
+                        <label htmlFor="comentarisText">Comentaris tècnic:</label>
+                        <textarea className="form-control" value={serveiTecnicLocation.comentarisTecnic} readOnly rows={3} id="comentarisText" />
+                    </div>
+                }
                 <div className="form-group">
                     <label htmlFor="actionDate">Data d'acció prevista:</label>
                     <input type="datetime-local" value={actionDate} onChange={(e) => setActionDate(e.target.value)} className="form-control" id="actionDate" />
@@ -456,6 +471,13 @@ const AddServeiTecnic = () => {
                         <option>Finalitzat</option>
                     </select>
                 </div>
+                {stateServei === "Per revisar" &&
+                    <div className="form-group">
+                        <label htmlFor="revisionText">Revisió administrador:</label>
+                        <textarea className="form-control" value={revision} onChange={(e) => setRevision(e.target.value)} rows={5} id="revisionText" />
+                        <label htmlFor="actionDate">Data de revisió:</label>
+                        <input type="datetime-local" value={revisionDate} onChange={(e) => setRevisionDate(e.target.value)} className="form-control" id="revisionDate" />
+                    </div>}
                 <button onClick={() => addServeiTecnic()} className="btn btn-primary m-5">{btnTitle}</button>
             </form>
 

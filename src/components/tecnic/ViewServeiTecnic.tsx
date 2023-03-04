@@ -208,7 +208,7 @@ const ViewServeiTecnic = () => {
                 {/*Text for description (it has to be multiple lines) */}
                 <div className="form-group">
                     <label htmlFor="description">Descripció</label>
-                    <textarea className="form-control" id="description" rows={3} value={description} readOnly></textarea>
+                    <textarea className="form-control" id="description" rows={3} value={description} readOnly/>
                     <small className="form-text text-muted">Descripció del servei.</small>
                 </div>
                 <div className="row">
@@ -230,7 +230,7 @@ const ViewServeiTecnic = () => {
                             <ul className="list-group">
                                 {documentsNames.map((documentName, index) => {
                                     return (
-                                        <li key={index} className="list-group-item">
+                                        <li key={documentName} className="list-group-item">
                                             {/*create a link to documentsUrls[index] and a delete button with onclick action*/}
                                             <div className="d-flex justify-content-between align-items-center">
                                                 <a href={documentsUrls[index]} target="_blank" rel="noreferrer">
@@ -246,17 +246,20 @@ const ViewServeiTecnic = () => {
                 </div>
 
                 <div className="row">
+                    {comentarisTecnic !== "" && 
                     <div className="col-md-6">
                         <h6>Comentaris tècnic</h6>
-                        <textarea className="form-control" id="description" rows={3} value={comentarisTecnic} readOnly></textarea>
+                        <textarea className="form-control" id="description" rows={3} value={comentarisTecnic} readOnly/>
                     </div>
+                    }
+                    {documentsTecnicUrls.length > 0 && 
                     <div className="col-md-6">
                         <h6>Documents aportats per tècnic:</h6>
-                        {documentsTecnicUrls.length > 0 && <div className="form-group">
+                        <div className="form-group">
                             <ul className="list-group">
                                 {documentsTecnicNames.map((documentTecnicName, index) => {
                                     return (
-                                        <li key={index} className="list-group-item">
+                                        <li key={documentTecnicName} className="list-group-item">
                                             {/*create a link to documentsUrls[index] and a delete button with onclick action*/}
                                             <div className="d-flex justify-content-between align-items-center">
                                                 <a href={documentsTecnicUrls[index]} target="_blank" rel="noreferrer">
@@ -267,8 +270,8 @@ const ViewServeiTecnic = () => {
                                     )
                                 })}
                             </ul>
-                        </div>}
-                    </div>
+                        </div>
+                    </div>}
                 </div>
             </div>
         </div >
