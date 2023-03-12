@@ -48,7 +48,6 @@ const IncidenciesObertes = () => {
                             comandaNum: data[key].comandaNum,
                             codiDistribuidor: data[key].codiDistribuidor,
                             nomDistribuidor: data[key].nomDistribuidor,
-                            correuDistribuidor: data[key].correuDistribuidor,
                             nomTrucador: data[key].nomTrucador,
                             correuTrucador: data[key].correuTrucador,
                             tlfTrucador: data[key].tlfTrucador,

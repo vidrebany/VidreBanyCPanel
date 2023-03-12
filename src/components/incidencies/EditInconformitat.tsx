@@ -1,13 +1,13 @@
 import Navbar from "../Navbar";
 import "./styles/AddIncidencia.css"
-import { Button, Stack, Checkbox, FormControlLabel, TextField, Select, SelectChangeEvent, MenuItem, InputLabel, FormControl } from '@mui/material';
+import { Button, Stack, Checkbox, TextField, Select, SelectChangeEvent, MenuItem, InputLabel, FormControl } from '@mui/material';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers/';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { AdminsData, Incidencia, formaRegistreObject, comandaTypeObject } from "../../types";
 import { useRef, useState, useEffect } from "react";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
-import { getDatabase, ref, push, set, DatabaseReference, onValue } from "firebase/database";
+import { getDatabase, ref, set, onValue } from "firebase/database";
 import { getStorage, ref as refStorage, deleteObject, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import firebaseApp from "../../firebase";
 
@@ -53,7 +53,7 @@ const EditInconformitat = () => {
 
     const [comandaNum, setComandaNum] = useState('');
 
-    const [codiDistribuidor, setCodiDistribuidor] = useState(''); const [nomDistribuidor, setNomDistribuidor] = useState(''); const [correuDistribuidor, setCorreuDistribuidor] = useState('');
+    const [codiDistribuidor, setCodiDistribuidor] = useState(''); const [nomDistribuidor, setNomDistribuidor] = useState('');
 
     const [nomTrucador, setNomTrucador] = useState(''); const [correuTrucador, setCorreuTrucador] = useState(''); const [tlfTrucador, setTlfTrucador] = useState('');
 
@@ -65,13 +65,22 @@ const EditInconformitat = () => {
     const [comentarisNC, setComentarisNC] = useState('');
     const [downloadURL, setDownloadURL] = useState('');
     const [state, setState] = useState('');
-    const [serveiChecked, setServeiChecked] = useState(false); const [producteChecked, setProducteChecked] = useState(false);
+    const [serveiChecked, setServeiChecked] = useState(false);
+    const [producteChecked, setProducteChecked] = useState(false);
+    const [altresChecked, setAltresChecked] = useState(false)
+
     const [producteDisplay, setProducteDisplay] = useState('none');
     const [error, setError] = useState('');
     const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
     const [resolutionDisplay, setResolutionDisplay] = useState('none');
+
     const [resolvedChecked, setResolvedChecked] = useState(false);
     const [unresolvedChecked, setUnresolvedChecked] = useState(true);
+    const [pendingInfoChecked, setPendingInfoChecked] = useState(true);
+
+    useEffect(() => {
+        console.log(error)
+    }, [error])
 
 
     useEffect(() => {
@@ -88,7 +97,6 @@ const EditInconformitat = () => {
                 comandaNum: data.comandaNum,
                 codiDistribuidor: data.codiDistribuidor,
                 nomDistribuidor: data.nomDistribuidor,
-                correuDistribuidor: data.correuDistribuidor,
                 nomTrucador: data.nomTrucador,
                 correuTrucador: data.correuTrucador,
                 tlfTrucador: data.tlfTrucador,
@@ -126,7 +134,6 @@ const EditInconformitat = () => {
             setComandaNum(incidenciaTemp.comandaNum);
             setCodiDistribuidor(incidenciaTemp.codiDistribuidor);
             setNomDistribuidor(incidenciaTemp.nomDistribuidor);
-            setCorreuDistribuidor(incidenciaTemp.correuDistribuidor);
             setNomTrucador(incidenciaTemp.nomTrucador);
             setCorreuTrucador(incidenciaTemp.correuTrucador);
             setTlfTrucador(incidenciaTemp.tlfTrucador);
@@ -146,6 +153,7 @@ const EditInconformitat = () => {
 
             setResolvedChecked(incidenciaTemp.state === 'resolta');
             setUnresolvedChecked(incidenciaTemp.state === 'pendent');
+            setPendingInfoChecked(incidenciaTemp.state === 'pendentinfo');
 
             if (incidenciaTemp.serveioproducte === 'producte') {
                 setProducteDisplay('');
@@ -162,6 +170,7 @@ const EditInconformitat = () => {
 
 
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
 
@@ -179,7 +188,7 @@ const EditInconformitat = () => {
         setAdminId(event.target.value as string);
 
     };
-    const handleDateChange = (newValue: Dayjs | null) => {        
+    const handleDateChange = (newValue: Dayjs | null) => {
         setDate(newValue);
         let timestamp = newValue?.valueOf();
         setTimestamp(timestamp?.toString() || '');
@@ -189,33 +198,56 @@ const EditInconformitat = () => {
         let resolutionTimestamp = newValue?.valueOf();
         setResolutionTimestamp(resolutionTimestamp?.toString() || '');
     };
+
     const handleServeiCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (producteChecked) {
+        if (producteChecked || altresChecked) {
             setProducteChecked(false);
+            setAltresChecked(false);
         }
         setServeiChecked(event.target.checked);
 
     };
+
     const handleProducteCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (serveiChecked) {
+        if (serveiChecked || altresChecked) {
             setServeiChecked(false);
+            setAltresChecked(false);
         }
         setProducteChecked(event.target.checked);
 
     };
+    const handleAltresCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (serveiChecked || producteChecked) {
+            setServeiChecked(false);
+            setProducteChecked(false);
+        }
+        setAltresChecked(event.target.checked);
+
+    };
+
     const handleResolvedChecked = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (unresolvedChecked) {
+        if (unresolvedChecked || pendingInfoChecked) {
             setUnresolvedChecked(false);
+            setPendingInfoChecked(false);
         }
         setResolvedChecked(event.target.checked);
 
     };
 
     const handleUnresolvedCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (resolvedChecked) {
+        if (resolvedChecked || pendingInfoChecked) {
             setResolvedChecked(false);
+            setPendingInfoChecked(false);
         }
         setUnresolvedChecked(event.target.checked);
+
+    };
+    const handlePendingInfoCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (resolvedChecked || unresolvedChecked) {
+            setResolvedChecked(false);
+            setUnresolvedChecked(false);
+        }
+        setPendingInfoChecked(event.target.checked);
 
     };
 
@@ -322,8 +354,10 @@ const EditInconformitat = () => {
                     serveioproducte = "servei";
                 } else if (producteChecked) {
                     serveioproducte = "producte";
+                } else if (altresChecked) {
+                    serveioproducte = "altres";
                 } else {
-                    alert("Has de marcar servei o producte!")
+                    alert("Has de marcar servei, producte o altres!")
                     return;
                 }
                 //get firebaseStorage from firebase
@@ -343,6 +377,14 @@ const EditInconformitat = () => {
 
                         let downloadURLTemp: string = '';
                         let fileTitleTemp: string = '';
+                        let state = '';
+                        if (resolvedChecked) {
+                            state = 'resolta';
+                        } else if (unresolvedChecked) {
+                            state = 'pendent';
+                        } else if (pendingInfoChecked) {
+                            state = 'pendentinfo';
+                        }
                         downloadURL !== '' ? downloadURLTemp = downloadURL : downloadURLTemp = '';
                         fileTitle !== '' ? fileTitleTemp = fileTitle : fileTitleTemp = '';
                         const incidencia: Incidencia = {
@@ -355,7 +397,6 @@ const EditInconformitat = () => {
                             comandaNum: comandaNum,
                             codiDistribuidor: codiDistribuidor,
                             nomDistribuidor: nomDistribuidor,
-                            correuDistribuidor: correuDistribuidor,
                             nomTrucador: nomTrucador,
                             correuTrucador: correuTrucador,
                             tlfTrucador: tlfTrucador,
@@ -369,7 +410,7 @@ const EditInconformitat = () => {
                             fileTitle: fileTitleTemp,
                             resolucio: resolution || '',
                             resolucioTimestamp: resolutionTimestamp || '',
-                            state: resolvedChecked ? 'resolta' : 'pendent',
+                            state: state,
                         };
                         await set(dbRef, incidencia);
 
@@ -402,7 +443,6 @@ const EditInconformitat = () => {
                                         comandaNum: comandaNum,
                                         codiDistribuidor: codiDistribuidor,
                                         nomDistribuidor: nomDistribuidor,
-                                        correuDistribuidor: correuDistribuidor,
                                         nomTrucador: nomTrucador,
                                         correuTrucador: correuTrucador,
                                         tlfTrucador: tlfTrucador,
@@ -456,7 +496,7 @@ const EditInconformitat = () => {
         updateFile();
         //navigate to transport page
         console.log("Edited incidencia")
-        alert("Incidència editada correctament!");
+        navigate('/incidencies');
 
     }
     function beginDeleteFile(): void {
@@ -510,6 +550,41 @@ const EditInconformitat = () => {
         }
     }
 
+    function startSendEmail(type: string): void {
+        let mailBody;
+        let mailSubject;
+
+        switch (type) {
+            case 'askInfo':
+                //send mail to correuTrucador
+                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " ha sido parcialmente registrada por falta de información. Información solicitada:\n\n    · (PARA RELLENAR POR EL USUARIO)\n\ny nos mantenemos a la espera de recibir documentación por su parte.\nAgradeceríamos que pudiera responder este email con la información solicitada.\n\nMuy atentamente,\n" + adminName;
+                mailSubject = `Notificación NC${ncNum} registrada`;
+                //mail to correuTrucador
+                sendEmail(correuTrucador, mailSubject, mailBody);
+                break;
+            case 'sendData':
+                //send mail to correuTrucador
+                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " ha sido correctamente registrada y que en un plazo de 24-48 horas recibirá una respuesta al respecto.\n\nMuy atentamente,\n" + adminName;
+                mailSubject = `Notificación NC${ncNum} registrada`;
+                //mail to correuTrucador
+                sendEmail(correuTrucador, mailSubject, mailBody);
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    function sendEmail(correuTrucador: string, mailSubject: string, mailBody: string) {
+        const mail = {
+            to: `${correuTrucador}`,
+            subject: mailSubject,
+            body: encodeURIComponent(mailBody)
+        }
+        window.open(`mailto:${mail.to}?subject=${mail.subject}&body=${mail.body}`, '_blank');
+
+    }
+
     return (
         <div>
             <Navbar />
@@ -518,7 +593,7 @@ const EditInconformitat = () => {
                 accept="*"
                 multiple={false} />
             <h1>Editar no conformitat</h1>
-            <Button onClick={() => resolvedChecked ? navigate('/inconformitatstancades') : navigate('/incidenciesobertes')} variant="contained">Tornar</Button>
+            <Button onClick={() => navigate('/incidencies')} variant="contained">Tornar</Button>
 
             <Stack className="MasterStack" spacing={4} direction="column">
 
@@ -642,16 +717,6 @@ const EditInconformitat = () => {
                     variant="outlined"
                     onChange={(e) => setNomDistribuidor(e.target.value)}
                 />
-                {/*Correu (field for distributor email)*/}
-                <h6>Correu:</h6>
-                <TextField
-                    id="outlined-multiline-static"
-                    label="exemple@mail.com"
-                    type="text"
-                    value={correuDistribuidor}
-                    variant="outlined"
-                    onChange={(e) => setCorreuDistribuidor(e.target.value)}
-                />
             </Stack>
 
             <h3>Dades trucador:</h3>
@@ -762,18 +827,24 @@ const EditInconformitat = () => {
                         onChange={handleServeiCheck}
                         inputProps={{ 'aria-label': 'controlled' }}
                     />
+                    <h6 style={{ marginTop: "10px" }}>Altres:</h6>
+                    <Checkbox
+                        checked={altresChecked}
+                        onChange={handleAltresCheck}
+                        inputProps={{ 'aria-label': 'controlled' }}
+                    />
                 </Stack>
             </Stack>
             {/*comentaris*/}
-            <Stack className="Stack" spacing={1} direction="column">
-                <Stack spacing={1} direction="column">
+            <Stack className="Stack w-50" spacing={1} direction="column">
+                <Stack spacing={1} className="w-100" direction="column">
                     <h6>Comentaris no conformitat:</h6>
                     <TextField
                         id="outlined-multiline-static"
                         label="Comentaris"
                         type="text"
                         multiline
-                        rows={2}
+                        rows={4}
                         value={comentarisNC}
                         variant="outlined"
                         onChange={(e) => {
@@ -833,6 +904,12 @@ const EditInconformitat = () => {
                         onChange={handleUnresolvedCheck}
                         inputProps={{ 'aria-label': 'controlled' }}
                     />
+                    <h6 style={{ marginTop: "10px" }}>Pendent d'informació:</h6>
+                    <Checkbox
+                        checked={pendingInfoChecked}
+                        onChange={handlePendingInfoCheck}
+                        inputProps={{ 'aria-label': 'controlled' }}
+                    />
                 </Stack>
             </Stack>
 
@@ -841,6 +918,10 @@ const EditInconformitat = () => {
                 {downloadURL !== "" || fileTitle !== '' ? <a href={`${downloadURL}`} rel="noreferrer" target="_blank">{fileTitle}</a> : <p>No hi ha fitxer adjunt</p>}
                 {downloadURL !== "" || fileTitle !== '' ? <Button sx={{ width: 'min-content' }} onClick={() => beginDeleteFile()} variant="contained">Eliminar fitxer</Button> : null}
                 {/*Input for document*/}
+            </Stack>
+            <Stack style={{ margin: "30px" }} className="StackCheck" spacing={1} direction="row">
+                {pendingInfoChecked &&
+                    <Button onClick={() => startSendEmail("askInfo")} variant="contained">ENVIAR MAIL<br />SOL·LICITUT DADES</Button>}
             </Stack>
             <Stack style={{ margin: "30px" }} className="StackCheck" spacing={1} direction="row">
                 <Button onClick={() => editIncidencia()} variant="contained">EDITAR NO CONFORMITAT</Button>

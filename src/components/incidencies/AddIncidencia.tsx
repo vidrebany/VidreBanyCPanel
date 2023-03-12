@@ -285,8 +285,10 @@ const Incidencies = () => {
                     serveioproducte = "servei";
                 } else if (producteChecked) {
                     serveioproducte = "producte";
+                } else if (altresChecked) {
+                    serveioproducte = "altres";
                 } else {
-                    alert("Has de marcar servei o producte!")
+                    alert("Has de marcar servei, producte o altres!")
                     return;
                 }
                 //get firebaseStorage from firebase
@@ -307,6 +309,13 @@ const Incidencies = () => {
                         //get key from newIncidenciaRef
                         const dbKey = newIncidenciaRef.key;
                         if (dbKey) {
+
+                            let state = 'pendent';
+                            if (resolvedChecked) {
+                                state = 'resolta';
+                            } else if (pendingInfoChecked) {
+                                state = 'pendentinfo';
+                            }
 
                             const incidencia: Incidencia = {
                                 key: dbKey,
@@ -331,7 +340,7 @@ const Incidencies = () => {
                                 fileTitle: '',
                                 resolucio: resolution || '',
                                 resolucioTimestamp: resolutionTimestamp || '',
-                                state: resolvedChecked ? 'resolta' : 'pendent',
+                                state: state,
                             };
                             set(newIncidenciaRef, incidencia);
 
