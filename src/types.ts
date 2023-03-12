@@ -158,7 +158,6 @@ export interface Incidencia {
   comandaNum: string;
   codiDistribuidor: string;
   nomDistribuidor: string;
-  correuDistribuidor: string;
   nomTrucador: string;
   correuTrucador: string;
   tlfTrucador: string;

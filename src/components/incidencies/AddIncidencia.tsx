@@ -42,7 +42,7 @@ const Incidencies = () => {
 
     const [comandaNum, setComandaNum] = useState('');
 
-    const [codiDistribuidor, setCodiDistribuidor] = useState(''); const [nomDistribuidor, setNomDistribuidor] = useState(''); const [correuDistribuidor, setCorreuDistribuidor] = useState('');
+    const [codiDistribuidor, setCodiDistribuidor] = useState(''); const [nomDistribuidor, setNomDistribuidor] = useState('');
 
     const [nomTrucador, setNomTrucador] = useState(''); const [correuTrucador, setCorreuTrucador] = useState(''); const [tlfTrucador, setTlfTrucador] = useState('');
 
@@ -52,10 +52,11 @@ const Incidencies = () => {
     const [resolution, setResolution] = useState('');
     const [comentarisNC, setComentarisNC] = useState('');
 
-    const [serveiChecked, setServeiChecked] = useState(false); const [producteChecked, setProducteChecked] = useState(false);
+    const [serveiChecked, setServeiChecked] = useState(false); const [producteChecked, setProducteChecked] = useState(false); const [altresChecked, setAltresChecked] = useState(false);
 
     const [resolvedChecked, setResolvedChecked] = useState(false);
     const [unresolvedChecked, setUnresolvedChecked] = useState(true);
+    const [pendingInfoChecked, setPendingInfoChecked] = useState(true);
 
     const [producteDisplay, setProducteDisplay] = useState('none');
     const [resolutionDisplay, setResolutionDisplay] = useState('none');
@@ -98,34 +99,54 @@ const Incidencies = () => {
     };
 
     const handleServeiCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (producteChecked) {
+        if (producteChecked || altresChecked) {
             setProducteChecked(false);
+            setAltresChecked(false);
         }
         setServeiChecked(event.target.checked);
 
     };
 
     const handleProducteCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (serveiChecked) {
+        if (serveiChecked || altresChecked) {
             setServeiChecked(false);
+            setAltresChecked(false);
         }
         setProducteChecked(event.target.checked);
 
     };
+    const handleAltresCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (serveiChecked || producteChecked) {
+            setServeiChecked(false);
+            setProducteChecked(false);
+        }
+        setAltresChecked(event.target.checked);
+
+    };
 
     const handleResolvedChecked = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (unresolvedChecked) {
+        if (unresolvedChecked || pendingInfoChecked) {
             setUnresolvedChecked(false);
+            setPendingInfoChecked(false);
         }
         setResolvedChecked(event.target.checked);
 
     };
 
     const handleUnresolvedCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (resolvedChecked) {
+        if (resolvedChecked || pendingInfoChecked) {
             setResolvedChecked(false);
+            setPendingInfoChecked(false);
         }
         setUnresolvedChecked(event.target.checked);
+
+    };
+    const handlePendingInfoCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (resolvedChecked || unresolvedChecked) {
+            setResolvedChecked(false);
+            setUnresolvedChecked(false);
+        }
+        setPendingInfoChecked(event.target.checked);
 
     };
 
@@ -240,7 +261,6 @@ const Incidencies = () => {
                 console.log("comandaNum: " + comandaNum);
                 console.log("codiDistribuidor: " + codiDistribuidor);
                 console.log("nomDistribuidor: " + nomDistribuidor);
-                console.log("correuDistribuidor: " + correuDistribuidor);
                 console.log("nomTrucador: " + nomTrucador);
                 console.log("correuTrucador: " + correuTrucador);
                 console.log("tlfTrucador: " + tlfTrucador);
@@ -298,7 +318,6 @@ const Incidencies = () => {
                                 comandaNum: comandaNum,
                                 codiDistribuidor: codiDistribuidor,
                                 nomDistribuidor: nomDistribuidor,
-                                correuDistribuidor: correuDistribuidor,
                                 nomTrucador: nomTrucador,
                                 correuTrucador: correuTrucador,
                                 tlfTrucador: tlfTrucador,
@@ -351,7 +370,6 @@ const Incidencies = () => {
                                         comandaNum: comandaNum,
                                         codiDistribuidor: codiDistribuidor,
                                         nomDistribuidor: nomDistribuidor,
-                                        correuDistribuidor: correuDistribuidor,
                                         nomTrucador: nomTrucador,
                                         correuTrucador: correuTrucador,
                                         tlfTrucador: tlfTrucador,
@@ -408,17 +426,34 @@ const Incidencies = () => {
 
     }
 
-    function startSendEmail(): void {
-        //send mail to correuTrucador and correuDistribuidor
-        const mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + "ha sido correctamente registrada y que en un plazo de 24-48 horas recibirá una respuesta al respecto.\n\nMuy atentamente,\n" + adminName;
-        const mailSubject = `Notificación NC${ncNum} registrada`;
-        //mail to correuTrucador and correuDistribuidor
-        sendEmail(correuTrucador, correuDistribuidor, mailSubject, mailBody);
+    function startSendEmail(type: string): void {
+        let mailBody;
+        let mailSubject;
+
+        switch (type) {
+            case 'askInfo':
+                //send mail to correuTrucador
+                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " ha sido parcialmente registrada por falta de información. Información solicitada:\n\n    · (PARA RELLENAR POR EL USUARIO)\n\ny nos mantenemos a la espera de recibir documentación por su parte.\nAgradeceríamos que pudiera responder este email con la información solicitada.\n\nMuy atentamente,\n" + adminName;
+                mailSubject = `Notificación NC${ncNum} registrada`;
+                //mail to correuTrucador
+                sendEmail(correuTrucador, mailSubject, mailBody);
+                break;
+            case 'sendData':
+                //send mail to correuTrucador
+                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " ha sido correctamente registrada y que en un plazo de 24-48 horas recibirá una respuesta al respecto.\n\nMuy atentamente,\n" + adminName;
+                mailSubject = `Notificación NC${ncNum} registrada`;
+                //mail to correuTrucador
+                sendEmail(correuTrucador, mailSubject, mailBody);
+                break;
+            default:
+                break;
+        }
+
     }
 
-    function sendEmail(correuTrucador: string, correuDistribuidor: string, mailSubject: string, mailBody: string) {
+    function sendEmail(correuTrucador: string, mailSubject: string, mailBody: string) {
         const mail = {
-            to: `${correuTrucador},${correuDistribuidor}`,
+            to: `${correuTrucador}`,
             subject: mailSubject,
             body: encodeURIComponent(mailBody)
         }
@@ -558,16 +593,6 @@ const Incidencies = () => {
                     variant="outlined"
                     onChange={(e) => setNomDistribuidor(e.target.value)}
                 />
-                {/*Correu (field for distributor email)*/}
-                <h6>Correu:</h6>
-                <TextField
-                    id="outlined-multiline-static"
-                    label="exemple@mail.com"
-                    type="text"
-                    value={correuDistribuidor}
-                    variant="outlined"
-                    onChange={(e) => setCorreuDistribuidor(e.target.value)}
-                />
             </Stack>
 
             <h3>Dades trucador:</h3>
@@ -678,6 +703,12 @@ const Incidencies = () => {
                         onChange={handleServeiCheck}
                         inputProps={{ 'aria-label': 'controlled' }}
                     />
+                    <h6 style={{ marginTop: "10px" }}>Altres:</h6>
+                    <Checkbox
+                        checked={altresChecked}
+                        onChange={handleAltresCheck}
+                        inputProps={{ 'aria-label': 'controlled' }}
+                    />
                 </Stack>
             </Stack>
             {/*comentaris*/}
@@ -731,20 +762,30 @@ const Incidencies = () => {
                     </Stack>
 
                 </Stack>
-                <Stack spacing={1} direction="row">
 
+                <Stack spacing={1} direction={{ xs: "column", sm: 'row' }}>
                     <h6 style={{ marginTop: "10px" }}>Resolt:</h6>
                     <Checkbox
                         checked={resolvedChecked}
                         onChange={handleResolvedChecked}
                         inputProps={{ 'aria-label': 'controlled' }}
                     />
+
                     <h6 style={{ marginTop: "10px" }}>Sense resoldre:</h6>
                     <Checkbox
                         checked={unresolvedChecked}
                         onChange={handleUnresolvedCheck}
                         inputProps={{ 'aria-label': 'controlled' }}
                     />
+
+
+                    <h6 style={{ marginTop: "10px" }}>Pendent d'informació:</h6>
+                    <Checkbox
+                        checked={pendingInfoChecked}
+                        onChange={handlePendingInfoCheck}
+                        inputProps={{ 'aria-label': 'controlled' }}
+                    />
+
                 </Stack>
             </Stack>
 
@@ -754,8 +795,11 @@ const Incidencies = () => {
                 {/*Input for document*/}
                 {/*Enviar button*/}
             </Stack>
+
             <Stack style={{ margin: "30px" }} className="StackCheck" spacing={1} direction="row">
-                <Button onClick={() => startSendEmail()} variant="contained">ENVIAR MAIL</Button>
+                {pendingInfoChecked ?
+                    <Button onClick={() => startSendEmail("askInfo")} variant="contained">ENVIAR MAIL<br />SOL·LICITUT DADES</Button> :
+                    <Button onClick={() => startSendEmail("sendData")} variant="contained">ENVIAR MAIL<br />DADES COMPLETES</Button>}
             </Stack>
             <Stack style={{ margin: "30px" }} className="StackCheck" spacing={1} direction="row">
                 <Button onClick={() => submitIncidencia()} variant="contained">NOVA NO CONFORMITAT</Button>
