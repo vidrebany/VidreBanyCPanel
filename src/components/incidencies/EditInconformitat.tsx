@@ -76,7 +76,7 @@ const EditInconformitat = () => {
 
     const [resolvedChecked, setResolvedChecked] = useState(false);
     const [unresolvedChecked, setUnresolvedChecked] = useState(true);
-    const [pendingInfoChecked, setPendingInfoChecked] = useState(true);
+    const [pendingInfoChecked, setPendingInfoChecked] = useState(false);
 
     useEffect(() => {
         console.log(error)
@@ -891,19 +891,19 @@ const EditInconformitat = () => {
 
                 </Stack>
                 <Stack spacing={1} direction="row">
-
-                    <h6 style={{ marginTop: "10px" }}>Resolt:</h6>
-                    <Checkbox
-                        checked={resolvedChecked}
-                        onChange={handleResolvedChecked}
-                        inputProps={{ 'aria-label': 'controlled' }}
-                    />
                     <h6 style={{ marginTop: "10px" }}>Sense resoldre:</h6>
                     <Checkbox
                         checked={unresolvedChecked}
                         onChange={handleUnresolvedCheck}
                         inputProps={{ 'aria-label': 'controlled' }}
                     />
+                    <h6 style={{ marginTop: "10px" }}>Resolt:</h6>
+                    <Checkbox
+                        checked={resolvedChecked}
+                        onChange={handleResolvedChecked}
+                        inputProps={{ 'aria-label': 'controlled' }}
+                    />
+
                     <h6 style={{ marginTop: "10px" }}>Pendent d'informació:</h6>
                     <Checkbox
                         checked={pendingInfoChecked}

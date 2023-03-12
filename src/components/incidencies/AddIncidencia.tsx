@@ -6,8 +6,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { AdminsData, Incidencia, formaRegistreObject, comandaTypeObject } from "../../types";
 import { useRef, useState, useEffect } from "react";
 
-import { getDatabase, ref, push, set, onValue } from "firebase/database";
-import { getStorage, ref as refStorage, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { getDatabase, ref as databaseRef, push, set, onValue, update } from "firebase/database";
+import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, uploadBytes, deleteObject } from "firebase/storage";
 import firebaseApp from "../../firebase";
 
 import { useNavigate } from "react-router-dom";
@@ -18,6 +18,7 @@ import dayjs, { Dayjs } from 'dayjs';
 const Incidencies = () => {
     const db = getDatabase(firebaseApp);
     const [timestamp, setTimestamp] = useState('');
+    const storage = getStorage(firebaseApp);
 
     //get current date and time (in day month year minutes and hours format) using dayjs and transforming to Dayjs type
     const [date, setDate] = useState<Dayjs | null>(() => {
@@ -54,12 +55,17 @@ const Incidencies = () => {
 
     const [serveiChecked, setServeiChecked] = useState(false); const [producteChecked, setProducteChecked] = useState(false); const [altresChecked, setAltresChecked] = useState(false);
 
-    const [resolvedChecked, setResolvedChecked] = useState(false);
     const [unresolvedChecked, setUnresolvedChecked] = useState(true);
-    const [pendingInfoChecked, setPendingInfoChecked] = useState(true);
+    const [resolvedChecked, setResolvedChecked] = useState(false);
+    const [pendingInfoChecked, setPendingInfoChecked] = useState(false);
 
     const [producteDisplay, setProducteDisplay] = useState('none');
     const [resolutionDisplay, setResolutionDisplay] = useState('none');
+
+    const [documents, setDocuments] = useState<FileList | null>(null);
+    const [documentsNames, setDocumentsNames] = useState<string[]>([]);
+    const [documentsUrls, setDocumentsUrls] = useState<string[]>([]);
+
 
     const [error, setError] = useState('');
 
@@ -162,9 +168,7 @@ const Incidencies = () => {
         setFile(fileInput);
         setFileTitle(fileInput?.name || 'SENSE ARXIU');
     }
-    const inputFileClick = () => {
-        inputFileRef.current?.click();
-    };
+
 
 
     var mounted = false;
@@ -172,7 +176,7 @@ const Incidencies = () => {
 
     //get admins list
     useEffect(() => {
-        const transportRef = ref(db, "/admins/");
+        const transportRef = databaseRef(db, "/admins/");
 
         onValue(transportRef, (snapshot) => {
             const data = snapshot.val();
@@ -226,7 +230,7 @@ const Incidencies = () => {
 
     //get no conformitats list
     useEffect(() => {
-        const inconfRef = ref(db, "/incidencies/inconformitats");
+        const inconfRef = databaseRef(db, "/incidencies/inconformitats");
 
         onValue(inconfRef, (snapshot) => {
             const data = snapshot.val();
@@ -250,188 +254,84 @@ const Incidencies = () => {
 
 
     async function submitIncidencia() {
-
-        /*
-                console.log('submitting');
-                console.log("date: " + date);
-                console.log("adminId: " + adminId);
-                console.log("comandaType: " + comandaType);
-                console.log("formaRegistre: " + formaRegistre);
-                console.log("ncNum: " + ncNum);
-                console.log("comandaNum: " + comandaNum);
-                console.log("codiDistribuidor: " + codiDistribuidor);
-                console.log("nomDistribuidor: " + nomDistribuidor);
-                console.log("nomTrucador: " + nomTrucador);
-                console.log("correuTrucador: " + correuTrucador);
-                console.log("tlfTrucador: " + tlfTrucador);
-                console.log("direccioClientFinal: " + direccioClientFinal);
-                console.log("tlfClientFinal: " + tlfClientFinal);
-                console.log("refProducte: " + refProducte);
-                console.log("descrProducte: " + descrProducte);
-                console.log("comentarisNC: " + comentarisNC);
-                console.log("serveiChecked: " + serveiChecked);
-                console.log("producteChecked: " + producteChecked);
-                console.log("file: " + file);
-                console.log("fileTitle: " + fileTitle);
-        */
-
-        //get realtime database ref and push
-
-        try {
-
-            try {
-                let serveioproducte: string;
-                if (serveiChecked) {
-                    serveioproducte = "servei";
-                } else if (producteChecked) {
-                    serveioproducte = "producte";
-                } else if (altresChecked) {
-                    serveioproducte = "altres";
-                } else {
-                    alert("Has de marcar servei, producte o altres!")
-                    return;
-                }
-                //get firebaseStorage from firebase
-                const storage = getStorage(firebaseApp);
-
-                //upload the file to storage, no matter if imports are not specified
-                var storageRef: any;
-                try {
-                    storageRef = refStorage(storage, 'incidencies/inconformitats/' + fileTitle);
-                } catch (error) {
-                    console.log(error);
-                }
-                if (fileTitle === 'SENSE ARXIU') {
-                    try {
-                        const dbRef = ref(db, 'incidencies/inconformitats/');
-
-                        const newIncidenciaRef = push(dbRef);
-                        //get key from newIncidenciaRef
-                        const dbKey = newIncidenciaRef.key;
-                        if (dbKey) {
-
-                            let state = 'pendent';
-                            if (resolvedChecked) {
-                                state = 'resolta';
-                            } else if (pendingInfoChecked) {
-                                state = 'pendentinfo';
-                            }
-
-                            const incidencia: Incidencia = {
-                                key: dbKey,
-                                ncNum: ncNum,
-                                date: timestamp || '',
-                                adminId: adminId,
-                                comandaType: comandaType,
-                                formaRegistre: formaRegistre,
-                                comandaNum: comandaNum,
-                                codiDistribuidor: codiDistribuidor,
-                                nomDistribuidor: nomDistribuidor,
-                                nomTrucador: nomTrucador,
-                                correuTrucador: correuTrucador,
-                                tlfTrucador: tlfTrucador,
-                                direccioClientFinal: direccioClientFinal,
-                                tlfClientFinal: tlfClientFinal,
-                                refProducte: refProducte,
-                                descrProducte: descrProducte,
-                                comentarisNC: comentarisNC,
-                                serveioproducte: serveioproducte,
-                                downloadURL: '',
-                                fileTitle: '',
-                                resolucio: resolution || '',
-                                resolucioTimestamp: resolutionTimestamp || '',
-                                state: state,
-                            };
-                            set(newIncidenciaRef, incidencia);
-
-                        } else {
-                            alert("error a la base de dades");
-                        }
+        const currentDateTimestamp = new Date().getTime();
 
 
+        if (documents) {
+            var documentsUrlsTemp = documentsUrls;
+            var documentsNamesTemp = documentsNames;
+
+            for (let i = 0; i < documents.length; i++) {
+                const documentsRef = storageRef(storage, `documents/incidencies/${currentDateTimestamp + documents[i].name}`);
+                await uploadBytes(documentsRef, documents[i]);
+                const documentUrl = await getDownloadURL(documentsRef);
+                documentsUrlsTemp.push(documentUrl);
+                documentsNamesTemp.push(documents[i].name);
+            }
+            setDocumentsUrls(documentsUrlsTemp);
+            setDocumentsNames(documentsNamesTemp);
+        }
 
 
-                    } catch (error: any) {
-                        alert("error: " + error.message);
-                    }
-                } else {
-                    await uploadBytesResumable(storageRef, file as Blob).then((snapshot) => {
-                        console.log('Uploaded a blob or file!');
+        //push to get new key
+        let infonformitatRef = push(databaseRef(db, 'incidencies/inconformitats/'));
+        let key = infonformitatRef.key;
 
-                        //get download url
-                        getDownloadURL(snapshot.ref).then((downloadURL) => {
-
-                            try {
-                                const dbRef = ref(db, 'incidencies/inconformitats/');
-
-                                const newIncidenciaRef = push(dbRef);
-                                //get key from newIncidenciaRef
-                                const dbKey = newIncidenciaRef.key;
-                                if (dbKey) {
-
-                                    const incidencia: Incidencia = {
-                                        key: dbKey,
-                                        ncNum: ncNum,
-                                        date: timestamp || '',
-                                        adminId: adminId,
-                                        comandaType: comandaType,
-                                        formaRegistre: formaRegistre,
-                                        comandaNum: comandaNum,
-                                        codiDistribuidor: codiDistribuidor,
-                                        nomDistribuidor: nomDistribuidor,
-                                        nomTrucador: nomTrucador,
-                                        correuTrucador: correuTrucador,
-                                        tlfTrucador: tlfTrucador,
-                                        direccioClientFinal: direccioClientFinal,
-                                        tlfClientFinal: tlfClientFinal,
-                                        refProducte: refProducte,
-                                        descrProducte: descrProducte,
-                                        comentarisNC: comentarisNC,
-                                        serveioproducte: serveioproducte,
-                                        downloadURL: downloadURL,
-                                        fileTitle: fileTitle,
-                                        resolucio: resolution || '',
-                                        resolucioTimestamp: resolutionTimestamp || '',
-                                        state: resolvedChecked ? 'resolta' : 'pendent',
-
-                                    };
-                                    set(newIncidenciaRef, incidencia);
-
-                                } else {
-                                    alert("error a la base de dades");
-                                }
-
-
-
-
-                            } catch (error: any) {
-                                alert("error: " + error.message);
-                            }
-
-
-                        });
-                    });
-                }
-
-            } catch (error: any) {
-                setError(error.message);
-                alert("Ja existeix un arxiu com aquest" + error.message);
+        if (key) {
+            let serveioproducte: string;
+            if (serveiChecked) {
+                serveioproducte = "servei";
+            } else if (producteChecked) {
+                serveioproducte = "producte";
+            } else if (altresChecked) {
+                serveioproducte = "altres";
+            } else {
+                alert("Has de marcar servei, producte o altres!")
+                return;
             }
 
+            let state = 'pendent';
+            if (resolvedChecked) {
+                state = 'resolta';
+            } else if (pendingInfoChecked) {
+                state = 'pendentinfo';
+            }
 
+            const incidencia: Incidencia = {
+                key: key,
+                ncNum: ncNum,
+                date: timestamp || '',
+                adminId: adminId,
+                comandaType: comandaType,
+                formaRegistre: formaRegistre,
+                comandaNum: comandaNum,
+                codiDistribuidor: codiDistribuidor,
+                nomDistribuidor: nomDistribuidor,
+                nomTrucador: nomTrucador,
+                correuTrucador: correuTrucador,
+                tlfTrucador: tlfTrucador,
+                direccioClientFinal: direccioClientFinal,
+                tlfClientFinal: tlfClientFinal,
+                refProducte: refProducte,
+                descrProducte: descrProducte,
+                comentarisNC: comentarisNC,
+                serveioproducte: serveioproducte,
+                documents: documentsUrls || [],
+                documentsNames: documentsNames,
+                resolucio: resolution || '',
+                resolucioTimestamp: resolutionTimestamp || '',
+                state: state,
+            };
+            set(infonformitatRef, incidencia);
 
-
-
-        } catch (error: any) {
-
-            setError(error.message);
-            console.log(error.message);
-
+        } else {
+            alert("error a la base de dades");
         }
+
 
         //navigate to transport page
         console.log("Created incidencia")
-        navigate('/incidenciesobertes');
+        navigate('/incidencies');
 
     }
 
@@ -467,6 +367,38 @@ const Incidencies = () => {
             body: encodeURIComponent(mailBody)
         }
         window.open(`mailto:${mail.to}?subject=${mail.subject}&body=${mail.body}`, '_blank');
+
+    }
+
+
+    function deleteDocument(documentIndex: number) {
+
+
+        var documentsUrlsTemp = documentsUrls;
+        var documentsNamesTemp = documentsNames;
+
+
+
+        if (!documentsUrlsTemp || !documentsNamesTemp) return;
+
+        const documentRef = storageRef(storage, documentsUrlsTemp[documentIndex]);
+
+        try {
+            deleteObject(documentRef).then(() => {
+                console.log("deleted document")
+            });
+        } catch (error) {
+            console.log(error)
+        }
+
+        documentsUrlsTemp.splice(documentIndex, 1);
+        documentsNamesTemp.splice(documentIndex, 1);
+
+        setDocumentsUrls(documentsUrlsTemp);
+        setDocumentsNames(documentsNamesTemp);
+
+
+
 
     }
 
@@ -721,15 +653,15 @@ const Incidencies = () => {
                 </Stack>
             </Stack>
             {/*comentaris*/}
-            <Stack className="Stack" spacing={1} direction="column">
-                <Stack spacing={1} direction="column">
+            <Stack className="Stack w-50" spacing={1} direction="column">
+                <Stack spacing={1} className="w-100" direction="column">
                     <h6>Comentaris no conformitat:</h6>
                     <TextField
                         id="outlined-multiline-static"
                         label="Comentaris"
                         type="text"
                         multiline
-                        rows={2}
+                        rows={4}
                         value={comentarisNC}
                         variant="outlined"
                         onChange={(e) => {
@@ -773,12 +705,6 @@ const Incidencies = () => {
                 </Stack>
 
                 <Stack spacing={1} direction={{ xs: "column", sm: 'row' }}>
-                    <h6 style={{ marginTop: "10px" }}>Resolt:</h6>
-                    <Checkbox
-                        checked={resolvedChecked}
-                        onChange={handleResolvedChecked}
-                        inputProps={{ 'aria-label': 'controlled' }}
-                    />
 
                     <h6 style={{ marginTop: "10px" }}>Sense resoldre:</h6>
                     <Checkbox
@@ -786,7 +712,12 @@ const Incidencies = () => {
                         onChange={handleUnresolvedCheck}
                         inputProps={{ 'aria-label': 'controlled' }}
                     />
-
+                    <h6 style={{ marginTop: "10px" }}>Resolt:</h6>
+                    <Checkbox
+                        checked={resolvedChecked}
+                        onChange={handleResolvedChecked}
+                        inputProps={{ 'aria-label': 'controlled' }}
+                    />
 
                     <h6 style={{ marginTop: "10px" }}>Pendent d'informació:</h6>
                     <Checkbox
@@ -796,14 +727,37 @@ const Incidencies = () => {
                     />
 
                 </Stack>
+
             </Stack>
 
             <Stack style={{ margin: "30px" }} className="StackCheck" spacing={1} direction="row">
 
-                <Button onClick={inputFileClick} variant="contained">{fileTitle}</Button>
                 {/*Input for document*/}
                 {/*Enviar button*/}
+                <div className="form-group">
+                    <label htmlFor="documentsInput">Documents: </label><br />
+                    <input type="file" multiple className="form-control-file" id="documentsInput" onChange={(e) => setDocuments(e.target.files)} />
+                </div>
+                {/*Display documentsNames list*/}
+                {documentsUrls.length > 0 && <div className="form-group">
+                    <label htmlFor="documentsNames">Noms dels documents: </label><br />
+                    <ul className="list-group">
+                        {documentsNames.map((documentName, index) => {
+                            return (
+                                <li key={documentName} className="list-group-item">
+                                    {/*create a link to documentsUrls[index] and a delete button with onclick action*/}
+                                    <div className="d-flex justify-content-between align-items-center">
+                                        <a href={documentsUrls[index]} target="_blank" rel="noreferrer">{documentName}</a>
+                                        <button onClick={() => deleteDocument(index)} className="btn btn-danger btn-sm float-right">Eliminar</button>
+                                    </div>
+                                </li>
+                            )
+                        })}
+                    </ul>
+                </div>}
+
             </Stack>
+
 
             <Stack style={{ margin: "30px" }} className="StackCheck" spacing={1} direction="row">
                 {pendingInfoChecked ?

@@ -167,8 +167,8 @@ export interface Incidencia {
   descrProducte: string;
   comentarisNC: string;
   serveioproducte: string;
-  downloadURL: string;
-  fileTitle: string;
+  documents: string[];
+  documentsNames: string[];
   resolucio: string;
   resolucioTimestamp: string;
   state: string;
