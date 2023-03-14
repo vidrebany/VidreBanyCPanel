@@ -738,23 +738,6 @@ const Incidencies = () => {
                     <label htmlFor="documentsInput">Documents: </label><br />
                     <input type="file" multiple className="form-control-file" id="documentsInput" onChange={(e) => setDocuments(e.target.files)} />
                 </div>
-                {/*Display documentsNames list*/}
-                {documentsUrls.length > 0 && <div className="form-group">
-                    <label htmlFor="documentsNames">Noms dels documents: </label><br />
-                    <ul className="list-group">
-                        {documentsNames.map((documentName, index) => {
-                            return (
-                                <li key={documentName} className="list-group-item">
-                                    {/*create a link to documentsUrls[index] and a delete button with onclick action*/}
-                                    <div className="d-flex justify-content-between align-items-center">
-                                        <a href={documentsUrls[index]} target="_blank" rel="noreferrer">{documentName}</a>
-                                        <button onClick={() => deleteDocument(index)} className="btn btn-danger btn-sm float-right">Eliminar</button>
-                                    </div>
-                                </li>
-                            )
-                        })}
-                    </ul>
-                </div>}
 
             </Stack>
 

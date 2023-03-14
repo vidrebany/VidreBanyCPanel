@@ -71,28 +71,31 @@ const Incidencies = () => {
         deleteIncidencia(incidenciaDeleteKey, incidenciaDeleteDownloadURL);
     }
 
-    
+
     function deleteIncidencia(incidenciaDeleteKey: string, incidenciaDeleteDownloadURL: string) {
 
         const dbRef = ref(db, '/incidencies/inconformitats/' + incidenciaDeleteKey);
 
-        if (incidenciaDeleteDownloadURL !== "") {
+        //select from inconformitatsList the object with the key that matches the key of the object to delete
+        const incidenciaToDelete = inconformitatsList.find((incidencia) => incidencia.key === incidenciaDeleteKey);
+
+        if (incidenciaToDelete?.documents) {
             try {
-                let storageRefFromDownloadURL = refStorage(storage, incidenciaDeleteDownloadURL);
-                deleteObject(storageRefFromDownloadURL).then(() => {
-                    console.log("deleted")
-                    remove(dbRef);
-                }).catch((error) => {
-                    console.log("error deleting: " + error)
-                    remove(dbRef);
+                incidenciaToDelete.documents.forEach(document => {
+                    let storageRefFromDownloadURL = refStorage(storage, document);
+                    deleteObject(storageRefFromDownloadURL).then(() => {
+                        console.log("deleted")
+                    }).catch((error) => {
+                        console.log("error deleting: " + error)
                     });
+                });
+                remove(dbRef);
             } catch (error) {
                 console.log("error deleting: " + error)
             }
         } else {
             remove(dbRef);
         }
-
     }
 
 
@@ -108,8 +111,8 @@ const Incidencies = () => {
                     let incidenciaData: Incidencia = data[key];
 
                     if (searchText !== "" &&
-                    (incidenciaData.nomDistribuidor.toLowerCase().includes(searchText.toLowerCase()) ||
-                    incidenciaData.codiDistribuidor.toLowerCase().includes(searchText.toLowerCase())) && filterIncidenciaType(incidenciaData)) {
+                        (incidenciaData.nomDistribuidor.toLowerCase().includes(searchText.toLowerCase()) ||
+                            incidenciaData.codiDistribuidor.toLowerCase().includes(searchText.toLowerCase())) && filterIncidenciaType(incidenciaData)) {
                         inconformitatsListTemp.push(incidenciaData);
                     } else if (searchText === "" && filterIncidenciaType(incidenciaData)) {
                         inconformitatsListTemp.push(incidenciaData);
@@ -150,7 +153,7 @@ const Incidencies = () => {
             <h1>No conormitats</h1>
             <Button onClick={() => navigate('/addincidencia')} variant="contained">Nova no conformitat</Button>
             <Stack spacing={4} className="w-50 my-3" direction="column">
-                <input onChange={(e) => setSearchText(e.target.value)} type="text" className="form-control" placeholder="Buscar per nom o codi de distribuïdor" aria-label="Search" aria-describedby="basic-addon2"/>
+                <input onChange={(e) => setSearchText(e.target.value)} type="text" className="form-control" placeholder="Buscar per nom o codi de distribuïdor" aria-label="Search" aria-describedby="basic-addon2" />
 
             </Stack>
 
@@ -201,7 +204,7 @@ const Incidencies = () => {
 
                                         <p><b>Comentaris: </b>{"\n" + incidencia.comentarisNC}</p>
                                         {incidencia.state !== "pendent" ? <p><b>Resolució ({dayjs(parseInt(incidencia.resolucioTimestamp)).format("DD/MM/YYYY - HH:mm").toString()}):</b>{"\n" + incidencia.resolucio}</p> : <p></p>}
-                                        {incidencia.downloadURL !== "" ? <a href={`${incidencia.downloadURL}`} rel="noreferrer" target="_blank">{incidencia.fileTitle}</a> : <p>No hi ha fitxer adjunt</p>}
+                                        <p>Nº arxius: {incidencia.documents ? incidencia.documents.length : 0} </p>
 
 
 
@@ -211,7 +214,7 @@ const Incidencies = () => {
 
                                 <div className="listItemContentRight">
                                     <button onClick={() => navigate(`/editinconformitat/`, { state: { incidenciaKey: incidencia.key } })}>Editar</button>
-                                    <button onClick={() => beginDeleteIncidencia(incidencia.key, incidencia.downloadURL)}>Eliminar</button>
+                                    <button onClick={() => beginDeleteIncidencia(incidencia.key)}>Eliminar</button>
                                     {/*<button onClick={() => navigate(`/viewtransportorder/${incidencia.key}`)}>Veure</button>*/}
                                 </div>
                             </div>
