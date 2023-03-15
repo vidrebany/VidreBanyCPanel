@@ -56,7 +56,6 @@ const Incidencies = () => {
 
     const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
     const [incidenciaDeleteKey, setIncidenciaDeleteKey] = useState('');
-    const [incidenciaDeleteDownloadURL, setIncidenciaDeleteDownloadURL] = useState('');
 
     const handleDeleteDialogClose = () => {
         setOpenDeleteAlert(false);
@@ -68,11 +67,11 @@ const Incidencies = () => {
 
     const handleDeleteAgree = () => {
         setOpenDeleteAlert(false);
-        deleteIncidencia(incidenciaDeleteKey, incidenciaDeleteDownloadURL);
+        deleteIncidencia(incidenciaDeleteKey);
     }
 
 
-    function deleteIncidencia(incidenciaDeleteKey: string, incidenciaDeleteDownloadURL: string) {
+    function deleteIncidencia(incidenciaDeleteKey: string) {
 
         const dbRef = ref(db, '/incidencies/inconformitats/' + incidenciaDeleteKey);
 
@@ -168,10 +167,9 @@ const Incidencies = () => {
 
             {/*Map inconformitatsList in case it's not null*/}
             {inconformitatsList && inconformitatsList.map((incidencia) => {
-                function beginDeleteIncidencia(incidenciaKey: string, incidenciaDownloadURL: string): void {
+                function beginDeleteIncidencia(incidenciaKey: string): void {
                     setOpenDeleteAlert(true)
                     setIncidenciaDeleteKey(incidenciaKey);
-                    setIncidenciaDeleteDownloadURL(incidenciaDownloadURL);
 
                 }
 
