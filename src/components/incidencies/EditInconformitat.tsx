@@ -281,7 +281,6 @@ const EditInconformitat = () => {
     const [ncNum, setNcNum] = useState(0);
 
 
-    const inputFileRef = useRef<HTMLInputElement>(null);
 
 
     var mounted = false;
@@ -527,6 +526,13 @@ const EditInconformitat = () => {
             case 'sendData':
                 //send mail to correuTrucador
                 mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " ha sido correctamente registrada y que en un plazo de 24-48 horas recibirá una respuesta al respecto.\n\nMuy atentamente,\n" + adminName;
+                mailSubject = `Notificación NC${ncNum} registrada`;
+                //mail to correuTrucador
+                sendEmail(correuTrucador, mailSubject, mailBody);
+                break;
+            case 'resolved':
+                //send mail to correuTrucador
+                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " ha sido resuelta.\n\nMuy atentamente,\n" + adminName;
                 mailSubject = `Notificación NC${ncNum} registrada`;
                 //mail to correuTrucador
                 sendEmail(correuTrucador, mailSubject, mailBody);
@@ -897,6 +903,11 @@ const EditInconformitat = () => {
             <Stack style={{ margin: "30px" }} className="StackCheck" spacing={1} direction="row">
                 {pendingInfoChecked &&
                     <Button onClick={() => startSendEmail("askInfo")} variant="contained">ENVIAR MAIL<br />SOL·LICITUT DADES</Button>}
+                {unresolvedChecked &&
+                    <Button onClick={() => startSendEmail("sendData")} variant="contained">ENVIAR MAIL<br />DADES COMPLETES</Button>
+                }
+                {resolvedChecked &&
+                    <Button onClick={() => startSendEmail("resolved")} variant="contained">ENVIAR MAIL<br />RESOLUCIÓ</Button>}
             </Stack>
             <Stack style={{ margin: "30px" }} className="StackCheck" spacing={1} direction="row">
                 <Button onClick={() => editIncidencia()} variant="contained">EDITAR NO CONFORMITAT</Button>

@@ -18,10 +18,13 @@ const Transporters = () => {
     const db = getDatabase(firebaseApp);
     //transport ref
     const transportRef = ref(db, "/transporters/");
+    const mailRef = ref(db, "/mails/destination");
 
     //transport list useState that has a list of Transports[] objects
     const [transportList, setTransportList] = useState<TransportersData[]>([]);
     const [transName, setTransName] = useState('');
+
+    const [emailDesti, setEmailDesti] = useState("");
 
     //get transport list
     useEffect(() => {
@@ -41,19 +44,28 @@ const Transporters = () => {
 
 
 
-                setTransportList(transportListTemp);
+            setTransportList(transportListTemp);
 
-            
+
 
 
         });
     }, [transportList]);
 
+    useEffect(() => {
+        onValue(mailRef, (snapshot) => {
+            const data = snapshot.val();
+            setEmailDesti(data.mail);
+        });
+    }, [emailDesti]);
 
 
-
-
-
+    function setDestinationMail() {
+        const dbRef = ref(db, '/mails/destination');
+        set(dbRef, {
+            mail: emailDesti,
+        });
+    }
 
     function showFields(): void {
         const textField = document.querySelectorAll(".textField") as NodeListOf<HTMLElement>;
@@ -96,7 +108,7 @@ const Transporters = () => {
 
     function deleteTrans(id: string): void {
         const dbRef = ref(db, '/transporters/' + id);
-        remove(dbRef);      
+        remove(dbRef);
     }
 
     return (
@@ -112,6 +124,19 @@ const Transporters = () => {
             <h3>Llista transportistes</h3>
             <Stack spacing={2} direction="column">
                 <Button id="addButton" onClick={() => showFields()} variant="contained">Afegir transportista</Button>
+
+                <div className="d-flex">
+                    <input
+                    className="m-1"
+                        type="text"
+                        id="location"
+                        value={emailDesti}
+                        placeholder="Destí on enviar factures"
+                        onChange={(e) => setEmailDesti(e.target.value)}
+                    />
+                    <Button className="m-1" id="addButton" onClick={() => setDestinationMail()} variant="contained">Canviar Mail</Button>
+                </div>
+
                 <Button onClick={() => navigate('/transport')} variant="contained">Tornar</Button>
                 <TextField className="textField" style={{ margin: "10px" }}
                     id="outlined-multiline-static"
@@ -128,16 +153,16 @@ const Transporters = () => {
 
                 {/*Map transportList*/}
                 {transportList.map((transport) => {
-                    
+
 
                     return (
                         <div className="transportCard" key={transport.id}>
                             <p>{transport.name}</p>
                             <img
-                            style={{ position: 'absolute', right: 0, bottom: 10 }} role={'button'} width={"30px"}
-                            onClick={() => deleteTrans(transport.id)}
-                            src={"https://www.shareicon.net/data/128x128/2015/09/06/96798_trash_512x512.png"}
-                            alt={"trashcan"}></img>
+                                style={{ position: 'absolute', right: 0, bottom: 10 }} role={'button'} width={"30px"}
+                                onClick={() => deleteTrans(transport.id)}
+                                src={"https://www.shareicon.net/data/128x128/2015/09/06/96798_trash_512x512.png"}
+                                alt={"trashcan"}></img>
                         </div>
                     );
                 })}

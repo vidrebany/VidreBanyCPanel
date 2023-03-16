@@ -93,7 +93,7 @@ const Transport = () => {
             <h3>Lista commandes</h3>
             <Stack spacing={2} direction="column">
                 <Button onClick={() => navigate('/addtransportorder')} variant="contained">Afegir comanda</Button>
-                <Button onClick={() => navigate('/transporters')} variant="contained">Veure Transportistes</Button>
+                <Button onClick={() => navigate('/transporters')} variant="contained">Configuració Transports</Button>
                 <div className="display-flex flex-direction-row">
                     <FormControlLabel
                         label="Pendents"

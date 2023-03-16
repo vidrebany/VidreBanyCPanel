@@ -354,6 +354,13 @@ const Incidencies = () => {
                 //mail to correuTrucador
                 sendEmail(correuTrucador, mailSubject, mailBody);
                 break;
+            case 'resolved':
+                //send mail to correuTrucador
+                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " ha sido resuelta.\n\nMuy atentamente,\n" + adminName;
+                mailSubject = `Notificación NC${ncNum} registrada`;
+                //mail to correuTrucador
+                sendEmail(correuTrucador, mailSubject, mailBody);
+                break;
             default:
                 break;
         }
@@ -630,26 +637,33 @@ const Incidencies = () => {
                         />
                     </Stack>
                 </Stack>
-                <Stack spacing={1} direction="row">
+                <Stack spacing={1} direction={{ xs: "column", sm: 'row' }}>
+                    <div className="d-flex w-100 justify-content-between">
+                        <h6 style={{ marginTop: "10px" }}>Producte:</h6>
 
-                    <h6 style={{ marginTop: "10px" }}>És Producte:</h6>
-                    <Checkbox
-                        checked={producteChecked}
-                        onChange={handleProducteCheck}
-                        inputProps={{ 'aria-label': 'controlled' }}
-                    />
-                    <h6 style={{ marginTop: "10px" }}>És Servei:</h6>
-                    <Checkbox
-                        checked={serveiChecked}
-                        onChange={handleServeiCheck}
-                        inputProps={{ 'aria-label': 'controlled' }}
-                    />
-                    <h6 style={{ marginTop: "10px" }}>Altres:</h6>
-                    <Checkbox
-                        checked={altresChecked}
-                        onChange={handleAltresCheck}
-                        inputProps={{ 'aria-label': 'controlled' }}
-                    />
+                        <Checkbox
+                            checked={producteChecked}
+                            onChange={handleProducteCheck}
+                            inputProps={{ 'aria-label': 'controlled' }}
+                        />
+                    </div>
+                    <div className="d-flex w-100 justify-content-between">
+
+                        <h6 style={{ marginTop: "10px" }}>Servei:</h6>
+                        <Checkbox
+                            checked={serveiChecked}
+                            onChange={handleServeiCheck}
+                            inputProps={{ 'aria-label': 'controlled' }}
+                        />
+                    </div>
+                    <div className="d-flex w-100 justify-content-between">
+                        <h6 style={{ marginTop: "10px" }}>Altres:</h6>
+                        <Checkbox
+                            checked={altresChecked}
+                            onChange={handleAltresCheck}
+                            inputProps={{ 'aria-label': 'controlled' }}
+                        />
+                    </div>
                 </Stack>
             </Stack>
             {/*comentaris*/}
@@ -743,9 +757,13 @@ const Incidencies = () => {
 
 
             <Stack style={{ margin: "30px" }} className="StackCheck" spacing={1} direction="row">
-                {pendingInfoChecked ?
-                    <Button onClick={() => startSendEmail("askInfo")} variant="contained">ENVIAR MAIL<br />SOL·LICITUT DADES</Button> :
-                    <Button onClick={() => startSendEmail("sendData")} variant="contained">ENVIAR MAIL<br />DADES COMPLETES</Button>}
+                {pendingInfoChecked &&
+                    <Button onClick={() => startSendEmail("askInfo")} variant="contained">ENVIAR MAIL<br />SOL·LICITUT DADES</Button>}
+                {unresolvedChecked &&
+                    <Button onClick={() => startSendEmail("sendData")} variant="contained">ENVIAR MAIL<br />DADES COMPLETES</Button>
+                }
+                {resolvedChecked &&
+                    <Button onClick={() => startSendEmail("resolved")} variant="contained">ENVIAR MAIL<br />RESOLUCIÓ</Button>}
             </Stack>
             <Stack style={{ margin: "30px" }} className="StackCheck" spacing={1} direction="row">
                 <Button onClick={() => submitIncidencia()} variant="contained">NOVA NO CONFORMITAT</Button>
