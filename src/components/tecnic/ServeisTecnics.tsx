@@ -108,7 +108,6 @@ const ServeisTecnics = () => {
 
     function filterStateServei(serveiTecnicData: ServeiTecnic) {
         if ((isPendent && !isPerRevisar && !isFinalitzat) || (!isPendent && isPerRevisar && !isFinalitzat) || (!isPendent && !isPerRevisar && isFinalitzat)) {
-
             if (isPendent && serveiTecnicData.stateServei === "Pendent") {
                 return true;
             } else if (isPerRevisar && serveiTecnicData.stateServei === "Per revisar") {
@@ -123,15 +122,13 @@ const ServeisTecnics = () => {
     }
 
     function filterTypeServei(serveiTecnicData: ServeiTecnic) {
-        if ((isMesura && !isInstalacio) || (!isMesura && isInstalacio)) {
-            if (isMesura && isInstalacio && serveiTecnicData.isMesura === true) {
-                return true;
-            } else if (!isMesura && serveiTecnicData.isMesura === false) {
-                return true;
-            }
-        } else {
+
+        if (isMesura && serveiTecnicData.isMesura === true) {
+            return true;
+        } else if (!isMesura && serveiTecnicData.isMesura === false) {
             return true;
         }
+
 
         return false;
     }
