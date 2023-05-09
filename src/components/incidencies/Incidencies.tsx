@@ -149,7 +149,7 @@ const Incidencies = () => {
     return (
         <div className="container tecnic">
             <Navbar />
-            <h1>No conormitats</h1>
+            <h1>No conformitats</h1>
             <Button onClick={() => navigate('/addincidencia')} variant="contained">Nova no conformitat</Button>
             <Stack spacing={4} className="w-50 my-3" direction="column">
                 <input onChange={(e) => setSearchText(e.target.value)} type="text" className="form-control" placeholder="Buscar per nom o codi de distribuïdor" aria-label="Search" aria-describedby="basic-addon2" />
