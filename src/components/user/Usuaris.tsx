@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getDatabase, ref, onValue } from "firebase/database";
+import { getDatabase, ref, onValue, set } from "firebase/database";
 import firebaseApp from "../../firebase";
 import { Users } from "../../types";
 import Navbar from "../Navbar";
@@ -10,7 +10,29 @@ const Usuaris = () => {
   const navigate = useNavigate();
 
   const db = getDatabase(firebaseApp);
+  //Users interface:
+  /*
+export type Users = {
+  id: string;
+  name: string;
+  number: string;
+  code: string;
+  process: string;
+  done: boolean;
+}
+  */
   const [usersList, setUsersList] = useState<Users[]>([]);
+
+  const editUser = (user: Users) => {
+    const newName = prompt("Introdueix el nou nom de l'usuari:", user.name);
+    const newCode = prompt("Introdueix el nou codi de l'usuari:", user.code);
+    const newProcess = prompt("Introdueix el nou procés de l'usuari:", user.process);
+
+    if (newName && newCode && newProcess) {
+      const userRef = ref(db, `/users/${user.number}`);
+      set(userRef, { ...user, name: newName, code: newCode, process: newProcess });
+    }
+  };
 
   useEffect(() => {
     const todoRef = ref(db, "/users");
@@ -57,12 +79,16 @@ const Usuaris = () => {
                 margin: '10px',
                 cursor: 'pointer'
               }}
-              onClick={() => navigate('/user', { state: { number: value.number} })}
+              onClick={() => navigate('/user', { state: { number: value.number } })}
             >
 
               <p>{value.number}.{value.name}</p>
               <p>Procés: {value.process}</p>
               <p>Codi: {value.code}</p>
+              <button className="btn btn-primary" onClick={(e) => {
+                e.stopPropagation();
+                editUser(value)
+              }}>Editar</button> {/* Edit button */}
 
             </div>
 

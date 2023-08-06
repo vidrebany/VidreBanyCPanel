@@ -12,6 +12,7 @@ import {
 import Usuaris from "./components/user/Usuaris";
 import Processes from "./components/process/Processes";
 import Process from "./components/process/Process";
+import StandBy from "./components/process/StandBy";
 import Ordres from "./components/Ordres";
 import OrdresRefactored from "./components/OrdresRefactored";
 import User from "./components/user/User";
@@ -57,6 +58,7 @@ root.render(
       <Route path="/editrefactored" element={<OrdresRefactored />} />
       <Route path="/user" element={<User />} />
       <Route path="/process" element={<Process />} />
+      <Route path="/standby" element={<StandBy />} />
       <Route path="/transport" element={<Transport />} />
       <Route path="/transporters" element={<Transporters />} />
       <Route path="/addtransportorder" element={<AddTransportOrder />} />

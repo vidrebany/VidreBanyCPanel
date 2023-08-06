@@ -19,6 +19,7 @@ function App() {
           <button type="button" className="btn btn-primary" onClick={() => navigate('/processes')}>PROCESSOS</button>
           <button type="button" className="btn btn-primary" onClick={() => navigate('/users')}>USUARIS</button>
           <button type="button" className="btn btn-primary" onClick={() => navigate('/edit')}>ORDRES</button>
+          <button type="button" className="btn btn-primary" onClick={() => navigate('/standby')}>ORDRES EN STANDBY</button>
           <button type="button" className="btn btn-primary" onClick={() => navigate('/transport')}>TRANSPORTS</button>
           <button type="button" className="btn btn-primary" onClick={() => navigate('/incidencies')}>NO CONFORMITATS</button>
           <button type="button" className="btn btn-primary" onClick={() => navigate('/admins')}>ADMINISTRADORS</button>

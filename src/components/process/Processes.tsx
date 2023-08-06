@@ -40,7 +40,7 @@ const Processes = () => {
                 margin: '10px',
                 cursor: 'pointer'
               }}
-              onClick={() => navigate('/process', { state: { number: value} })}
+              onClick={() => navigate('/process', { state: { number: value } })}
             >
               <p>{value}</p>
             </div>

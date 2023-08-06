@@ -52,6 +52,14 @@ export type Orders = {
 
 }
 
+export interface StandByOrder {
+  code: string;
+  process: string;
+  started: string;
+  ended: string|null;
+  mark:  string|null;
+}
+
 export interface Transports {
   address: string;
   albaraNum: string;
