@@ -200,6 +200,7 @@ const Incidencies = () => {
                                             </Stack>
                                         </Stack>
 
+                                        <p><b>Comentaris inicials: </b>{"\n" + incidencia.comentarisInicialsNC}</p>
                                         <p><b>Comentaris: </b>{"\n" + incidencia.comentarisNC}</p>
                                         {incidencia.state !== "pendent" ? <p><b>Resolució ({dayjs(parseInt(incidencia.resolucioTimestamp)).format("DD/MM/YYYY - HH:mm").toString()}):</b>{"\n" + incidencia.resolucio}</p> : <p></p>}
                                         <p>Nº arxius: {incidencia.documents ? incidencia.documents.length : 0} </p>

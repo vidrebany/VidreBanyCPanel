@@ -63,6 +63,7 @@ const EditInconformitat = () => {
     const [refProducte, setRefProducte] = useState(''); const [descrProducte, setDescrProducte] = useState('');
 
     const [comentarisNC, setComentarisNC] = useState('');
+    const [comentarisInicialsNC, setComentarisInicialsNC] = useState('');
     const [downloadURL, setDownloadURL] = useState('');
     const [state, setState] = useState('');
     const [serveiChecked, setServeiChecked] = useState(false);
@@ -111,6 +112,7 @@ const EditInconformitat = () => {
                 refProducte: data.refProducte,
                 descrProducte: data.descrProducte,
                 comentarisNC: data.comentarisNC,
+                comentarisInicialsNC: data.comentarisInicialsNC,
                 serveioproducte: data.serveioproducte,
                 documents: data.documents,
                 documentsNames: data.documentsNames,
@@ -146,6 +148,7 @@ const EditInconformitat = () => {
             setDireccioClientFinal(incidenciaTemp.direccioClientFinal);
             setTlfClientFinal(incidenciaTemp.tlfClientFinal);
             setComentarisNC(incidenciaTemp.comentarisNC);
+            setComentarisInicialsNC(incidenciaTemp.comentarisInicialsNC);
             setServeiChecked(incidenciaTemp.serveioproducte === 'servei');
             setProducteChecked(incidenciaTemp.serveioproducte === 'producte');
             setAltresChecked(incidenciaTemp.serveioproducte === 'altres');
@@ -413,6 +416,7 @@ const EditInconformitat = () => {
                         refProducte: refProducte,
                         descrProducte: descrProducte,
                         comentarisNC: comentarisNC,
+                        comentarisInicialsNC: comentarisInicialsNC,
                         serveioproducte: serveioproducte,
                         documents: documentsUrls || [],
                         documentsNames: documentsNames || [],
@@ -518,14 +522,14 @@ const EditInconformitat = () => {
         switch (type) {
             case 'askInfo':
                 //send mail to correuTrucador
-                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " ha sido parcialmente registrada por falta de información. Información solicitada:\n\n    · (PARA RELLENAR POR EL USUARIO)\n\ny nos mantenemos a la espera de recibir documentación por su parte.\nAgradeceríamos que pudiera responder este email con la información solicitada.\n\nMuy atentamente,\n" + adminName;
+                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " con los comentarios iniciales:\n\n-"+ comentarisInicialsNC + "\n\nha sido parcialmente registrada por falta de información. Información solicitada:\n\n    · (PARA RELLENAR POR EL USUARIO)\n\ny nos mantenemos a la espera de recibir documentación por su parte.\nAgradeceríamos que pudiera responder este email con la información solicitada.\n\nMuy atentamente,\n" + adminName;
                 mailSubject = `Notificación NC${ncNum} registrada`;
                 //mail to correuTrucador
                 sendEmail(correuTrucador, mailSubject, mailBody);
                 break;
             case 'sendData':
                 //send mail to correuTrucador
-                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " ha sido correctamente registrada y que en un plazo de 24-48 horas recibirá una respuesta al respecto.\n\nMuy atentamente,\n" + adminName;
+                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " con los comentarios iniciales:\n\n-"+ comentarisInicialsNC +"\n\nha sido correctamente registrada y que en un plazo de 24-48 horas recibirá una respuesta al respecto.\n\nMuy atentamente,\n" + adminName;
                 mailSubject = `Notificación NC${ncNum} registrada`;
                 //mail to correuTrucador
                 sendEmail(correuTrucador, mailSubject, mailBody);
@@ -683,7 +687,7 @@ const EditInconformitat = () => {
                 />
             </Stack>
 
-            <h3>Dades trucador:</h3>
+            <h3>Dades contacte:</h3>
             {/*Nom trucador*/}
             <Stack className="Stack" spacing={1} direction={{ xs: "column", sm: 'row' }}>
                 <h6>Nom:</h6>
@@ -802,10 +806,27 @@ const EditInconformitat = () => {
             {/*comentaris*/}
             <Stack className="Stack w-50" spacing={1} direction="column">
                 <Stack spacing={1} className="w-100" direction="column">
+                    <h6>Comentaris inicials:</h6>
+                    <TextField
+                        id="outlined-multiline-static"
+                        label="El registrador ha d'explicar la no conformitat."
+                        type="text"
+                        multiline
+                        rows={4}
+                        value={comentarisInicialsNC}
+                        variant="outlined"
+                        onChange={(e) => {
+                            setComentarisInicialsNC(e.target.value)
+                        }}
+                    />
+                </Stack>
+            </Stack>
+            <Stack className="Stack w-50" spacing={1} direction="column">
+                <Stack spacing={1} className="w-100" direction="column">
                     <h6>Comentaris no conformitat:</h6>
                     <TextField
                         id="outlined-multiline-static"
-                        label="Comentaris"
+                        label="Comentaris (totes les accions que es realitzen a la companyia)"
                         type="text"
                         multiline
                         rows={4}

@@ -174,6 +174,7 @@ export interface Incidencia {
   refProducte: string;
   descrProducte: string;
   comentarisNC: string;
+  comentarisInicialsNC: string;
   serveioproducte: string;
   documents: string[];
   documentsNames: string[];

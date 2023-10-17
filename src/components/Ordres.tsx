@@ -67,7 +67,12 @@ const Ordres = () => {
                 setOrdersList(newOrdersList);
     
                 newOrdersList.map((order) => {
-                    puntuation += parseInt(order.code.split("X")[1])
+                    let puntuationAndCode = order.code.split("X");
+                    if (puntuationAndCode.length > 1) {
+                        puntuation += parseInt(puntuationAndCode[1]);
+                    } else {
+                        puntuation += 0;
+                    }
                     ordersTotal += 1
                     return true;
                 });
@@ -308,7 +313,8 @@ const Ordres = () => {
     function getCodeAndPuntuation(code: string): import("react").ReactNode {
         //split code by X to get the code and the puntuation
         let codeAndPuntuation = code.split("X");
-        return <div style={{ position: 'relative' }}><p>Codi: {codeAndPuntuation[0]}</p><p> Puntuació: {codeAndPuntuation[1]}</p><img style={{ position: 'absolute', right: 0, bottom: -15 }}
+        let puntuation = codeAndPuntuation[1] || 0; 
+        return <div style={{ position: 'relative' }}><p>Codi: {codeAndPuntuation[0]}</p><p> Puntuació: {puntuation}</p><img style={{ position: 'absolute', right: 0, bottom: -15 }}
             role={'button'} width={"30px"}
             onClick={() => deleteOrder(code)}
             src={"https://www.shareicon.net/data/128x128/2015/09/06/96798_trash_512x512.png"}

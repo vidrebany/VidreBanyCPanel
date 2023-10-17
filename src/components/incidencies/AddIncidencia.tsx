@@ -52,6 +52,7 @@ const Incidencies = () => {
     const [refProducte, setRefProducte] = useState(''); const [descrProducte, setDescrProducte] = useState('');
     const [resolution, setResolution] = useState('');
     const [comentarisNC, setComentarisNC] = useState('');
+    const [comentarisInicialsNC, setComentarisInicialsNC] = useState('');
 
     const [serveiChecked, setServeiChecked] = useState(false); const [producteChecked, setProducteChecked] = useState(false); const [altresChecked, setAltresChecked] = useState(false);
 
@@ -315,6 +316,7 @@ const Incidencies = () => {
                 refProducte: refProducte,
                 descrProducte: descrProducte,
                 comentarisNC: comentarisNC,
+                comentarisInicialsNC: comentarisInicialsNC,
                 serveioproducte: serveioproducte,
                 documents: documentsUrls || [],
                 documentsNames: documentsNames,
@@ -342,14 +344,14 @@ const Incidencies = () => {
         switch (type) {
             case 'askInfo':
                 //send mail to correuTrucador
-                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " ha sido parcialmente registrada por falta de información. Información solicitada:\n\n    · (PARA RELLENAR POR EL USUARIO)\n\ny nos mantenemos a la espera de recibir documentación por su parte.\nAgradeceríamos que pudiera responder este email con la información solicitada.\n\nMuy atentamente,\n" + adminName;
+                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " con los comentarios iniciales:\n\n-" + comentarisInicialsNC +"\n\nHa sido parcialmente registrada por falta de información. Información solicitada:\n\n    · (PARA RELLENAR POR EL USUARIO)\n\ny nos mantenemos a la espera de recibir documentación por su parte.\nAgradeceríamos que pudiera responder este email con la información solicitada.\n\nMuy atentamente,\n" + adminName;
                 mailSubject = `Notificación NC${ncNum} registrada`;
                 //mail to correuTrucador
                 sendEmail(correuTrucador, mailSubject, mailBody);
                 break;
             case 'sendData':
                 //send mail to correuTrucador
-                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " ha sido correctamente registrada y que en un plazo de 24-48 horas recibirá una respuesta al respecto.\n\nMuy atentamente,\n" + adminName;
+                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " con los comentarios iniciales:\n\n-" + comentarisInicialsNC + "\n\nHa sido correctamente registrada y que en un plazo de 24-48 horas recibirá una respuesta al respecto.\n\nMuy atentamente,\n" + adminName;
                 mailSubject = `Notificación NC${ncNum} registrada`;
                 //mail to correuTrucador
                 sendEmail(correuTrucador, mailSubject, mailBody);
@@ -543,7 +545,7 @@ const Incidencies = () => {
                 />
             </Stack>
 
-            <h3>Dades trucador:</h3>
+            <h3>Dades contacte:</h3>
             {/*Nom trucador*/}
             <Stack className="Stack" spacing={1} direction={{ xs: "column", sm: 'row' }}>
                 <h6>Nom:</h6>
@@ -667,6 +669,23 @@ const Incidencies = () => {
                 </Stack>
             </Stack>
             {/*comentaris*/}
+            <Stack className="Stack w-50" spacing={1} direction="column">
+                <Stack spacing={1} className="w-100" direction="column">
+                    <h6>Comentaris inicials:</h6>
+                    <TextField
+                        id="outlined-multiline-static"
+                        label="Comentaris"
+                        type="text"
+                        multiline
+                        rows={4}
+                        value={comentarisInicialsNC}
+                        variant="outlined"
+                        onChange={(e) => {
+                            setComentarisInicialsNC(e.target.value)
+                        }}
+                    />
+                </Stack>
+            </Stack>
             <Stack className="Stack w-50" spacing={1} direction="column">
                 <Stack spacing={1} className="w-100" direction="column">
                     <h6>Comentaris no conformitat:</h6>
