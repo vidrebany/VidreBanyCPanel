@@ -26,3 +26,14 @@ h1 {
     display: flex;
     justify-content: space-evenly;
 }
+
+.listItem {
+    display: flex;         /* set this div to be a flex container */
+    width: 90vw;
+    justify-content: space-between;  /* space out the children */
+}
+
+.listItemContent {
+    width: 100%;            /* set each child to take up nearly half the width, adjust as needed */
+    box-sizing: border-box; /* this ensures that padding and border are included in the total width */
+}
