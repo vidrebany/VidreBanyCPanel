@@ -536,7 +536,7 @@ const EditInconformitat = () => {
                 break;
             case 'resolved':
                 //send mail to correuTrucador
-                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " ha sido resuelta.\n\nMuy atentamente,\n" + adminName;
+                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " con los comentarios iniciales:\n\n-"+ comentarisInicialsNC +"\n\nha sido resuelta.\n\nMuy atentamente,\n" + adminName;
                 mailSubject = `Notificación NC${ncNum} registrada`;
                 //mail to correuTrucador
                 sendEmail(correuTrucador, mailSubject, mailBody);
