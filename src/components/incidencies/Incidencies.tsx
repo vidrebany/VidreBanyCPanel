@@ -1,6 +1,8 @@
 import Navbar from "../Navbar";
 import "./styles/Incidencies.css"
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { List, ListItem, ListItemText, Typography } from '@mui/material';
+
 import { Button, Stack } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -36,22 +38,6 @@ const Incidencies = () => {
     const [inconformitatsList, setInconformitatsList] = useState<Incidencia[]>([]);
 
 
-    const handleCheckbox = (e: string) => {
-        //only one of the checkboxes can be checked at a time
-        if (e === "unresolvedChecked") {
-            setUnresolvedChecked(!unresolvedChecked);
-            setPendingInfoChecked(false);
-            setResolvedChecked(false);
-        } else if (e === "pendingInfoChecked") {
-            setUnresolvedChecked(false);
-            setPendingInfoChecked(!pendingInfoChecked);
-            setResolvedChecked(false);
-        } else if (e === "resolvedChecked") {
-            setUnresolvedChecked(false);
-            setPendingInfoChecked(false);
-            setResolvedChecked(!resolvedChecked);
-        }
-    }
 
 
     const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
@@ -149,6 +135,71 @@ const Incidencies = () => {
         return false;
     }
 
+    //Pagination code
+    const [currentIndexes, setCurrentIndexes] = useState({
+        unresolved: 0,
+        pendingInfo: 0,
+        resolved: 0,
+    });
+
+
+    const handlePrev = () => {
+        setCurrentIndexes((prevIndexes) => {
+            const currentFilter = unresolvedChecked ? 'unresolved' : pendingInfoChecked ? 'pendingInfo' : 'resolved';
+            return {
+                ...prevIndexes,
+                [currentFilter]: prevIndexes[currentFilter] > 0 ? prevIndexes[currentFilter] - 1 : prevIndexes[currentFilter],
+            };
+        });
+    };
+
+    const handleNext = () => {
+        setCurrentIndexes((prevIndexes) => {
+            const currentFilter = unresolvedChecked ? 'unresolved' : pendingInfoChecked ? 'pendingInfo' : 'resolved';
+            return {
+                ...prevIndexes,
+                [currentFilter]: prevIndexes[currentFilter] < inconformitatsList.length - 1 ? prevIndexes[currentFilter] + 1 : prevIndexes[currentFilter],
+            };
+        });
+    };
+
+    function beginDeleteIncidencia(incidenciaKey: string): void {
+        setOpenDeleteAlert(true)
+        setIncidenciaDeleteKey(incidenciaKey);
+
+    }
+
+    const handleCheckbox = (e: string) => {
+        // Assuming you want to reset the index to 0 when you check a box
+        // and restore it when you uncheck and check again, you would:
+
+        // Store the current index before changing the filters
+        const newIndexState = { ...currentIndexes };
+
+        //only one of the checkboxes can be checked at a time
+        if (e === "unresolvedChecked") {
+            setUnresolvedChecked(!unresolvedChecked);
+            setPendingInfoChecked(false);
+            setResolvedChecked(false);
+            newIndexState.unresolved = unresolvedChecked ? 0 : currentIndexes.unresolved;
+        } else if (e === "pendingInfoChecked") {
+            setUnresolvedChecked(false);
+            setPendingInfoChecked(!pendingInfoChecked);
+            setResolvedChecked(false);
+            newIndexState.pendingInfo = pendingInfoChecked ? 0 : currentIndexes.pendingInfo;
+        } else if (e === "resolvedChecked") {
+            setUnresolvedChecked(false);
+            setPendingInfoChecked(false);
+            setResolvedChecked(!resolvedChecked);
+            newIndexState.resolved = resolvedChecked ? 0 : currentIndexes.resolved;
+        }
+
+        setCurrentIndexes(newIndexState);
+    }
+
+    const currentFilter = unresolvedChecked ? 'unresolved' : pendingInfoChecked ? 'pendingInfo' : 'resolved';
+    const currentIndex = currentIndexes[currentFilter];
+
 
     return (
         <div className="container tecnic">
@@ -168,64 +219,73 @@ const Incidencies = () => {
                 <input checked={resolvedChecked} value="resolvedChecked" onChange={(e) => handleCheckbox(e.target.value)} type="checkbox" className="mx-2 form-check-input" id="measureTaking" />
                 <label className="form-check-label" htmlFor="measureTaking">Resoltes</label>
             </div>
+            <div>
+                <Button variant="contained" onClick={handlePrev} disabled={currentIndexes[currentFilter] === 0}>
+                    Previ
+                </Button>
+                <Button
+                    variant="contained"
+                    onClick={handleNext}
+                    disabled={currentIndex === inconformitatsList.length - 1}
+                    sx={{ marginLeft: '8px' }}
+                >
+                    Següent
+                </Button>
+            </div>
+                <p>
+                    Mostrant {currentIndexes[currentFilter] + 1} de {inconformitatsList.length} no conformitats
+                </p>
 
             {/*Map inconformitatsList in case it's not null*/}
-            {inconformitatsList && inconformitatsList.map((incidencia) => {
-                function beginDeleteIncidencia(incidenciaKey: string): void {
-                    setOpenDeleteAlert(true)
-                    setIncidenciaDeleteKey(incidenciaKey);
+            {inconformitatsList[currentIndex] &&
 
-                }
 
-                return (
-                    <div key={incidencia.key} style={{ whiteSpace: 'pre-wrap' }} className="listView">
-                        <div className="listItem">
-                            <div className="listItemContent">
-                                <div className="listItemContentLeft">
-                                    <Stack sx={{ justifyContent: 'center' }} spacing={2} direction="row">
-                                        <h4>NC: {incidencia.ncNum}</h4>
-                                        <h4>{dayjs(parseInt(incidencia.date)).format("DD/MM/YYYY - HH:mm").toString()}</h4>
-                                    </Stack>
-                                    <Stack spacing={1} direction="column">
-                                        <Stack spacing={1} direction="row">
-                                            <Stack spacing={2} direction="column">
-                                                <p><b>Tipus: </b>{incidencia.serveioproducte}</p>
-                                                <p><b>{incidencia.comandaType}:</b> {incidencia.comandaNum}</p>
+                <div key={inconformitatsList[currentIndex].key} style={{ whiteSpace: 'pre-wrap' }} className="listView">
+                    <div className="listItem">
+                        <div className="listItemContent">
+                            <div className="listItemContentLeft">
+                                <Stack sx={{ justifyContent: 'center' }} spacing={2} direction="row">
+                                    <h4>NC: {inconformitatsList[currentIndex].ncNum}</h4>
+                                    <h4>{dayjs(parseInt(inconformitatsList[currentIndex].date)).format("DD/MM/YYYY - HH:mm").toString()}</h4>
+                                </Stack>
+                                <Stack spacing={1} direction="column">
+                                    <Stack spacing={1} direction="row">
+                                        <Stack spacing={2} direction="column">
+                                            <p><b>Tipus: </b>{inconformitatsList[currentIndex].serveioproducte}</p>
+                                            <p><b>{inconformitatsList[currentIndex].comandaType}:</b> {inconformitatsList[currentIndex].comandaNum}</p>
 
 
 
-                                            </Stack>
-                                            <Stack spacing={2} direction="column">
-                                                <p><b>Codi distribuïdor: </b>{incidencia.codiDistribuidor}</p>
-                                                <p><b>Nom distribuïdor: </b>{incidencia.nomDistribuidor}</p>
-
-
-
-                                            </Stack>
                                         </Stack>
-
-                                        <p><b>Comentaris inicials: </b>{"\n" + incidencia.comentarisInicialsNC}</p>
-                                        <p><b>Comentaris: </b>{"\n" + incidencia.comentarisNC}</p>
-                                        {incidencia.state !== "pendent" ? <p><b>Resolució ({dayjs(parseInt(incidencia.resolucioTimestamp)).format("DD/MM/YYYY - HH:mm").toString()}):</b>{"\n" + incidencia.resolucio}</p> : <p></p>}
-                                        <p>Nº arxius: {incidencia.documents ? incidencia.documents.length : 0} </p>
+                                        <Stack spacing={2} direction="column">
+                                            <p><b>Codi distribuïdor: </b>{inconformitatsList[currentIndex].codiDistribuidor}</p>
+                                            <p><b>Nom distribuïdor: </b>{inconformitatsList[currentIndex].nomDistribuidor}</p>
 
 
 
+                                        </Stack>
                                     </Stack>
-                                </div>
+
+                                    <p><b>Comentaris inicials: </b>{"\n" + inconformitatsList[currentIndex].comentarisInicialsNC}</p>
+                                    <p><b>Comentaris: </b>{"\n" + inconformitatsList[currentIndex].comentarisNC}</p>
+                                    {inconformitatsList[currentIndex].state !== "pendent" ? <p><b>Resolució ({dayjs(parseInt(inconformitatsList[currentIndex].resolucioTimestamp)).format("DD/MM/YYYY - HH:mm").toString()}):</b>{"\n" + inconformitatsList[currentIndex].resolucio}</p> : <p></p>}
+                                    <p>Nº arxius: {inconformitatsList[currentIndex].documents ? inconformitatsList[currentIndex].documents.length : 0} </p>
 
 
-                                <div className="listItemContentRight">
-                                    <button onClick={() => navigate(`/editinconformitat/`, { state: { incidenciaKey: incidencia.key } })}>Editar</button>
-                                    <button onClick={() => beginDeleteIncidencia(incidencia.key)}>Eliminar</button>
-                                    {/*<button onClick={() => navigate(`/viewtransportorder/${incidencia.key}`)}>Veure</button>*/}
-                                </div>
+
+                                </Stack>
+                            </div>
+
+
+                            <div className="listItemContentRight">
+                                <button onClick={() => navigate(`/editinconformitat/`, { state: { incidenciaKey: inconformitatsList[currentIndex].key } })}>Editar</button>
+                                <button onClick={() => beginDeleteIncidencia(inconformitatsList[currentIndex].key)}>Eliminar</button>
+                                {/*<button onClick={() => navigate(`/viewtransportorder/${inconformitatsList[currentIndex].key}`)}>Veure</button>*/}
                             </div>
                         </div>
                     </div>
-
-                );
-            })}
+                </div>
+            }
 
             <Dialog
                 open={openDeleteAlert}
