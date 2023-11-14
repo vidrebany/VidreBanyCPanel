@@ -3,7 +3,7 @@ import "./styles/AddIncidencia.css"
 import { Button, Stack, Checkbox, TextField, Select, SelectChangeEvent, MenuItem, InputLabel, FormControl } from '@mui/material';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers/';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { AdminsData, Incidencia, formaRegistreObject, comandaTypeObject } from "../../types";
+import { AdminsData, Incidencia, formaRegistreObject, comandaTypeObject, formaDefectoObject } from "../../types";
 import { useRef, useState, useEffect } from "react";
 
 import { getDatabase, ref as databaseRef, push, set, onValue, update } from "firebase/database";
@@ -38,7 +38,7 @@ const Incidencies = () => {
 
 
 
-    const [adminId, setAdminId] = useState(''); const [comandaType, setComandaType] = useState(''); const [adminsList, setAdminsList] = useState<AdminsData[]>([]); const [formaRegistre, setFormaRegistre] = useState('');
+    const [adminId, setAdminId] = useState(''); const [comandaType, setComandaType] = useState(''); const [adminsList, setAdminsList] = useState<AdminsData[]>([]); const [formaRegistre, setFormaRegistre] = useState(''); const [tipusDefecte, setTipusDefecte] = useState(''); const [nomProveidor, setNomProveidor] = useState(''); const [numProveidor, setNumProveidor] = useState('');
     const [adminName, setAdminName] = useState('');
 
     const [comandaNum, setComandaNum] = useState('');
@@ -83,6 +83,9 @@ const Incidencies = () => {
     const handleFormaRegistreSelectChange = (event: SelectChangeEvent) => {
         setFormaRegistre(event.target.value as string);
     };
+    const handleTipusDefecteSelectChange = (event: SelectChangeEvent) => {
+        setTipusDefecte(event.target.value as string);
+    }
     const handleComandaTypeSelectChange = (event: SelectChangeEvent) => {
         setComandaType(event.target.value as string);
     };
@@ -323,6 +326,9 @@ const Incidencies = () => {
                 resolucio: resolution || '',
                 resolucioTimestamp: resolutionTimestamp || '',
                 state: state,
+                tipusDefecte: tipusDefecte,
+                nomProveidor: nomProveidor,
+                numProveidor: numProveidor,
             };
             set(infonformitatRef, incidencia);
 
@@ -344,7 +350,7 @@ const Incidencies = () => {
         switch (type) {
             case 'askInfo':
                 //send mail to correuTrucador
-                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " con los comentarios iniciales:\n\n-" + comentarisInicialsNC +"\n\nHa sido parcialmente registrada por falta de información. Información solicitada:\n\n    · (PARA RELLENAR POR EL USUARIO)\n\ny nos mantenemos a la espera de recibir documentación por su parte.\nAgradeceríamos que pudiera responder este email con la información solicitada.\n\nMuy atentamente,\n" + adminName;
+                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " con los comentarios iniciales:\n\n-" + comentarisInicialsNC + "\n\nHa sido parcialmente registrada por falta de información. Información solicitada:\n\n    · (PARA RELLENAR POR EL USUARIO)\n\ny nos mantenemos a la espera de recibir documentación por su parte.\nAgradeceríamos que pudiera responder este email con la información solicitada.\n\nMuy atentamente,\n" + adminName;
                 mailSubject = `Notificación NC${ncNum} registrada`;
                 //mail to correuTrucador
                 sendEmail(correuTrucador, mailSubject, mailBody);
@@ -458,6 +464,7 @@ const Incidencies = () => {
                             })}
                         </Select>
                     </FormControl>
+
                 </div>
             </Stack>
 
@@ -579,8 +586,7 @@ const Incidencies = () => {
                     onChange={(e) => setTlfTrucador(e.target.value)}
                 />
             </Stack>
-            <h3>Dades client final:</h3>
-            {/*Nom trucador*/}
+            <h3>Dades client final:</h3> {/*Nom trucador*/}
             <Stack className="Stack" spacing={1} direction={{ xs: "column", sm: 'row' }}>
                 {/*Direcció client final */}
                 <h6>Direcció:</h6>
@@ -667,6 +673,52 @@ const Incidencies = () => {
                         />
                     </div>
                 </Stack>
+                <FormControl sx={{ margin: '10px' }} fullWidth>
+                    <InputLabel id="demo-simple-select-label">TIPUS DE DEFECTE</InputLabel>
+                    <Select
+                        value={tipusDefecte}
+                        label="Tipus de defecte del producte"
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        onChange={(e) => setTipusDefecte(e.target.value as string)}
+                    >
+                        {/*Map transList */}
+
+                        {formaDefectoObject.map((formaDefecto) => {
+
+                            return <MenuItem key={formaDefecto.key} value={formaDefecto.name}>{formaDefecto.name}</MenuItem>
+                        })}
+                    </Select>
+                </FormControl>
+                {tipusDefecte === "DEFECTE DE FABRICACIÓ ( SIFONAT, MIDA, ACABAT…)" && 
+                <div>
+                <h3>Dades proveïdor de fabricació:</h3>
+                <Stack className="Stack" spacing={1} direction={{ xs: "column", sm: 'row' }} width={"100%"} alignContent={"center"}>
+                    <Stack spacing={1} direction="column">
+                        <h6>Nom proveïdor:</h6>
+                        <TextField
+                            id="outlined-multiline-static"
+                            label="Nom proveïdor S.L."
+                            type="text"
+                            value={nomProveidor}
+                            variant="outlined"
+                            onChange={(e) => setNomProveidor(e.target.value)}
+                        />
+                    </Stack>
+                    <Stack spacing={1} direction="column">
+                        <h6>Número proveïdor:</h6>
+                        <TextField
+                            id="outlined-multiline-static"
+                            label="12345"
+                            type="text"
+                            value={numProveidor}
+                            variant="outlined"
+                            onChange={(e) => setNumProveidor(e.target.value)}
+                        />
+                    </Stack>
+                </Stack>
+                </div>
+                }
             </Stack>
             {/*comentaris*/}
             <Stack className="Stack w-50" spacing={1} direction="column">

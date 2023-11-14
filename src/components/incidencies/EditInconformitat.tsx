@@ -3,7 +3,7 @@ import "./styles/AddIncidencia.css"
 import { Button, Stack, Checkbox, TextField, Select, SelectChangeEvent, MenuItem, InputLabel, FormControl } from '@mui/material';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers/';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { AdminsData, Incidencia, formaRegistreObject, comandaTypeObject } from "../../types";
+import { AdminsData, Incidencia, formaRegistreObject, comandaTypeObject, formaDefectoObject } from "../../types";
 import { useRef, useState, useEffect } from "react";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
@@ -63,6 +63,9 @@ const EditInconformitat = () => {
     const [refProducte, setRefProducte] = useState(''); const [descrProducte, setDescrProducte] = useState('');
 
     const [comentarisNC, setComentarisNC] = useState('');
+    const [nomProveidor, setNomProveidor] = useState('');
+    const [numProveidor, setNumProveidor] = useState('');
+    const [tipusDefecte, setTipusDefecte] = useState('');
     const [comentarisInicialsNC, setComentarisInicialsNC] = useState('');
     const [downloadURL, setDownloadURL] = useState('');
     const [state, setState] = useState('');
@@ -119,6 +122,9 @@ const EditInconformitat = () => {
                 resolucio: data.resolucio || '',
                 resolucioTimestamp: data.resolucioTimestamp || '',
                 state: data.state,
+                tipusDefecte: data.tipusDefecte || '',
+                numProveidor: data.numProveidor || '',
+                nomProveidor: data.nomProveidor || '',
             }
             setIncidencia(incidenciaTemp);
 
@@ -148,6 +154,10 @@ const EditInconformitat = () => {
             setDireccioClientFinal(incidenciaTemp.direccioClientFinal);
             setTlfClientFinal(incidenciaTemp.tlfClientFinal);
             setComentarisNC(incidenciaTemp.comentarisNC);
+            setTipusDefecte(incidenciaTemp.tipusDefecte === ("") ? 'SENSE ASSIGNAR' : incidenciaTemp.tipusDefecte);
+            
+            setNomProveidor(incidenciaTemp.nomProveidor);
+            setNumProveidor(incidenciaTemp.numProveidor);
             setComentarisInicialsNC(incidenciaTemp.comentarisInicialsNC);
             setServeiChecked(incidenciaTemp.serveioproducte === 'servei');
             setProducteChecked(incidenciaTemp.serveioproducte === 'producte');
@@ -335,8 +345,6 @@ const EditInconformitat = () => {
             setResolutionDisplay('');
         } else {
             setResolutionDisplay('none');
-            setRefProducte('');
-            setDescrProducte('');
         }
     }, [resolvedChecked])
 
@@ -423,6 +431,9 @@ const EditInconformitat = () => {
                         resolucio: resolution || '',
                         resolucioTimestamp: resolutionTimestamp || '',
                         state: state,
+                        tipusDefecte: tipusDefecte || '',
+                        nomProveidor: nomProveidor || '',
+                        numProveidor: numProveidor || '',
                     };
                     await set(dbRef, incidencia);
 
@@ -522,21 +533,21 @@ const EditInconformitat = () => {
         switch (type) {
             case 'askInfo':
                 //send mail to correuTrucador
-                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " con los comentarios iniciales:\n\n-"+ comentarisInicialsNC + "\n\nha sido parcialmente registrada por falta de información. Información solicitada:\n\n    · (PARA RELLENAR POR EL USUARIO)\n\ny nos mantenemos a la espera de recibir documentación por su parte.\nAgradeceríamos que pudiera responder este email con la información solicitada.\n\nMuy atentamente,\n" + adminName;
+                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " con los comentarios iniciales:\n\n-" + comentarisInicialsNC + "\n\nha sido parcialmente registrada por falta de información. Información solicitada:\n\n    · (PARA RELLENAR POR EL USUARIO)\n\ny nos mantenemos a la espera de recibir documentación por su parte.\nAgradeceríamos que pudiera responder este email con la información solicitada.\n\nMuy atentamente,\n" + adminName;
                 mailSubject = `Notificación NC${ncNum} registrada`;
                 //mail to correuTrucador
                 sendEmail(correuTrucador, mailSubject, mailBody);
                 break;
             case 'sendData':
                 //send mail to correuTrucador
-                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " con los comentarios iniciales:\n\n-"+ comentarisInicialsNC +"\n\nha sido correctamente registrada y que en un plazo de 24-48 horas recibirá una respuesta al respecto.\n\nMuy atentamente,\n" + adminName;
+                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " con los comentarios iniciales:\n\n-" + comentarisInicialsNC + "\n\nha sido correctamente registrada y que en un plazo de 24-48 horas recibirá una respuesta al respecto.\n\nMuy atentamente,\n" + adminName;
                 mailSubject = `Notificación NC${ncNum} registrada`;
                 //mail to correuTrucador
                 sendEmail(correuTrucador, mailSubject, mailBody);
                 break;
             case 'resolved':
                 //send mail to correuTrucador
-                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " con los comentarios iniciales:\n\n-"+ comentarisInicialsNC +"\n\nha sido resuelta.\n\nMuy atentamente,\n" + adminName;
+                mailBody = "Estimado cliente, le confirmamos que su notificación con referencia NC" + ncNum + " con los comentarios iniciales:\n\n-" + comentarisInicialsNC + "\n\nha sido resuelta.\n\nMuy atentamente,\n" + adminName;
                 mailSubject = `Notificación NC${ncNum} registrada`;
                 //mail to correuTrucador
                 sendEmail(correuTrucador, mailSubject, mailBody);
@@ -755,6 +766,7 @@ const EditInconformitat = () => {
                     <Stack spacing={1} direction="column">
 
                         <h6>Ref. producte:</h6>
+                        {refProducte}
                         <TextField
                             id="outlined-multiline-static"
                             label="0000"
@@ -802,6 +814,52 @@ const EditInconformitat = () => {
                         inputProps={{ 'aria-label': 'controlled' }}
                     />
                 </Stack>
+                <FormControl sx={{ margin: '10px' }} fullWidth>
+                    <InputLabel id="demo-simple-select-label">TIPUS DE DEFECTE</InputLabel>
+                    <Select
+                        value={tipusDefecte}
+                        label="Tipus de defecte del producte"
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        onChange={(e) => setTipusDefecte(e.target.value as string)}
+                    >
+                        {/*Map transList */}
+
+                        {formaDefectoObject.map((formaDefecto) => {
+
+                            return <MenuItem key={formaDefecto.key} value={formaDefecto.name}>{formaDefecto.name}</MenuItem>
+                        })}
+                    </Select>
+                </FormControl>
+                {tipusDefecte === "DEFECTE DE FABRICACIÓ ( SIFONAT, MIDA, ACABAT…)" &&
+                    <div>
+                        <h3>Dades proveïdor de fabricació:</h3>
+                        <Stack className="Stack" spacing={1} direction={{ xs: "column", sm: 'row' }} width={"100%"} alignContent={"center"}>
+                            <Stack spacing={1} direction="column">
+                                <h6>Nom proveïdor:</h6>
+                                <TextField
+                                    id="outlined-multiline-static"
+                                    label="Nom proveïdor S.L."
+                                    type="text"
+                                    value={nomProveidor}
+                                    variant="outlined"
+                                    onChange={(e) => setNomProveidor(e.target.value)}
+                                />
+                            </Stack>
+                            <Stack spacing={1} direction="column">
+                                <h6>Número proveïdor:</h6>
+                                <TextField
+                                    id="outlined-multiline-static"
+                                    label="12345"
+                                    type="text"
+                                    value={numProveidor}
+                                    variant="outlined"
+                                    onChange={(e) => setNumProveidor(e.target.value)}
+                                />
+                            </Stack>
+                        </Stack>
+                    </div>
+                }
             </Stack>
             {/*comentaris*/}
             <Stack className="Stack w-50" spacing={1} direction="column">

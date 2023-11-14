@@ -151,6 +151,43 @@ export const formaRegistreObject: FormaRegistre[] = [
   },
 ];
 
+export interface FormaDefectoType {
+  key: number;
+  name: string;
+}
+/*
+DEFECTE DE FABRICACIÓ ( SIFONAT, MIDA, ACABAT…)   
+
+DEFECTUÓS PROVEÏDOR   
+
+ENVIAMENT ERRONI (REF. UNITATS,COLOR......)   
+
+ERROR CLIENT   
+
+FALTA ALGUN ELEMENT DE LA COMANDA    
+
+INCIDÈNCIA ADMINISTRATIVA( ERROR COMANDA, PRESA MIDES…)  
+
+INCIDÈNCIA TRANSPORT   
+
+VARIS  
+
+DEVOLUCIÓ
+*/
+export const formaDefectoObject: FormaDefectoType[] = [
+  {key: 1, name: 'ARRIBA TRENCAT / AMB COP'},
+  {key: 2, name: 'DEFECTE DE FABRICACIÓ ( SIFONAT, MIDA, ACABAT…)'},
+  {key: 3, name: 'DEFECTUÓS PROVEÏDOR'},
+  {key: 4, name: 'ENVIAMENT ERRONI (REF. UNITATS,COLOR...)'},
+  {key: 5, name: 'ERROR CLIENT'},
+  {key: 6, name: 'FALTA ALGUN ELEMENT DE LA COMANDA'},
+  {key: 7, name: 'INCIDÈNCIA ADMINISTRATIVA( ERROR COMANDA, PRESA MIDES…)'},
+  {key: 8, name: 'INCIDÈNCIA TRANSPORT'},
+  {key: 9, name: 'VARIS'},
+  {key: 10, name: 'DEVOLUCIÓ'},
+  {key: 11, name: 'SENSE ASSIGNAR'},
+];
+
 export interface ComandaType {
   key: number;
   type: string;
@@ -181,6 +218,9 @@ export interface Incidencia {
   resolucio: string;
   resolucioTimestamp: string;
   state: string;
+  tipusDefecte: string;
+  nomProveidor: string;
+  numProveidor: string;
 }
 
 export const comandaTypeObject: ComandaType[] = [
