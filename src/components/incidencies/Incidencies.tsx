@@ -254,7 +254,7 @@ const Incidencies = () => {
                                             <p><b>Tipus: </b>{inconformitatsList[currentIndex].serveioproducte}</p>
                                             <p><b>{inconformitatsList[currentIndex].comandaType}:</b> {inconformitatsList[currentIndex].comandaNum}</p>
 
-                                            {inconformitatsList[currentIndex].comandaNovaType !== "" &&
+                                            {(inconformitatsList[currentIndex].comandaNovaType !== "" && inconformitatsList[currentIndex].comandaNovaType !== undefined) &&
                                                 <div>
                                                     <p><b> {inconformitatsList[currentIndex].comandaNovaType} nou: </b>{inconformitatsList[currentIndex].comandaNovaNum}</p>
                                                 </div>
