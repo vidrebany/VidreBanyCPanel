@@ -199,8 +199,10 @@ export interface Incidencia {
   date: string;
   adminId: string;
   comandaType: string;
+  comandaNovaType: string;
   formaRegistre: string;
   comandaNum: string;
+  comandaNovaNum: string;
   codiDistribuidor: string;
   nomDistribuidor: string;
   nomTrucador: string;
@@ -221,6 +223,7 @@ export interface Incidencia {
   tipusDefecte: string;
   nomProveidor: string;
   numProveidor: string;
+
 }
 
 export const comandaTypeObject: ComandaType[] = [

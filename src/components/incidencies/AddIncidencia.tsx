@@ -38,10 +38,11 @@ const Incidencies = () => {
 
 
 
-    const [adminId, setAdminId] = useState(''); const [comandaType, setComandaType] = useState(''); const [adminsList, setAdminsList] = useState<AdminsData[]>([]); const [formaRegistre, setFormaRegistre] = useState(''); const [tipusDefecte, setTipusDefecte] = useState(''); const [nomProveidor, setNomProveidor] = useState(''); const [numProveidor, setNumProveidor] = useState('');
+    const [adminId, setAdminId] = useState(''); const [comandaType, setComandaType] = useState(''); const [comandaNovaType, setComandaNovaType] = useState(''); const [adminsList, setAdminsList] = useState<AdminsData[]>([]); const [formaRegistre, setFormaRegistre] = useState(''); const [tipusDefecte, setTipusDefecte] = useState(''); const [nomProveidor, setNomProveidor] = useState(''); const [numProveidor, setNumProveidor] = useState('');
     const [adminName, setAdminName] = useState('');
 
     const [comandaNum, setComandaNum] = useState('');
+    const [comandaNovaNum, setComandaNovaNum] = useState('');
 
     const [codiDistribuidor, setCodiDistribuidor] = useState(''); const [nomDistribuidor, setNomDistribuidor] = useState('');
 
@@ -307,8 +308,10 @@ const Incidencies = () => {
                 date: timestamp || '',
                 adminId: adminId,
                 comandaType: comandaType,
+                comandaNovaType: comandaNovaType,
                 formaRegistre: formaRegistre,
                 comandaNum: comandaNum,
+                comandaNovaNum: comandaNovaNum,
                 codiDistribuidor: codiDistribuidor,
                 nomDistribuidor: nomDistribuidor,
                 nomTrucador: nomTrucador,
@@ -690,34 +693,34 @@ const Incidencies = () => {
                         })}
                     </Select>
                 </FormControl>
-                {tipusDefecte === "DEFECTE DE FABRICACIÓ ( SIFONAT, MIDA, ACABAT…)" && 
-                <div>
-                <h3>Dades proveïdor de fabricació:</h3>
-                <Stack className="Stack" spacing={1} direction={{ xs: "column", sm: 'row' }} width={"100%"} alignContent={"center"}>
-                    <Stack spacing={1} direction="column">
-                        <h6>Nom proveïdor:</h6>
-                        <TextField
-                            id="outlined-multiline-static"
-                            label="Nom proveïdor S.L."
-                            type="text"
-                            value={nomProveidor}
-                            variant="outlined"
-                            onChange={(e) => setNomProveidor(e.target.value)}
-                        />
-                    </Stack>
-                    <Stack spacing={1} direction="column">
-                        <h6>Número proveïdor:</h6>
-                        <TextField
-                            id="outlined-multiline-static"
-                            label="12345"
-                            type="text"
-                            value={numProveidor}
-                            variant="outlined"
-                            onChange={(e) => setNumProveidor(e.target.value)}
-                        />
-                    </Stack>
-                </Stack>
-                </div>
+                {tipusDefecte === "DEFECTE DE FABRICACIÓ ( SIFONAT, MIDA, ACABAT…)" &&
+                    <div>
+                        <h3>Dades proveïdor de fabricació:</h3>
+                        <Stack className="Stack" spacing={1} direction={{ xs: "column", sm: 'row' }} width={"100%"} alignContent={"center"}>
+                            <Stack spacing={1} direction="column">
+                                <h6>Nom proveïdor:</h6>
+                                <TextField
+                                    id="outlined-multiline-static"
+                                    label="Nom proveïdor S.L."
+                                    type="text"
+                                    value={nomProveidor}
+                                    variant="outlined"
+                                    onChange={(e) => setNomProveidor(e.target.value)}
+                                />
+                            </Stack>
+                            <Stack spacing={1} direction="column">
+                                <h6>Número proveïdor:</h6>
+                                <TextField
+                                    id="outlined-multiline-static"
+                                    label="12345"
+                                    type="text"
+                                    value={numProveidor}
+                                    variant="outlined"
+                                    onChange={(e) => setNumProveidor(e.target.value)}
+                                />
+                            </Stack>
+                        </Stack>
+                    </div>
                 }
             </Stack>
             {/*comentaris*/}
@@ -752,6 +755,37 @@ const Incidencies = () => {
                         onChange={(e) => {
                             setComentarisNC(e.target.value)
                         }}
+                    />
+                </Stack>
+            </Stack>
+            <Stack className="Stack w-50" spacing={1} direction="column">
+                <Stack spacing={2} direction="column">
+                    <h6 className="text-center">Nº de comanda nova</h6>
+                    <FormControl sx={{ margin: '10px' }} fullWidth>
+                        <InputLabel id="demo-simple-select-label">Tipus comanda</InputLabel>
+                        <Select
+                            value={comandaNovaType}
+                            label="Tipus comanda"
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            onChange={(event) => {
+                                setComandaNovaType(event.target.value as string)
+                            }}
+                        >
+                            {/*Map transList */}
+                            {comandaTypeObject.map((comandaType) => {
+                                return <MenuItem key={comandaType.key} value={comandaType.type}>{comandaType.type}</MenuItem>
+                            })}
+                        </Select>
+                    </FormControl>
+                    <TextField
+                        id="outlined-multiline-static"
+                        label="0000"
+                        type="text"
+                        value={comandaNovaNum}
+                        variant="outlined"
+
+                        onChange={(e) => setComandaNovaNum(e.target.value)}
                     />
                 </Stack>
             </Stack>

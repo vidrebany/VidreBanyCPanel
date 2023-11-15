@@ -48,10 +48,11 @@ const EditInconformitat = () => {
         dayjs(),
     );
 
-    const [adminId, setAdminId] = useState(''); const [comandaType, setComandaType] = useState(''); const [adminsList, setAdminsList] = useState<AdminsData[]>([]); const [formaRegistre, setFormaRegistre] = useState('');
+    const [adminId, setAdminId] = useState(''); const [comandaType, setComandaType] = useState(''); const [comandaNovaType, setComandaNovaType] = useState(''); const [adminsList, setAdminsList] = useState<AdminsData[]>([]); const [formaRegistre, setFormaRegistre] = useState('');
     const [adminName, setAdminName] = useState('');
 
     const [comandaNum, setComandaNum] = useState('');
+    const [comandaNovaNum, setComandaNovaNum] = useState('');
 
     const [codiDistribuidor, setCodiDistribuidor] = useState(''); const [nomDistribuidor, setNomDistribuidor] = useState('');
 
@@ -103,8 +104,10 @@ const EditInconformitat = () => {
                 date: data.date,
                 adminId: data.adminId,
                 comandaType: data.comandaType,
+                comandaNovaType: data.comandaNovaType,
                 formaRegistre: data.formaRegistre,
                 comandaNum: data.comandaNum,
+                comandaNovaNum: data.comandaNovaNum,
                 codiDistribuidor: data.codiDistribuidor,
                 nomDistribuidor: data.nomDistribuidor,
                 nomTrucador: data.nomTrucador,
@@ -137,6 +140,7 @@ const EditInconformitat = () => {
 
             setAdminId(incidenciaTemp.adminId);
             setComandaType(incidenciaTemp.comandaType);
+            setComandaNovaType(incidenciaTemp.comandaNovaType);
             setFormaRegistre(incidenciaTemp.formaRegistre);
 
             if (incidenciaTemp.date) {
@@ -146,6 +150,7 @@ const EditInconformitat = () => {
 
             setNcNum(incidenciaTemp.ncNum);
             setComandaNum(incidenciaTemp.comandaNum);
+            setComandaNovaNum(incidenciaTemp.comandaNovaNum);
             setCodiDistribuidor(incidenciaTemp.codiDistribuidor);
             setNomDistribuidor(incidenciaTemp.nomDistribuidor);
             setNomTrucador(incidenciaTemp.nomTrucador);
@@ -155,7 +160,7 @@ const EditInconformitat = () => {
             setTlfClientFinal(incidenciaTemp.tlfClientFinal);
             setComentarisNC(incidenciaTemp.comentarisNC);
             setTipusDefecte(incidenciaTemp.tipusDefecte === ("") ? 'SENSE ASSIGNAR' : incidenciaTemp.tipusDefecte);
-            
+
             setNomProveidor(incidenciaTemp.nomProveidor);
             setNumProveidor(incidenciaTemp.numProveidor);
             setComentarisInicialsNC(incidenciaTemp.comentarisInicialsNC);
@@ -412,8 +417,10 @@ const EditInconformitat = () => {
                         date: timestamp || '',
                         adminId: adminId,
                         comandaType: comandaType,
+                        comandaNovaType: comandaNovaType,
                         formaRegistre: formaRegistre,
                         comandaNum: comandaNum,
+                        comandaNovaNum: comandaNovaNum,
                         codiDistribuidor: codiDistribuidor,
                         nomDistribuidor: nomDistribuidor,
                         nomTrucador: nomTrucador,
@@ -893,6 +900,38 @@ const EditInconformitat = () => {
                         onChange={(e) => {
                             setComentarisNC(e.target.value)
                         }}
+                    />
+                </Stack>
+            </Stack>
+
+            <Stack className="Stack w-50" spacing={1} direction="column">
+                <Stack spacing={2} direction="column">
+                    <h6 className="text-center">Nº de comanda nova</h6>
+                    <FormControl sx={{ margin: '10px' }} fullWidth>
+                        <InputLabel id="demo-simple-select-label">Tipus comanda</InputLabel>
+                        <Select
+                            value={comandaNovaType}
+                            label="Tipus comanda"
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            onChange={(event) => {
+                                setComandaNovaType(event.target.value as string)
+                            }}
+                        >
+                            {/*Map transList */}
+                            {comandaTypeObject.map((comandaType) => {
+                                return <MenuItem key={comandaType.key} value={comandaType.type}>{comandaType.type}</MenuItem>
+                            })}
+                        </Select>
+                    </FormControl>
+                    <TextField
+                        id="outlined-multiline-static"
+                        label="0000"
+                        type="text"
+                        value={comandaNovaNum}
+                        variant="outlined"
+
+                        onChange={(e) => setComandaNovaNum(e.target.value)}
                     />
                 </Stack>
             </Stack>

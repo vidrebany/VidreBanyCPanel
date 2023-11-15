@@ -232,9 +232,9 @@ const Incidencies = () => {
                     Següent
                 </Button>
             </div>
-                <p>
-                    Mostrant {currentIndexes[currentFilter] + 1} de {inconformitatsList.length} no conformitats
-                </p>
+            <p>
+                Mostrant {currentIndexes[currentFilter] + 1} de {inconformitatsList.length} no conformitats
+            </p>
 
             {/*Map inconformitatsList in case it's not null*/}
             {inconformitatsList[currentIndex] &&
@@ -253,6 +253,12 @@ const Incidencies = () => {
                                         <Stack spacing={2} direction="column">
                                             <p><b>Tipus: </b>{inconformitatsList[currentIndex].serveioproducte}</p>
                                             <p><b>{inconformitatsList[currentIndex].comandaType}:</b> {inconformitatsList[currentIndex].comandaNum}</p>
+
+                                            {inconformitatsList[currentIndex].comandaNovaType !== "" &&
+                                                <div>
+                                                    <p><b> {inconformitatsList[currentIndex].comandaNovaType} nou: </b>{inconformitatsList[currentIndex].comandaNovaNum}</p>
+                                                </div>
+                                            }
 
 
 
