@@ -1,6 +1,6 @@
 import Navbar from "../Navbar";
 import "./styles/Incidencies.css"
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import { List, ListItem, ListItemText, Typography } from '@mui/material';
 
 import { Button, Stack } from '@mui/material';
@@ -163,6 +163,21 @@ const Incidencies = () => {
         });
     };
 
+    const [inputPage, setInputPage] = useState('');
+
+
+    const handlePageInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const pageNum = parseInt(event.target.value, 10) - 1; // Subtract 1 to get zero-based index
+        if (!isNaN(pageNum) && pageNum >= 0 && pageNum < inconformitatsList.length) {
+            setCurrentIndexes((prevIndexes) => ({
+                ...prevIndexes,
+                [currentFilter]: pageNum,
+            }));
+        }
+        setInputPage(event.target.value);
+    };
+
+
     function beginDeleteIncidencia(incidenciaKey: string): void {
         setOpenDeleteAlert(true)
         setIncidenciaDeleteKey(incidenciaKey);
@@ -223,6 +238,12 @@ const Incidencies = () => {
                 <Button variant="contained" onClick={handlePrev} disabled={currentIndexes[currentFilter] === 0}>
                     Previ
                 </Button>
+                <TextField
+                    type="number"
+                    value={inputPage}
+                    onChange={handlePageInputChange}
+                    sx={{ mx: 2, width: '80px' }} // Adjust styling as needed
+                />
                 <Button
                     variant="contained"
                     onClick={handleNext}
