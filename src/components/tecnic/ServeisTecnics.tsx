@@ -4,7 +4,6 @@ import { deleteObject, getStorage, ref as storageRef } from "firebase/storage";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ServeiTecnic } from "../../types";
-import Navbar from "../Navbar";
 import firebaseApp from "../../firebase";
 
 
@@ -173,7 +172,6 @@ const ServeisTecnics = () => {
 
     return (
         <div className="container tecnic">
-            <Navbar />
             <Alert className="alert" severity="success">Èxit</Alert>
             <h3>Administració servei tècnic</h3>
             <button type="button" className="btn btn-primary" onClick={() => navigate("/tecnic/tecnicslist")}>Llistat professionals tècnics</button>

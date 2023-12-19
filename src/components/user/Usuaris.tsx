@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { getDatabase, ref, onValue, set } from "firebase/database";
 import firebaseApp from "../../firebase";
 import { Users } from "../../types";
-import Navbar from "../Navbar";
 import { useNavigate } from "react-router-dom";
 
 
@@ -52,12 +51,10 @@ export type Users = {
 
   return (
     <div>
-      <Navbar />
       <div>
         <h1 style={{ textAlign: 'center' }}>Escollir usuari:</h1>
       </div>
 
-      {/*Sepparate from Navbar 150px*/}
       <div style={{ marginTop: '150px' }}>
 
         {usersList.map((value, index) => {

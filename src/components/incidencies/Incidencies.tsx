@@ -1,4 +1,3 @@
-import Navbar from "../Navbar";
 import "./styles/Incidencies.css"
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import { List, ListItem, ListItemText, Typography } from '@mui/material';
@@ -218,7 +217,6 @@ const Incidencies = () => {
 
     return (
         <div className="container tecnic">
-            <Navbar />
             <h1>No conformitats</h1>
             <Button onClick={() => navigate('/addincidencia')} variant="contained">Nova no conformitat</Button>
             <Stack spacing={4} className="w-50 my-3" direction="column">

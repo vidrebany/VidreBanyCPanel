@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { StandByOrder } from "../../types";
-import Navbar from "../Navbar";
 import { getDatabase, onValue, ref, remove } from "firebase/database";
 import firebaseApp from "../../firebase";
 
@@ -63,7 +62,6 @@ const StandBy = () => {
 
     return (
         <div>
-            <Navbar />
             <div>
                 <h1 style={{ textAlign: 'center' }}>Llista standby:</h1>
             </div>
@@ -71,7 +69,6 @@ const StandBy = () => {
                 <input type="text" placeholder="Buscar per codi, procés, data, anotació..." onChange={(e) => setSearchTerm(e.target.value.toLocaleLowerCase())} />
                 <button className="btn btn-primary" onClick={handleSearch}>Buscar</button>
             </div>
-            {/* Separate from Navbar 150px */}
             <div style={{ marginTop: '150px' }}>
                 <table className="table table-striped table-hover">
                     <thead>

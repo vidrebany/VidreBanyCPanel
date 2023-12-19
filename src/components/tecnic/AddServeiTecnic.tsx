@@ -1,7 +1,6 @@
 import { deleteObject, getDownloadURL, getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import Navbar from "../Navbar";
 import firebaseApp from "../../firebase";
 import { ServeiTecnic, TecnicData } from "../../types";
 import { getDatabase, onValue, push, ref as databaseRef, set, update } from "firebase/database";
@@ -329,7 +328,6 @@ const AddServeiTecnic = () => {
 
     return (
         <div className="container">
-            <Navbar />
             <h1>Afegir servei tècnic</h1>
             <div className="w-100 d-flex justify-content-start">
                 <button type="button" className="btn btn-primary" onClick={() => navigate('/tecnic')}>Tornar</button>

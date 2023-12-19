@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Users } from "../../types";
-import Navbar from "../Navbar";
 import { useNavigate } from "react-router-dom";
 
 
@@ -13,12 +12,10 @@ const Processes = () => {
 
   return (
     <div>
-      <Navbar />
       <div>
         <h1 style={{ textAlign: 'center' }}>Escollir procés:</h1>
       </div>
 
-      {/*Sepparate from Navbar 150px*/}
       <div style={{ marginTop: '150px' }}>
 
         {processesList.map((value, index) => {

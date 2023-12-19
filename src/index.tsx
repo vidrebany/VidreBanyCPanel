@@ -1,83 +1,45 @@
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
-import {
-  Routes,
-  HashRouter,
-  Route,
-} from 'react-router-dom';
-import Usuaris from "./components/user/Usuaris";
-import Processes from "./components/process/Processes";
-import Process from "./components/process/Process";
-import StandBy from "./components/process/StandBy";
-import Ordres from "./components/Ordres";
-import OrdresRefactored from "./components/OrdresRefactored";
-import User from "./components/user/User";
-import Transport from "./components/transports/Transport"
-import Transporters from "./components/transports/Transporters"
-import AddTransportOrder from "./components/transports/AddTransportOrder"
-import Incidencies from "./components/incidencies/Incidencies"
-import AddIncidencia from "./components/incidencies/AddIncidencia"
-import EditInconformitat from "./components/incidencies/EditInconformitat"
-import EditTransport from "./components/transports/EditTransport"
-import Admins from "./components/admins/Admins"
-import ServeisTecnics from "./components/tecnic/ServeisTecnics"
-import AddServeiTecnic from "./components/tecnic/AddServeiTecnic"
-import TecnicsList from "./components/tecnic/TecnicsList"
-import ViewServeiTecnic from './components/tecnic/ViewServeiTecnic';
-
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-
-);
-
-root.render(
-  /*
-  <BrowserRouter basename="VidreBanyCPanel">
-    <Routes>
-      <Route path="/" element={<App />} />
-      <Route path="/processes" element={<Processes />} />
-      <Route path="/users" element={<Usuaris />} />
-      <Route path="/edit" element={<Ordres />} />
-      <Route path="/user" element={<User />} />
-      <Route path="/process" element={<Process />} />
-    </Routes>
-  </BrowserRouter>
+import { store } from './redux/store';
+/*
+<BrowserRouter basename="VidreBanyCPanel">
+  <Routes>
+    <Route path="/" element={<App />} />
+    <Route path="/processes" element={<Processes />} />
+    <Route path="/users" element={<Usuaris />} />
+    <Route path="/edit" element={<Ordres />} />
+    <Route path="/user" element={<User />} />
+    <Route path="/process" element={<Process />} />
+  </Routes>
+</BrowserRouter>
 
 */
 
-  <HashRouter>
-    <Routes>
-      <Route path="/" element={<App />} />
-      <Route path="/processes" element={<Processes />} />
-      <Route path="/users" element={<Usuaris />} />
-      <Route path="/edit" element={<Ordres />} />
-      <Route path="/editrefactored" element={<OrdresRefactored />} />
-      <Route path="/user" element={<User />} />
-      <Route path="/process" element={<Process />} />
-      <Route path="/standby" element={<StandBy />} />
-      <Route path="/transport" element={<Transport />} />
-      <Route path="/transporters" element={<Transporters />} />
-      <Route path="/addtransportorder" element={<AddTransportOrder />} />
-      <Route path="/incidencies" element={<Incidencies />} />
-      <Route path="/addincidencia" element={<AddIncidencia />} />
-      <Route path="/editinconformitat" element={<EditInconformitat />} />
-      <Route path="/admins" element={<Admins />} />
-      <Route path="/transport/edittransport" element={<EditTransport />} />
-      <Route path="/tecnic" element={<ServeisTecnics />} />
-      <Route path="/tecnic/addserveitecnic" element={<AddServeiTecnic />} />
-      <Route path="/tecnic/tecnicslist" element={<TecnicsList />} />
-      <Route path="/tecnic/viewserveitecnic" element={<ViewServeiTecnic />} />
-    </Routes>
-  </HashRouter>
-);
+import reportWebVitals from './reportWebVitals';
+import React from "react";
+import App from "./App";
+import ReactDOM from "react-dom";
+import Navbar from './components/Navbar';
+import { Provider } from 'react-redux';
+import { ToastContainer } from 'react-toastify';
+
+ReactDOM.render(
+  <React.StrictMode>
+    <>
+      <Provider store={store}>
+        <Navbar />
+        <App />
+      </Provider>
+      <ToastContainer position="top-right" theme="colored" closeOnClick />
+    </>
+  </React.StrictMode>,
+  document.getElementById('root')
+)
+
+
+reportWebVitals();
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
 
 

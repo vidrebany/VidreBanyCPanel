@@ -1,6 +1,5 @@
 import { useRef, useState, useEffect } from "react";
 import { TransportersData } from "../../types";
-import Navbar from "../Navbar";
 import { useNavigate } from "react-router-dom";
 import Button from '@mui/material/Button';
 import "./styles/Transport.css"
@@ -343,14 +342,12 @@ const AddTransportOrder = () => {
                 style={{ display: 'none' }}
                 accept="application/pdf"
                 multiple={false} />
-            <Navbar />
             <Alert className="alert" severity="success">Copiat</Alert>
 
             <div>
                 <h1 style={{ textAlign: 'center' }}>Afegir comanda transport</h1>
             </div>
 
-            {/*Sepparate from Navbar 150px*/}
 
             <h3>Pujar PDF</h3>
             <Button onClick={() => navigate('/transport')} variant="contained">Tornar</Button>

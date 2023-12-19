@@ -23,6 +23,7 @@ const Navbar = () => {
               </NavDropdown>
               <Nav.Link href="#/transport">Transports</Nav.Link>
               <Nav.Link href="#/incidencies">No conformitats</Nav.Link>
+              <Nav.Link href="#/control-horari">Control horari</Nav.Link>
               <Nav.Link href="#/admins">Administradors</Nav.Link>
               <Nav.Link href="#/tecnic">Servei Tècnic</Nav.Link>
             </Nav>

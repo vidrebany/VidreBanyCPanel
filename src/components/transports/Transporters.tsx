@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { TransportersData } from "../../types";
-import Navbar from "../Navbar";
 import firebaseApp from "../../firebase";
 import { getDatabase, ref, onValue, push, set, remove } from "firebase/database";
 import { useNavigate } from "react-router-dom";
@@ -113,13 +112,11 @@ const Transporters = () => {
 
     return (
         <div className="container" style={{ textAlign: 'center' }}>
-            <Navbar />
             <Alert className="alert" severity="success">Èxit</Alert>
             <div>
                 <h1 style={{ textAlign: 'center' }}>Transports</h1>
             </div>
 
-            {/*Sepparate from Navbar 150px*/}
 
             <h3>Llista transportistes</h3>
             <Stack spacing={2} direction="column">

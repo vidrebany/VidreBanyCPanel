@@ -1,4 +1,3 @@
-import Navbar from "../Navbar";
 import "./styles/AddIncidencia.css"
 import { Button, Stack, Checkbox, TextField, Select, SelectChangeEvent, MenuItem, InputLabel, FormControl } from '@mui/material';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers/';
@@ -577,7 +576,6 @@ const EditInconformitat = () => {
 
     return (
         <div>
-            <Navbar />
             <h1>Editar no conformitat</h1>
             <Button onClick={() => navigate('/incidencies')} variant="contained">Tornar</Button>
 

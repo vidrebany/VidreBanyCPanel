@@ -1,7 +1,6 @@
 import { ServeiTecnic } from "../../types";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Navbar from "../Navbar";
 
 const ViewServeiTecnic = () => {
     const navigate = useNavigate();
@@ -104,7 +103,6 @@ const ViewServeiTecnic = () => {
 
     return (
         <div className="container">
-            <Navbar />
             {/*Display responsively all servei tecnic data*/}
             <h1>Dades servei tècnic</h1>
             <div className="w-100 d-flex justify-content-between align-items-center">

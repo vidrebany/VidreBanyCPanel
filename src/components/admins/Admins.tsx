@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { AdminsData } from "../../types";
-import Navbar from "../Navbar";
 import firebaseApp from "../../firebase";
 import { getDatabase, ref, onValue, push, set, remove } from "firebase/database";
 import Stack from '@mui/material/Stack';
@@ -97,13 +96,11 @@ const Admins = () => {
 
     return (
         <div className="container" style={{ textAlign: 'center' }}>
-            <Navbar />
             <Alert className="alert" severity="success">Èxit</Alert>
             <div>
                 <h1 style={{ textAlign: 'center' }}>Admins</h1>
             </div>
 
-            {/*Sepparate from Navbar 150px*/}
 
             <h3>Lista administradors</h3>
             <Stack spacing={2} direction="column">

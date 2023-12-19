@@ -1,4 +1,3 @@
-import Navbar from './Navbar';
 import { Orders } from "../types";
 import { useEffect, useState } from "react";
 import { getDatabase, ref, set, onValue, remove, update, get } from "firebase/database";
@@ -132,7 +131,6 @@ const OrdresRefactored = () => {
     return (
         <div>
             <div>
-                <Navbar />
                 <h1 style={{ textAlign: 'center' }}>Ordres</h1>
 
             </div>

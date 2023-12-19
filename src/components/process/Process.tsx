@@ -1,5 +1,4 @@
 import { useLocation } from "react-router-dom";
-import Navbar from "../Navbar";
 import { useState, useEffect } from "react";
 import firebaseApp from "../../firebase";
 import { Form } from "react-bootstrap";
@@ -470,7 +469,6 @@ const Process = () => {
 
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
 
-            <Navbar />
 
             <div>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>

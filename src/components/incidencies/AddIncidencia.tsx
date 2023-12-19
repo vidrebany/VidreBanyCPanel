@@ -1,4 +1,3 @@
-import Navbar from "../Navbar";
 import "./styles/AddIncidencia.css"
 import { Button, Stack, Checkbox, TextField, Select, SelectChangeEvent, MenuItem, InputLabel, FormControl } from '@mui/material';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers/';
@@ -422,7 +421,6 @@ const Incidencies = () => {
 
     return (
         <div>
-            <Navbar />
             <input type='file' name='file' id='file' ref={inputFileRef} onChangeCapture={onFileChangeCapture}
                 style={{ display: 'none' }}
                 accept="*"

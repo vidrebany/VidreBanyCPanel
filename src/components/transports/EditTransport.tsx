@@ -2,7 +2,6 @@ import { Transports } from "../../types";
 import { useLocation } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { useNavigate } from "react-router-dom";
-import Navbar from "../Navbar";
 import Alert from '@mui/material/Alert';
 import { TextField } from "@mui/material";
 import InputLabel from '@mui/material/InputLabel';
@@ -157,7 +156,6 @@ export default function EditTransport() {
 
     return (
         <div className="container">
-            <Navbar />
 
 
             <Alert className="alert" severity="success">Copiat</Alert>
@@ -166,7 +164,6 @@ export default function EditTransport() {
                 <h1 style={{ textAlign: 'center' }}>Editar comanda transport</h1>
             </div>
 
-            {/*Sepparate from Navbar 150px*/}
 
             <h3>Pujar PDF</h3>
             <Button onClick={() => navigate('/transport')} variant="contained">Tornar</Button>
