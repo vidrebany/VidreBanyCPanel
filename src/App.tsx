@@ -31,6 +31,8 @@ import ControlHorari from './components/control-horari/ControlHorari';
 import ManageTrabajadores from './components/control-horari/trabajadores/ManageTrabajadores';
 import TrabajadorDetails from './components/control-horari/trabajadores/TrabajadorDetails';
 import TrabajadorSchedule from './components/control-horari/trabajadores/TrabajadorSchedule';
+import EntradaTrabajador from './components/control-horari/trabajadores/EntradaTrabajador';
+import PanelTrabajador from './components/control-horari/trabajadores/PanelTrabajador';
 
 const App = () => {
 
@@ -52,6 +54,8 @@ const App = () => {
 
           <Route path="/control-horari" element={<ControlHorari />} />
           <Route path="/control-horari/trabajadores" element={<ManageTrabajadores />} />
+          <Route path="/control-horari/trabajadores/trabajador/entrada" element={<EntradaTrabajador />} />
+          <Route path="/control-horari/trabajadores/trabajador" element={<PanelTrabajador />} />
           <Route path="/control-horari/trabajadores/trabajador-details" element={<TrabajadorDetails />} />
           <Route path="/control-horari/trabajadores/trabajador-details/manage-schedule" element={<TrabajadorSchedule />} />
 
