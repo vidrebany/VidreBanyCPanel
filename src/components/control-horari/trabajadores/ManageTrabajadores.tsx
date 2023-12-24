@@ -3,9 +3,11 @@ import { Trabajador } from "./types/trabajadoresTypes";
 import TrabajadoresList from "./TrabajadoresList";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
-import { addTrabajador, setTrabajadores } from "../../../redux/features/trabajadores/trabajadoresSlice";
+import { addTrabajador } from "../../../redux/features/trabajadores/trabajadoresSlice";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import useFetchWorkers from "../../../hooks/useFetchTrabajadores";
+import { Api } from "../../../api/api";
 
 
 const ManageTrabajadores = () => {
@@ -20,17 +22,7 @@ const ManageTrabajadores = () => {
 
     const dispatch = useDispatch();
 
-    //Generate synthetic list of workers
-    const fetchWorkers = async () => {
-        const trabajadores: Trabajador[] = [];
-        for (let i = 0; i < 10; i++) {
-            trabajadores.push({
-                name: `Trabajador ${i}`,
-                code: `T${i}`
-            })
-        }
-        dispatch(setTrabajadores(trabajadores));
-    }
+
 
     const handleSearch = () => {
         if (trabajadorCodeSearch === "") {
@@ -46,22 +38,31 @@ const ManageTrabajadores = () => {
         setFilteredTrabajadores(trabajadores);
     }, [trabajadores])
 
-    useEffect(() => {
-        //fetch workers
-        fetchWorkers();
-    }, [])
+    useFetchWorkers();
 
     const handleAddTrabajadorClick = () => {
         setIsAddingTrabajador(!isAddingTrabajador);
     };
 
-    const handleAddTrabajador = () => {
+    const handleAddTrabajador = async () => {
         if (trabajadorCode === "" || trabajadorName === "") return toast.error("Debes rellenar todos los campos");
         const newTrabajador: Trabajador = {
             name: trabajadorName,
             code: trabajadorCode
         };
-        dispatch(addTrabajador(newTrabajador));
+        const res = await Api.post("/worker/create", newTrabajador)
+            .catch((err) => {
+                const error = (err.response.data.error);
+                if (error.includes("duplicate")) {
+                    toast.error("Ya existe un trabajador con ese código");
+                    return;
+                }
+                toast.error("Error al crear trabajador:", error);
+                return;
+            });
+
+        if (!res) return;
+        dispatch(addTrabajador(res.data.worker));
         setIsAddingTrabajador(false);
         setTrabajadorCode("");
         setTrabajadorName("");
@@ -75,7 +76,7 @@ const ManageTrabajadores = () => {
     return (
         <div className="d-flex flex-column align-items-center">
             <div>
-            <h1>Gestión trabajadores</h1>
+                <h1>Gestión trabajadores</h1>
             </div>
             <button className="btn btn-primary align-self-start mb-2" onClick={() => navigate("/control-horari")}>Volver</button>
             {/*Input with code input to search workers*/}

@@ -21,6 +21,10 @@ export const trabajadoresSlice = createSlice({
         addTrabajador: (state, action: PayloadAction<Trabajador>) => {
             state.trabajadores.push(action.payload);
         },
+        selectTrabajadorByCode: (state, action: PayloadAction<string>) => {
+            const found = state.trabajadores.find(trabajador => trabajador.code === action.payload);
+            state.selectedTrabajador = found ? found : null;
+        },
         removeTrabajador: (state, action: PayloadAction<string>) => {
             state.trabajadores = state.trabajadores.filter(trabajador => trabajador.code !== action.payload);
         },
@@ -39,6 +43,6 @@ export const trabajadoresSlice = createSlice({
     }
 });
 
-export const { setTrabajadores, addTrabajador, removeTrabajador, modifyTrabajador, setSelectedTrabajador } = trabajadoresSlice.actions;
+export const { setTrabajadores, addTrabajador, selectTrabajadorByCode, removeTrabajador, modifyTrabajador, setSelectedTrabajador } = trabajadoresSlice.actions;
 
 export default trabajadoresSlice.reducer;

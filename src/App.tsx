@@ -30,6 +30,7 @@ import ViewServeiTecnic from './components/tecnic/ViewServeiTecnic';
 import ControlHorari from './components/control-horari/ControlHorari';
 import ManageTrabajadores from './components/control-horari/trabajadores/ManageTrabajadores';
 import TrabajadorDetails from './components/control-horari/trabajadores/TrabajadorDetails';
+import TrabajadorSchedule from './components/control-horari/trabajadores/TrabajadorSchedule';
 
 const App = () => {
 
@@ -52,6 +53,7 @@ const App = () => {
           <Route path="/control-horari" element={<ControlHorari />} />
           <Route path="/control-horari/trabajadores" element={<ManageTrabajadores />} />
           <Route path="/control-horari/trabajadores/trabajador-details" element={<TrabajadorDetails />} />
+          <Route path="/control-horari/trabajadores/trabajador-details/manage-schedule" element={<TrabajadorSchedule />} />
 
           <Route path="/addincidencia" element={<AddIncidencia />} />
           <Route path="/editinconformitat" element={<EditInconformitat />} />

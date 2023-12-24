@@ -4,6 +4,7 @@ import { modifyTrabajador, removeTrabajador, setSelectedTrabajador } from "../..
 import { toast } from "react-toastify";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Api } from "../../../api/api";
 
 
 /*
@@ -31,26 +32,47 @@ const TrabajadoresList = ({ trabajadores }: { trabajadores: Trabajador[] }) => {
         setEditedName(trabajador.name);
         setEditedCode(trabajador.code);
     }
-    const modifyTrabajadorHandler = () => {
+    const modifyTrabajadorHandler = async () => {
         if (editingTrabajador) {
             if (editedName === "" || editedCode === "") return toast.error("Debes rellenar todos los campos");
             const trabajadorModified: Trabajador = {
                 name: editedName,
                 code: editingTrabajador.code
             }
-            dispatch(modifyTrabajador(trabajadorModified));
+            const res = await Api.post("/worker/update", trabajadorModified).catch((err) => {
+                const error = (err.response.data.error);
+                if (error.includes("duplicate")) {
+                    toast.error("Ya existe o existió un trabajador con ese código");
+                    return;
+                }
+                toast.error("Error al modificar trabajador:", error);
+                return;
+            });
+
+            if (!res) return;
+
+            dispatch(modifyTrabajador(res.data.worker));
             setEditingTrabajador(null);
             toast.success("Trabajador modificado correctamente");
         }
     }
 
-    const removeTrabajadorHandler = (trabajador: Trabajador) => {
+    const removeTrabajadorHandler = async (trabajador: Trabajador) => {
+
+
         setTrabajadorToRemove(trabajador);
         setShowConfirmationModal(true);
     }
 
-    const confirmRemoveTrabajador = () => {
+    const confirmRemoveTrabajador = async () => {
         if (trabajadorToRemove) {
+            //ad trabajador code as query param
+            const res = await Api.delete(`/worker/delete?code=${trabajadorToRemove.code}`).catch((err) => {
+                const error = (err.response.data.error);
+                toast.error("Error al eliminar trabajador:", error);
+                return;
+            });
+            if (!res) return;
             dispatch(removeTrabajador(trabajadorToRemove.code));
             toast.success("Trabajador eliminado correctamente");
         }
@@ -61,7 +83,7 @@ const TrabajadoresList = ({ trabajadores }: { trabajadores: Trabajador[] }) => {
 
     const handleSelect = (trabajador: Trabajador) => {
         dispatch(setSelectedTrabajador(trabajador));
-        navigate("trabajador-details")
+        navigate("trabajador-details?code=" + trabajador.code);
     }
 
     return (
