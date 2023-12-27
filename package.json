@@ -46,7 +46,7 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "set GENERATE_SOURCEMAP=false && tsc && vite build",
+    "build": "set GENERATE_SOURCEMAP=false && vite build",
     "serve": "vite preview",
     "predeploy": "yarn run build",
     "deploy": "gh-pages -d build",

@@ -6,6 +6,7 @@ type ExtraHours = {
     day_type: DayType;
     start_hour: string;
     end_hour: string;
+    is_entry: boolean;
 };
 
 type HourRangeProps = {
@@ -23,6 +24,14 @@ const HourRange: React.FC<HourRangeProps> = ({ label, ranges, extraHours, onChan
             (eh) => eh.day_type === label && eh.start_hour === start_hour && eh.end_hour === end_hour
         )
     }
+
+    const extraHour = (range: string): ExtraHours | undefined => {
+        const [start_hour, end_hour] = range.split("-");
+        return extraHours.find((eh) => eh.day_type === label && eh.start_hour === start_hour && eh.end_hour === end_hour);
+    }
+
+
+
     return (
         <tr>
             <td>{label === "laborable" ? "Laborables" : label === "sabado" ? "Sábados" : "Domingos y festivos"}</td>
@@ -33,8 +42,11 @@ const HourRange: React.FC<HourRangeProps> = ({ label, ranges, extraHours, onChan
 
                 return (
                     <td key={index}>
-                        <input type="checkbox" checked={isHourRangeSelected(range)} id={id} onChange={(e) => onChange(label, range, e.target.checked)} />
-                        <label htmlFor={id}></label>
+                        <label htmlFor={id} style={{ display: 'inline-block', position: 'relative', padding: '0' }}>
+                            <input type="checkbox" id={id} checked={isHourRangeSelected(range)} onChange={(e) => onChange(label, range, e.target.checked)} style={{ display: 'none' }} />
+                            <span style={{ display: 'inline-block', width: '20px', height: '20px', background: 'white', position: 'relative', border: `2px solid ${isHourRangeSelected(range) ? extraHour(range)?.is_entry ? "green" : "red" : "black"}`, borderRadius: '3px' }}></span>
+                            <span style={{ display: 'inline-block', width: '10px', height: '10px', background: `${extraHour(range)?.is_entry ? "green" : "red"}`, position: 'absolute', top: '5px', left: '5px', borderRadius: '2px', visibility: isHourRangeSelected(range) ? 'visible' : 'hidden' }}></span>
+                        </label>
                     </td>
                 )
             })}
