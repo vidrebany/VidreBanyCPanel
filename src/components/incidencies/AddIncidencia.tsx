@@ -5,12 +5,13 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { AdminsData, Incidencia, formaRegistreObject, comandaTypeObject, formaDefectoObject } from "../../types";
 import { useRef, useState, useEffect } from "react";
 
-import { getDatabase, ref as databaseRef, push, set, onValue, update } from "firebase/database";
+import { getDatabase, ref as databaseRef, push, set, onValue, update, get } from "firebase/database";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, uploadBytes, deleteObject } from "firebase/storage";
 import firebaseApp from "../../firebase";
 
 import { useNavigate } from "react-router-dom";
 import dayjs, { Dayjs } from 'dayjs';
+import { toast } from "react-toastify";
 
 
 
@@ -175,14 +176,13 @@ const Incidencies = () => {
 
 
 
-    var mounted = false;
 
 
     //get admins list
     useEffect(() => {
         const transportRef = databaseRef(db, "/admins/");
 
-        onValue(transportRef, (snapshot) => {
+        get(transportRef).then((snapshot) => {
             const data = snapshot.val();
 
             let adminsListTemp: AdminsData[] = [];
@@ -198,15 +198,15 @@ const Incidencies = () => {
 
 
 
-            if (!mounted) {
-                setAdminsList(adminsListTemp);
-
-            }
+            setAdminsList(adminsListTemp);
 
 
-            mounted = true;
+
+        }).catch((error) => {
+            toast.error("Error al carregar els admins");
+            console.log(error);
         });
-    }, []);
+    }, [db]);
 
     useEffect(() => {
 
