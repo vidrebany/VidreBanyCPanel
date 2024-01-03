@@ -199,6 +199,7 @@ const Incidencies = () => {
         } else if (e === "pendingInfoChecked") {
             setUnresolvedChecked(false);
             setPendingInfoChecked(!pendingInfoChecked);
+            console.log("1")
             setResolvedChecked(false);
             newIndexState.pendingInfo = pendingInfoChecked ? 0 : currentIndexes.pendingInfo;
         } else if (e === "resolvedChecked") {

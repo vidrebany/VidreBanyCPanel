@@ -204,10 +204,9 @@ const Incidencies = () => {
             }
 
 
-            // eslint-disable-next-line react-hooks/exhaustive-deps
             mounted = true;
         });
-    }, [adminsList]);
+    }, []);
 
     useEffect(() => {
 
