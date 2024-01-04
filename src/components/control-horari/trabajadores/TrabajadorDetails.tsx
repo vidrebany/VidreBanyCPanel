@@ -15,8 +15,85 @@ const TrabajadorDetails = () => {
     const workers = useSelector((state: RootState) => state.trabajadores.trabajadores);
     // TODO: set dates to undefined
     const [startDate, setStartDate] = useState<string | number | readonly string[] | undefined>("2023-12-22");
-    const [endDate, setEndDate] = useState<string | number | readonly string[] | undefined>("2023-12-28");
+    const [endDate, setEndDate] = useState<string | number | readonly string[] | undefined>("2024-01-05");
     const [workingDays, setWorkingDays] = useState<WorkingDay[]>([]);
+    const [editMode, setEditMode] = useState({ date: false, time: false, dayIndex: -1, field: '' });
+
+    const handleRemoveWorkday = async (day: WorkingDay) => {
+
+        const isoDate = day.date.toISOString();
+        const date = isoDate.slice(0, isoDate.indexOf('T'));
+
+        const res = await Api.delete(`/worker/work_day/delete?worker_code=${selectedTrabajador?.code}&date=${date}`).catch((err) => {
+            const error = (err.response.data.error);
+            toast.error("Error al eliminar día de trabajo:", error);
+            return;
+        });
+
+        if (!res) return;
+
+        toast.success("Día de trabajo eliminado correctamente");
+        fetchWorkedHours(startDate, endDate);
+    }
+
+    type WorkingDayField = 'date' | 'enterHour' | 'exitHour' | 'startRestHour' | 'endRestHour';
+
+    // Handler to toggle edit mode
+    const toggleEditMode = (index: number, field: WorkingDayField) => {
+        setEditMode({ date: field.includes('date'), time: field.includes('Hour'), dayIndex: index, field });
+    };
+
+    // Handler to save the changed value
+    const handleSaveChange = async (e: React.ChangeEvent<HTMLInputElement>, day: WorkingDay, field: WorkingDayField) => {
+        // Update the specific day's field with the new value
+        // Make sure to clone the array and update the state accordingly
+        let newDate: Date | string;
+
+        if (field === 'date') {
+            // For date field, create a new Date directly from the input value
+            newDate = new Date(e.target.value);
+            const isoDate = newDate.toISOString();
+            newDate = isoDate.slice(0, isoDate.indexOf('T'));
+        } else {
+            // For time fields, combine the time value with the existing date
+            const timeParts = e.target.value.split(':');
+            newDate = new Date(day.date);
+            newDate.setHours(parseInt(timeParts[0]), parseInt(timeParts[1]));
+        }
+
+        //make a request to /worker/work_day/update with the worker code, date, type and time
+        const isoDate = day.date.toISOString();
+        const date = isoDate.slice(0, isoDate.indexOf('T'));
+
+        const payload = {
+            worker_code: selectedTrabajador?.code,
+            date: date,
+            type: field,
+            time: newDate
+        }
+
+        const res = await Api.put('/worker/work_day/update', payload)
+            .catch((err) => {
+                const error = (err.response.data.error);
+                toast.error("Error al registrar hora:", error);
+                return;
+            });
+        if (!res) return;
+        console.log(res.data);
+        toast.success('Hora registrada correctamente');
+
+        const newWorkingDays = [...workingDays];
+        newWorkingDays[editMode.dayIndex] = { ...day, [field]: field !== 'date' ? newDate : new Date(newDate) };
+        console.log(newWorkingDays)
+        setWorkingDays(newWorkingDays);
+
+        // Log the change
+        console.log(`Changed ${field} to: `, e.target.value);
+
+        // Exit edit mode
+        setEditMode({ date: false, time: false, dayIndex: -1, field: '' });
+    };
+
 
     useFetchWorkers();
 
@@ -25,14 +102,10 @@ const TrabajadorDetails = () => {
     const [searchParams] = useSearchParams();
     const code = searchParams.get("code");
 
-    const fetchWorkedHours = async () => {
-        //generate synthetic data
-        //it has to contain 10 days
-        //from 04/10/2023 to 14/10/2023 (don't use startDate and endDate for now)
-        //enterHour 8:00
-        //exitHour 18:00
-        //startRestHour 13:00
-        //endRestHour 14:00
+    const fetchWorkedHours = async (startDate: string | number | readonly string[] | undefined, endDate: string | number | readonly string[] | undefined) => {
+        //startDate 2023-12-22
+        //endDate 2024-01-05
+
 
         const res = await Api.get("/worker/work_days", {
             params: {
@@ -47,22 +120,23 @@ const TrabajadorDetails = () => {
         });
         if (!res) return;
 
-        console.log(res)
+        const obtainedWorkingDays: WorkingDay[] = res.data.work_schedules.map((work_schedule: any) => {
+            const date = new Date(work_schedule.date);
+            const entry_hour = new Date(work_schedule.entry_hour);
+            const exit_hour = new Date(work_schedule.exit_hour);
+            const rest_start_hour = new Date(work_schedule.rest_start_hour);
+            const rest_end_hour = new Date(work_schedule.rest_end_hour);
 
-        const generatedWorkingDays: WorkingDay[] = [];
+            return {
+                date,
+                enterHour: entry_hour,
+                exitHour: exit_hour,
+                startRestHour: rest_start_hour,
+                endRestHour: rest_end_hour
+            }
+        });
 
-        for (let i = 0; i < 10; i++) {
-            generatedWorkingDays.push({
-                date: new Date(2023, 10, 4 + i),
-                enterHour: new Date(2023, 10, 4 + i, 8, 0),
-                exitHour: new Date(2023, 10, 4 + i, 18, 0),
-                startRestHour: new Date(2023, 10, 4 + i, 13, 0),
-                endRestHour: new Date(2023, 10, 4 + i, 14, 0),
-            })
-        }
-
-        console.log(generatedWorkingDays);
-        setWorkingDays(generatedWorkingDays);
+        setWorkingDays(obtainedWorkingDays);
 
 
     }
@@ -75,7 +149,7 @@ const TrabajadorDetails = () => {
 
     useEffect(() => {
         if (startDate && endDate)
-            fetchWorkedHours();
+            fetchWorkedHours(startDate, endDate);
     }, [startDate, endDate])
 
     useEffect(() => {
@@ -86,6 +160,7 @@ const TrabajadorDetails = () => {
             }
         }
     }, [code, dispatch, selectedTrabajador, workers])
+
 
     if (!selectedTrabajador) {
         return <div>
@@ -142,17 +217,51 @@ const TrabajadorDetails = () => {
                             <th>Hora Inicio Descanso</th>
                             <th>Hora Final Descanso</th>
                             <th>Horas Trabajadas</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {workingDays.map((day, index) => (
                             <tr key={index}>
-                                <td>{format(day.date, 'dd/MM/yyyy')}</td>
-                                <td>{format(day.enterHour, 'HH:mm')}</td>
-                                <td>{format(day.exitHour, 'HH:mm')}</td>
-                                <td>{format(day.startRestHour, 'HH:mm')}</td>
-                                <td>{format(day.endRestHour, 'HH:mm')}</td>
+                                <td onClick={() => toggleEditMode(index, 'date')}>
+                                    {editMode.dayIndex === index && editMode.field === 'date' ?
+                                        <input type="date" value={format(day.date, 'yyyy-MM-dd')} onChange={(e) => handleSaveChange(e, day, 'date')} />
+                                        :
+                                        format(day.date, 'dd/MM/yyyy')
+                                    }
+                                </td>
+                                <td onClick={() => toggleEditMode(index, 'enterHour')}>
+                                    {editMode.dayIndex === index && editMode.field === 'enterHour' ?
+                                        <input type="time" value={format(day.enterHour, 'HH:mm')} onChange={(e) => handleSaveChange(e, day, 'enterHour')} />
+                                        :
+                                        format(day.enterHour, 'HH:mm')
+                                    }
+                                </td>
+                                <td onClick={() => toggleEditMode(index, 'exitHour')}>
+                                    {editMode.dayIndex === index && editMode.field === 'exitHour' ?
+                                        <input type="time" value={format(day.exitHour, 'HH:mm')} onChange={(e) => handleSaveChange(e, day, 'exitHour')} />
+                                        :
+                                        format(day.exitHour, 'HH:mm')
+                                    }
+                                </td>
+                                <td onClick={() => toggleEditMode(index, 'startRestHour')}>
+                                    {editMode.dayIndex === index && editMode.field === 'startRestHour' ?
+                                        <input type="time" value={format(day.startRestHour, 'HH:mm')} onChange={(e) => handleSaveChange(e, day, 'startRestHour')} />
+                                        :
+                                        format(day.startRestHour, 'HH:mm')
+                                    }
+                                </td>
+                                <td onClick={() => toggleEditMode(index, 'endRestHour')}>
+                                    {editMode.dayIndex === index && editMode.field === 'endRestHour' ?
+                                        <input type="time" value={format(day.endRestHour, 'HH:mm')} onChange={(e) => handleSaveChange(e, day, 'endRestHour')} />
+                                        :
+                                        format(day.endRestHour, 'HH:mm')
+                                    }
+                                </td>
                                 <td>{calculateWorkedHours(day)}</td>
+                                <td>
+                                    <button className="btn btn-danger" onClick={() => handleRemoveWorkday(day)}>Eliminar</button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>

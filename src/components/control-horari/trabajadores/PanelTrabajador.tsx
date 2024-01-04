@@ -6,6 +6,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { selectTrabajadorByCode } from "../../../redux/features/trabajadores/trabajadoresSlice";
 import { Api } from "../../../api/api";
 import { toast } from "react-toastify";
+import { AxiosError } from "axios";
 
 const PanelTrabajador = () => {
 
@@ -62,12 +63,9 @@ const PanelTrabajador = () => {
     const postTime = async (type: 'entry' | 'startRest' | 'endRest' | 'exit') => {
         const now = new Date();
 
-        const time = now.toLocaleTimeString('es-ES', {
-            timeZone: 'Europe/Madrid',
-            hour12: false,
-            hour: '2-digit',
-            minute: '2-digit',
-        });
+
+
+
 
         // Convert the date to the ISO string and then slice it to get the yyyy-mm-dd format
         const isoDate = now.toISOString();
@@ -78,7 +76,7 @@ const PanelTrabajador = () => {
             worker_code: selectedTrabajador?.code,
             date: date,
             type,
-            time
+            time: now
         }
 
         try {
@@ -86,8 +84,11 @@ const PanelTrabajador = () => {
             console.log(response.data);
             toast.success('Hora registrada correctamente');
         } catch (error) {
-            console.log(error);
-            toast.error('Error al registrar hora: ' + error);
+            const axiosError = error as AxiosError;
+            if (!axiosError) return console.log(error);
+            if (!axiosError.response) return console.log(error);
+            if (!axiosError.response.data) return console.log(error);
+            toast.error('Error al registrar hora: ' + axiosError.response.data);
         }
     }
 
@@ -107,7 +108,7 @@ const PanelTrabajador = () => {
                 <button type="button" className="btn btn-primary" onClick={() => postTime('entry')}>Entrada</button>
                 <button type="button" className="btn btn-secondary" onClick={() => postTime('startRest')}>Inicio Descanso</button>
                 <button type="button" className="btn btn-secondary" onClick={() => postTime('endRest')}>Final Descanso</button>
-                <button type="button" className="btn btn-danger" onClick={() => 'exit'}>Salida</button>
+                <button type="button" className="btn btn-danger" onClick={() => postTime('exit')}>Salida</button>
             </div>
             <div className="position-absolute bottom-0 end-0 p-3">
                 <span className="text-muted">{currentDateTime}</span>
