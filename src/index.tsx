@@ -18,10 +18,29 @@ import reportWebVitals from './reportWebVitals';
 import React from "react";
 import App from "./App";
 import ReactDOM from "react-dom";
+import { createRoot } from 'react-dom/client'; // Updated import
+
 import Navbar from './components/Navbar';
 import { Provider } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
 
+const container = document.getElementById('root');
+const root = createRoot(container!);
+
+
+// Render the app on the root
+root.render(
+  <React.StrictMode>
+    <Provider store={store}>
+      <Navbar />
+      <App />
+    </Provider>
+    <ToastContainer position="top-right" theme="colored" closeOnClick />
+  </React.StrictMode>
+);
+
+
+/*
 ReactDOM.render(
   <React.StrictMode>
     <>
@@ -35,6 +54,7 @@ ReactDOM.render(
   document.getElementById('root')
 )
 
+*/
 
 reportWebVitals();
 

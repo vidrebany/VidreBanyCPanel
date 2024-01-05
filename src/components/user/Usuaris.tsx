@@ -46,7 +46,7 @@ export type Users = {
 
       setUsersList(newUsersList);
     });
-  }, [db]);
+  }, []);
 
 
   return (

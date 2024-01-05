@@ -49,7 +49,7 @@ const Transporters = () => {
 
 
         });
-    }, [transportList]);
+    }, []);
 
     useEffect(() => {
         onValue(mailRef, (snapshot) => {

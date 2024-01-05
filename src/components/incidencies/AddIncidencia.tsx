@@ -206,7 +206,7 @@ const Incidencies = () => {
             toast.error("Error al carregar els admins");
             console.log(error);
         });
-    }, [db]);
+    }, []);
 
     useEffect(() => {
 
@@ -249,7 +249,7 @@ const Incidencies = () => {
 
 
         });
-    }, [db, ncNum]);
+    }, [ncNum]);
 
 
 

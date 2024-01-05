@@ -121,7 +121,7 @@ const Ordres = () => {
         });
 
 
-    }, [searchText, startDate, endDate, db]);
+    }, [searchText, startDate, endDate]);
 
 
     function deleteProcess(code: string, processName: string, processStarted: string, processUser: string) {

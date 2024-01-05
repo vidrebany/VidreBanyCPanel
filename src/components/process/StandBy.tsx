@@ -24,7 +24,7 @@ const StandBy = () => {
                 console.log(data)
             }
         });
-    }, [db])
+    }, [])
 
     useEffect(() => {
         setFilteredStandbyList(standbyList.filter((order) =>

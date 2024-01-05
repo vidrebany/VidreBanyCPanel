@@ -6,7 +6,7 @@ import { AdminsData, Incidencia, formaRegistreObject, comandaTypeObject, formaDe
 import { useRef, useState, useEffect } from "react";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
-import { getDatabase, ref as databaseRef, set, onValue, update } from "firebase/database";
+import { getDatabase, ref as databaseRef, set, onValue, update, get } from "firebase/database";
 import { getStorage, ref as refStorage, deleteObject, uploadBytesResumable, getDownloadURL, uploadBytes } from "firebase/storage";
 import firebaseApp from "../../firebase";
 
@@ -307,7 +307,7 @@ const EditInconformitat = () => {
     useEffect(() => {
         const transportRef = databaseRef(db, "/admins/");
 
-        onValue(transportRef, (snapshot) => {
+        get(transportRef).then((snapshot) => {
             const data = snapshot.val();
 
             let adminsListTemp: AdminsData[] = [];
@@ -332,7 +332,7 @@ const EditInconformitat = () => {
             // eslint-disable-next-line react-hooks/exhaustive-deps
             mounted = true;
         });
-    }, [adminsList]);
+    }, []);
 
     useEffect(() => {
 
