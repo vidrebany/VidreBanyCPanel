@@ -235,10 +235,10 @@ const TrabajadorSchedule = () => {
             <div>
                 <button
                     className={`btn ${isEntry === true ? "btn-success" : "btn-outline-success"}`}
-                    onClick={() => setIsEntry(true)}>Entrada</button>
-                <button
+                    onClick={() => setIsEntry(true)}>Horas extra</button>
+                {/*<button
                     className={`btn ${isEntry === false ? "btn-danger" : "btn-outline-danger"}`}
-                    onClick={() => setIsEntry(false)}>Salida</button>
+    onClick={() => setIsEntry(false)}>Salida</button>*/}
             </div>
             <table className="table">
                 <thead>

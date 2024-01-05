@@ -107,7 +107,7 @@ const Incidencies = () => {
             }
             //sort the list by date, most recent first (inconformitatsListTemp.date)
             inconformitatsListTemp.sort((a, b) => {
-                return parseInt(b.date) - parseInt(a.date);
+                return b.ncNum - a.ncNum;
             });
             setInconformitatsList(inconformitatsListTemp);
 
