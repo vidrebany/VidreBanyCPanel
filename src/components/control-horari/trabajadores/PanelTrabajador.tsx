@@ -88,7 +88,21 @@ const PanelTrabajador = () => {
             if (!axiosError) return console.log(error);
             if (!axiosError.response) return console.log(error);
             if (!axiosError.response.data) return console.log(error);
-            toast.error('Error al registrar hora: ' + axiosError.response.data);
+            const errorMessage = (axiosError.response.data as { error: string }).error;
+            console.log(errorMessage)
+            if (errorMessage.includes("NO HA INDICADO EL INICIO DEL DESCANSO")) {
+                //Output current time minus 30 minutes
+                const now = new Date();
+                const nowMinus30 = new Date(now.getTime() - 30 * 60000);
+                // Format the date in the local time zone
+                // Format the date in the local time zone
+                const optionsTime: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Europe/Madrid' };
+                const nowMinus30TimeString = new Intl.DateTimeFormat('es-ES', optionsTime).format(nowMinus30);
+
+                toast.error(`NO HA INDICADO EL INICIO DEL DESCANSO, SE INDICA EL INICIO A LAS ${nowMinus30TimeString}`);
+            } else {
+                toast.error(errorMessage);
+            }
         }
     }
 
@@ -105,10 +119,10 @@ const PanelTrabajador = () => {
                 <input type="text" id="usuario" className="form-control" value={selectedTrabajador.name} readOnly />
             </div>
             <div className="d-flex justify-content-center gap-2 mb-3">
-                <button type="button" className="btn btn-primary" onClick={() => postTime('entry')}>Entrada</button>
-                <button type="button" className="btn btn-secondary" onClick={() => postTime('startRest')}>Inicio Descanso</button>
-                <button type="button" className="btn btn-secondary" onClick={() => postTime('endRest')}>Final Descanso</button>
-                <button type="button" className="btn btn-danger" onClick={() => postTime('exit')}>Salida</button>
+                <button type="button" className="btn btn-primary" onClick={() => postTime('entry')}><h2 className="text-white mb-0">Entrada</h2></button>
+                <button type="button" className="btn btn-secondary" onClick={() => postTime('startRest')}><h2 className="text-white mb-0">Inicio<br />Descanso</h2></button>
+                <button type="button" className="btn btn-secondary" onClick={() => postTime('endRest')}><h2 className="text-white mb-0">Final<br />Descanso</h2></button>
+                <button type="button" className="btn btn-danger" onClick={() => postTime('exit')}><h2 className="text-white mb-0">Salida</h2></button>
             </div>
             <div className="position-absolute bottom-0 end-0 p-3">
                 <span className="text-muted">{currentDateTime}</span>

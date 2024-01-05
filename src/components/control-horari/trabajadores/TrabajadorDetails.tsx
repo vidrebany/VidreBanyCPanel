@@ -8,16 +8,149 @@ import { selectTrabajadorByCode } from '../../../redux/features/trabajadores/tra
 import useFetchWorkers from '../../../hooks/useFetchTrabajadores';
 import { Api } from '../../../api/api';
 import { toast } from 'react-toastify';
-import axios from 'axios';
+import { Page, Text, View, Document, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
+
+
+// Create PDF styles
+const styles = StyleSheet.create({
+    page: {
+        flexDirection: 'column',
+        backgroundColor: '#E4E4E4',
+        padding: 10
+    },
+    title: {
+        textAlign: 'center',
+        marginBottom: 10,
+    },
+    table: {
+        display: "flex",
+        width: "100%",
+        borderStyle: "solid",
+        borderWidth: 1,
+        borderRightWidth: 0,
+        borderBottomWidth: 0
+    },
+    tableRow: {
+        margin: "auto",
+        flexDirection: "row"
+    },
+    tableCol: {
+        width: "16.666666%",
+        borderStyle: "solid",
+        borderWidth: 1,
+        borderLeftWidth: 0,
+        borderTopWidth: 0
+    },
+    tableCell: {
+        margin: "auto",
+        marginTop: 5,
+        fontSize: 10
+    }
+});
+
+const calculateWorkedHours = (day: WorkingDay) => {
+    if (!day.enterHour || !day.exitHour || !day.startRestHour || !day.endRestHour) return (0).toFixed(2);
+    const workDuration = (day.exitHour.getTime() - day.enterHour.getTime()) / (1000 * 60 * 60);
+    const restDuration = (day.endRestHour.getTime() - day.startRestHour.getTime()) / (1000 * 60 * 60);
+    return (workDuration - restDuration).toFixed(2);
+}
+
+
+// Document Component
+const WorkDaysPDF = ({ workingDays, selectedTrabajador }) => (
+    <Document>
+        <Page size="A4" style={styles.page}>
+            <Text style={styles.title}>Control Horarios VidreBany - {selectedTrabajador.name} ({selectedTrabajador.code})</Text>
+            <View style={styles.table}>
+                {/* Table Header */}
+                <View style={styles.tableRow}>
+                    <View style={styles.tableCol}><Text style={styles.tableCell}>Fecha</Text></View>
+                    <View style={styles.tableCol}><Text style={styles.tableCell}>Hora Entrada</Text></View>
+                    <View style={styles.tableCol}><Text style={styles.tableCell}>Hora Salida</Text></View>
+                    <View style={styles.tableCol}><Text style={styles.tableCell}>Inicio Descanso</Text></View>
+                    <View style={styles.tableCol}><Text style={styles.tableCell}>Fin Descanso</Text></View>
+                    <View style={styles.tableCol}><Text style={styles.tableCell}>Horas Trabajadas</Text></View>
+                </View>
+                {/* Table Rows */}
+                {workingDays.map((day, index) => (
+                    <View key={index} style={styles.tableRow}>
+                        <View style={styles.tableCol}><Text style={styles.tableCell}>{format(day.date, "dd/MM/yyyy")}</Text></View>
+                        <View style={styles.tableCol}><Text style={styles.tableCell}>{format(day.enterHour, "HH:mm")}</Text></View>
+                        <View style={styles.tableCol}><Text style={styles.tableCell}>{format(day.exitHour, "HH:mm")}</Text></View>
+                        <View style={styles.tableCol}><Text style={styles.tableCell}>{format(day.startRestHour, "HH:mm")}</Text></View>
+                        <View style={styles.tableCol}><Text style={styles.tableCell}>{format(day.endRestHour, "HH:mm")}</Text></View>
+                        <View style={styles.tableCol}><Text style={styles.tableCell}>{calculateWorkedHours(day)}</Text></View>
+                    </View>
+                ))}
+            </View>
+            {/* Footer */}
+            <View style={styles.tableRow}>
+                <View style={{ ...styles.tableCol, width: "80%" }}><Text style={styles.tableCell}>Sumatorio Horas Trabajadas</Text></View>
+                <View style={styles.tableCol}><Text style={styles.tableCell}>{workingDays.reduce((acc, day) => acc + parseFloat(calculateWorkedHours(day)), 0).toFixed(2)}</Text></View>
+            </View>
+        </Page>
+    </Document>
+);
+
 
 const TrabajadorDetails = () => {
     const selectedTrabajador = useSelector((state: RootState) => state.trabajadores.selectedTrabajador);
     const workers = useSelector((state: RootState) => state.trabajadores.trabajadores);
     // TODO: set dates to undefined
     const [startDate, setStartDate] = useState<string | number | readonly string[] | undefined>("2023-12-22");
-    const [endDate, setEndDate] = useState<string | number | readonly string[] | undefined>("2024-01-05");
+    const [endDate, setEndDate] = useState<string | number | readonly string[] | undefined>("2024-02-05");
     const [workingDays, setWorkingDays] = useState<WorkingDay[]>([]);
     const [editMode, setEditMode] = useState({ date: false, time: false, dayIndex: -1, field: '' });
+    const [newWorkday, setNewWorkday] = useState({
+        date: '',
+        enterHour: '',
+        exitHour: '',
+        startRestHour: '',
+        endRestHour: ''
+    });
+    const [showAddDay, setShowAddDay] = useState(false);
+
+    // Function to handle the upload
+    const handleUpload = async () => {
+
+        // For time fields, combine the time value with the existing date
+        const timeEnterParts = newWorkday.enterHour.split(':');
+        const newEnterDate: Date = new Date(newWorkday.date);
+        newEnterDate.setHours(parseInt(timeEnterParts[0]), parseInt(timeEnterParts[1]));
+        const timeExitParts = newWorkday.exitHour.split(':');
+        const newExitDate: Date = new Date(newWorkday.date);
+        newExitDate.setHours(parseInt(timeExitParts[0]), parseInt(timeExitParts[1]));
+        const timeStartRestParts = newWorkday.startRestHour.split(':');
+        const newStartRestDate: Date = new Date(newWorkday.date);
+        newStartRestDate.setHours(parseInt(timeStartRestParts[0]), parseInt(timeStartRestParts[1]));
+        const timeEndRestParts = newWorkday.endRestHour.split(':');
+        const newEndRestDate: Date = new Date(newWorkday.date);
+        newEndRestDate.setHours(parseInt(timeEndRestParts[0]), parseInt(timeEndRestParts[1]));
+
+        const payload = {
+            worker_code: selectedTrabajador?.code,
+            date: newWorkday.date,
+            enterHour: newEnterDate,
+            exitHour: newExitDate,
+            startRestHour: newStartRestDate,
+            endRestHour: newEndRestDate
+        };
+
+        console.log(payload);
+
+        // Here, adapt this to your API call logic
+        try {
+            const response = await Api.post('/worker/work_day/add', payload);
+            console.log(response.data);
+            toast.success('Día de trabajo añadido correctamente');
+            // After successful upload, fetch the updated workdays
+            fetchWorkedHours(startDate, endDate);
+        } catch (error) {
+            // Handle your errors
+            toast.error('Error al añadir día de trabajo');
+        }
+    };
+
 
     const handleRemoveWorkday = async (day: WorkingDay) => {
 
@@ -123,9 +256,19 @@ const TrabajadorDetails = () => {
         const obtainedWorkingDays: WorkingDay[] = res.data.work_schedules.map((work_schedule: any) => {
             const date = new Date(work_schedule.date);
             const entry_hour = new Date(work_schedule.entry_hour);
-            const exit_hour = new Date(work_schedule.exit_hour);
-            const rest_start_hour = new Date(work_schedule.rest_start_hour);
-            const rest_end_hour = new Date(work_schedule.rest_end_hour);
+            let exit_hour: Date | null = new Date(work_schedule.exit_hour);
+            // if year is 1970, it means that the date is null
+            if (exit_hour.getFullYear() === 0) {
+                exit_hour = null;
+            }
+            let rest_start_hour: Date | null = new Date(work_schedule.rest_start_hour);
+            if (rest_start_hour.getFullYear() === 0) {
+                rest_start_hour = null;
+            }
+            let rest_end_hour: Date | null = new Date(work_schedule.rest_end_hour);
+            if (rest_end_hour.getFullYear() === 0) {
+                rest_end_hour = null;
+            }
 
             return {
                 date,
@@ -135,17 +278,13 @@ const TrabajadorDetails = () => {
                 endRestHour: rest_end_hour
             }
         });
+        console.log(obtainedWorkingDays)
 
         setWorkingDays(obtainedWorkingDays);
 
 
     }
 
-    const calculateWorkedHours = (day: WorkingDay) => {
-        const workDuration = (day.exitHour.getTime() - day.enterHour.getTime()) / (1000 * 60 * 60);
-        const restDuration = (day.endRestHour.getTime() - day.startRestHour.getTime()) / (1000 * 60 * 60);
-        return (workDuration - restDuration).toFixed(2);
-    }
 
     useEffect(() => {
         if (startDate && endDate)
@@ -206,10 +345,50 @@ const TrabajadorDetails = () => {
                 </div>
                 <div className="d-flex flex-row align-items-center justify-content-center m-2">
                     <button className="btn btn-primary btn-block btn-info" onClick={() => navigate("/control-horari/trabajadores/trabajador-details/manage-schedule?code=" + selectedTrabajador.code)} style={{ width: "fit-content" }}><h3 style={{ display: "incline-block", verticalAlign: "top" }} className=" align-items-center justify-content-center text-white">Gestionar horario</h3></button>
-                    <button onClick={() => alert("generando pdf")} className='btn btn-primary btn-block justify-content-center align-items-center m-2' style={{ width: "fit-content" }}><h3 style={{ display: "incline-block", verticalAlign: "top" }} className=" align-items-center justify-content-center text-white">Generar PDF</h3></button>
+                    <PDFDownloadLink document={<WorkDaysPDF workingDays={workingDays} selectedTrabajador={selectedTrabajador} />} fileName={`${selectedTrabajador?.code}-${selectedTrabajador?.name}.pdf`}>
+                        {({ blob, url, loading, error }) =>
+                            loading ? 'Loading document...' :
+                                <button className='btn btn-primary btn-block justify-content-center align-items-center m-2' style={{ width: "fit-content" }}><h3 style={{ display: "incline-block", verticalAlign: "top" }} className=" align-items-center justify-content-center text-white">Generar PDF</h3></button>
+                        }
+                    </PDFDownloadLink>
                 </div>
+                <button className="btn btn-primary my-2" onClick={() => setShowAddDay(!showAddDay)}>Añadir día</button>
+                {showAddDay && (
+                    <div className="card my-2">
+                        <div className="card-body">
+                            <h5 className="card-title">Añadir Nuevo Día de Trabajo</h5>
+                            <form className="row g-3">
+                                <div className="col-md-3">
+                                    <label htmlFor="newWorkdayDate" className="form-label">Fecha</label>
+                                    <input type="date" className="form-control" id="newWorkdayDate" value={newWorkday.date} onChange={(e) => setNewWorkday({ ...newWorkday, date: e.target.value })} />
+                                </div>
+                                <div className="col-md-2">
+                                    <label htmlFor="enterHour" className="form-label">Hora Entrada</label>
+                                    <input type="time" className="form-control" id="enterHour" value={newWorkday.enterHour} onChange={(e) => setNewWorkday({ ...newWorkday, enterHour: e.target.value })} />
+                                </div>
+                                <div className="col-md-2">
+                                    <label htmlFor="exitHour" className="form-label">Hora Salida</label>
+                                    <input type="time" className="form-control" id="exitHour" value={newWorkday.exitHour} onChange={(e) => setNewWorkday({ ...newWorkday, exitHour: e.target.value })} />
+                                </div>
+                                <div className="col-md-2">
+                                    <label htmlFor="startRestHour" className="form-label">Inicio Descanso</label>
+                                    <input type="time" className="form-control" id="startRestHour" value={newWorkday.startRestHour} onChange={(e) => setNewWorkday({ ...newWorkday, startRestHour: e.target.value })} />
+                                </div>
+                                <div className="col-md-2">
+                                    <label htmlFor="endRestHour" className="form-label">Fin Descanso</label>
+                                    <input type="time" className="form-control" id="endRestHour" value={newWorkday.endRestHour} onChange={(e) => setNewWorkday({ ...newWorkday, endRestHour: e.target.value })} />
+                                </div>
+                                <div className="col-md-1 d-flex align-items-end">
+                                    <button type="button" className="btn btn-success" onClick={handleUpload}>Subir</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
                 <table className="table">
+
                     <thead>
+
                         <tr>
                             <th>Fecha</th>
                             <th>Hora Entrada</th>
@@ -234,28 +413,28 @@ const TrabajadorDetails = () => {
                                     {editMode.dayIndex === index && editMode.field === 'enterHour' ?
                                         <input type="time" value={format(day.enterHour, 'HH:mm')} onChange={(e) => handleSaveChange(e, day, 'enterHour')} />
                                         :
-                                        format(day.enterHour, 'HH:mm')
+                                        day.enterHour ? format(day.enterHour, 'HH:mm') : '-'
                                     }
                                 </td>
                                 <td onClick={() => toggleEditMode(index, 'exitHour')}>
                                     {editMode.dayIndex === index && editMode.field === 'exitHour' ?
                                         <input type="time" value={format(day.exitHour, 'HH:mm')} onChange={(e) => handleSaveChange(e, day, 'exitHour')} />
                                         :
-                                        format(day.exitHour, 'HH:mm')
+                                        day.exitHour ? format(day.exitHour, 'HH:mm') : '-'
                                     }
                                 </td>
                                 <td onClick={() => toggleEditMode(index, 'startRestHour')}>
                                     {editMode.dayIndex === index && editMode.field === 'startRestHour' ?
                                         <input type="time" value={format(day.startRestHour, 'HH:mm')} onChange={(e) => handleSaveChange(e, day, 'startRestHour')} />
                                         :
-                                        format(day.startRestHour, 'HH:mm')
+                                        day.startRestHour ? format(day.startRestHour, 'HH:mm') : '-'
                                     }
                                 </td>
                                 <td onClick={() => toggleEditMode(index, 'endRestHour')}>
                                     {editMode.dayIndex === index && editMode.field === 'endRestHour' ?
                                         <input type="time" value={format(day.endRestHour, 'HH:mm')} onChange={(e) => handleSaveChange(e, day, 'endRestHour')} />
                                         :
-                                        format(day.endRestHour, 'HH:mm')
+                                        day.endRestHour ? format(day.endRestHour, 'HH:mm') : '-'
                                     }
                                 </td>
                                 <td>{calculateWorkedHours(day)}</td>
