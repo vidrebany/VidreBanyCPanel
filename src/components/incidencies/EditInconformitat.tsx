@@ -836,7 +836,7 @@ const EditInconformitat = () => {
                         })}
                     </Select>
                 </FormControl>
-                {tipusDefecte === "DEFECTE DE FABRICACIÓ ( SIFONAT, MIDA, ACABAT…)" &&
+                {tipusDefecte === "DEFECTUÓS PROVEÏDOR" &&
                     <div>
                         <h3>Dades proveïdor de fabricació:</h3>
                         <Stack className="Stack" spacing={1} direction={{ xs: "column", sm: 'row' }} width={"100%"} alignContent={"center"}>
