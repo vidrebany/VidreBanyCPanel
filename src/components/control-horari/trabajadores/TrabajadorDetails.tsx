@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../redux/store';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { WorkingDay } from './types/trabajadoresTypes';
+import { Trabajador, WorkingDay } from './types/trabajadoresTypes';
 import { selectTrabajadorByCode } from '../../../redux/features/trabajadores/trabajadoresSlice';
 import useFetchWorkers from '../../../hooks/useFetchTrabajadores';
 import { Api } from '../../../api/api';
@@ -57,7 +57,7 @@ const calculateWorkedHours = (day: WorkingDay) => {
 
 
 // Document Component
-const WorkDaysPDF = ({ workingDays, selectedTrabajador }) => (
+const WorkDaysPDF = ({ workingDays, selectedTrabajador }: { workingDays: WorkingDay[], selectedTrabajador: Trabajador }) => (
     <Document>
         <Page size="A4" style={styles.page}>
             <Text style={styles.title}>Control Horarios VidreBany - {selectedTrabajador.name} ({selectedTrabajador.code})</Text>
@@ -72,7 +72,7 @@ const WorkDaysPDF = ({ workingDays, selectedTrabajador }) => (
                     <View style={styles.tableCol}><Text style={styles.tableCell}>Horas Trabajadas</Text></View>
                 </View>
                 {/* Table Rows */}
-                {workingDays.map((day, index) => (
+                {workingDays.map((day: WorkingDay, index: number) => (
                     <View key={index} style={styles.tableRow}>
                         <View style={styles.tableCol}><Text style={styles.tableCell}>{format(day.date, "dd/MM/yyyy")}</Text></View>
                         <View style={styles.tableCol}><Text style={styles.tableCell}>{format(day.enterHour, "HH:mm")}</Text></View>
@@ -235,61 +235,62 @@ const TrabajadorDetails = () => {
     const [searchParams] = useSearchParams();
     const code = searchParams.get("code");
 
-    const fetchWorkedHours = async (startDate: string | number | readonly string[] | undefined, endDate: string | number | readonly string[] | undefined) => {
-        //startDate 2023-12-22
-        //endDate 2024-01-05
+    const fetchWorkedHours = useCallback(
+        async (startDate: string | number | readonly string[] | undefined, endDate: string | number | readonly string[] | undefined) => {
+            //startDate 2023-12-22
+            //endDate 2024-01-05
 
 
-        const res = await Api.get("/worker/work_days", {
-            params: {
-                worker_code: code,
-                start_date: startDate,
-                end_date: endDate
-            }
-        }).catch((err) => {
-            const error = (err.response.data.error);
-            toast.error("Error al obtener horario:", error);
-            return;
-        });
-        if (!res) return;
+            const res = await Api.get("/worker/work_days", {
+                params: {
+                    worker_code: code,
+                    start_date: startDate,
+                    end_date: endDate
+                }
+            }).catch((err) => {
+                const error = (err.response.data.error);
+                toast.error("Error al obtener horario:", error);
+                return;
+            });
+            if (!res) return;
 
-        const obtainedWorkingDays: WorkingDay[] = res.data.work_schedules.map((work_schedule: any) => {
-            const date = new Date(work_schedule.date);
-            const entry_hour = new Date(work_schedule.entry_hour);
-            let exit_hour: Date | null = new Date(work_schedule.exit_hour);
-            // if year is 1970, it means that the date is null
-            if (exit_hour.getFullYear() === 0) {
-                exit_hour = null;
-            }
-            let rest_start_hour: Date | null = new Date(work_schedule.rest_start_hour);
-            if (rest_start_hour.getFullYear() === 0) {
-                rest_start_hour = null;
-            }
-            let rest_end_hour: Date | null = new Date(work_schedule.rest_end_hour);
-            if (rest_end_hour.getFullYear() === 0) {
-                rest_end_hour = null;
-            }
+            const obtainedWorkingDays: WorkingDay[] = res.data.work_schedules.map((work_schedule: any) => {
+                const date = new Date(work_schedule.date);
+                const entry_hour = new Date(work_schedule.entry_hour);
+                let exit_hour: Date | null = new Date(work_schedule.exit_hour);
+                // if year is 1970, it means that the date is null
+                if (exit_hour.getFullYear() === 0) {
+                    exit_hour = null;
+                }
+                let rest_start_hour: Date | null = new Date(work_schedule.rest_start_hour);
+                if (rest_start_hour.getFullYear() === 0) {
+                    rest_start_hour = null;
+                }
+                let rest_end_hour: Date | null = new Date(work_schedule.rest_end_hour);
+                if (rest_end_hour.getFullYear() === 0) {
+                    rest_end_hour = null;
+                }
 
-            return {
-                date,
-                enterHour: entry_hour,
-                exitHour: exit_hour,
-                startRestHour: rest_start_hour,
-                endRestHour: rest_end_hour
-            }
-        });
-        console.log(obtainedWorkingDays)
+                return {
+                    date,
+                    enterHour: entry_hour,
+                    exitHour: exit_hour,
+                    startRestHour: rest_start_hour,
+                    endRestHour: rest_end_hour
+                }
+            });
+            console.log(obtainedWorkingDays)
 
-        setWorkingDays(obtainedWorkingDays);
+            setWorkingDays(obtainedWorkingDays);
 
 
-    }
+
+        }, [code]);
 
 
     useEffect(() => {
-        if (startDate && endDate)
-            fetchWorkedHours(startDate, endDate);
-    }, [startDate, endDate])
+        fetchWorkedHours(startDate, endDate);
+    }, [startDate, endDate, fetchWorkedHours])
 
     useEffect(() => {
 
