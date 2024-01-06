@@ -8,6 +8,8 @@ export type WorkingDay = {
     date: Date,
     enterHour: Date,
     exitHour: Date,
-    startRestHour: Date,
-    endRestHour: Date,
+    startBreakfastHour: Date,
+    endBreakfastHour: Date,
+    startLunchHour: Date,
+    endLunchHour: Date,
 }

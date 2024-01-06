@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
         flexDirection: "row"
     },
     tableCol: {
-        width: "16.666666%",
+        width: "12.5%",
         borderStyle: "solid",
         borderWidth: 1,
         borderLeftWidth: 0,
@@ -49,9 +49,18 @@ const styles = StyleSheet.create({
 });
 
 const calculateWorkedHours = (day: WorkingDay) => {
-    if (!day.enterHour || !day.exitHour || !day.startRestHour || !day.endRestHour) return (0).toFixed(2);
+    if (!day.enterHour || !day.exitHour) return (0).toFixed(2);
     const workDuration = (day.exitHour.getTime() - day.enterHour.getTime()) / (1000 * 60 * 60);
-    const restDuration = (day.endRestHour.getTime() - day.startRestHour.getTime()) / (1000 * 60 * 60);
+
+    let breakfastTime = 0;
+    if (day.startBreakfastHour && day.endBreakfastHour)
+    breakfastTime = (day.endBreakfastHour.getTime() - day.startBreakfastHour.getTime()) / (1000 * 60 * 60);
+    let lunchTime = 0;
+    if (day.startLunchHour && day.endLunchHour)
+    lunchTime = (day.endLunchHour.getTime() - day.startLunchHour.getTime()) / (1000 * 60 * 60);
+
+    const restDuration = breakfastTime + lunchTime;
+
     return (workDuration - restDuration).toFixed(2);
 }
 
@@ -65,20 +74,24 @@ const WorkDaysPDF = ({ workingDays, selectedTrabajador }: { workingDays: Working
                 {/* Table Header */}
                 <View style={styles.tableRow}>
                     <View style={styles.tableCol}><Text style={styles.tableCell}>Fecha</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>Hora Entrada</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>Hora Salida</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>Inicio Descanso</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>Fin Descanso</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>Horas Trabajadas</Text></View>
+                    <View style={styles.tableCol}><Text style={styles.tableCell}>Hora</Text><Text style={styles.tableCell}>Entrada</Text></View>
+                    <View style={styles.tableCol}><Text style={styles.tableCell}>Hora</Text><Text style={styles.tableCell}>Salida</Text></View>
+                    <View style={styles.tableCol}><Text style={styles.tableCell}>Inicio</Text><Text style={styles.tableCell}>Desayuno</Text></View>
+                    <View style={styles.tableCol}><Text style={styles.tableCell}>Fin</Text><Text style={styles.tableCell}>Desayuno</Text></View>
+                    <View style={styles.tableCol}><Text style={styles.tableCell}>Inicio</Text><Text style={styles.tableCell}>Almuerzo</Text></View>
+                    <View style={styles.tableCol}><Text style={styles.tableCell}>Fin</Text><Text style={styles.tableCell}>Almuerzo</Text></View>
+                    <View style={styles.tableCol}><Text style={styles.tableCell}>Horas</Text><Text style={styles.tableCell}>Trabajadas</Text></View>
                 </View>
                 {/* Table Rows */}
                 {workingDays.map((day: WorkingDay, index: number) => (
                     <View key={index} style={styles.tableRow}>
-                        <View style={styles.tableCol}><Text style={styles.tableCell}>{format(day.date, "dd/MM/yyyy")}</Text></View>
-                        <View style={styles.tableCol}><Text style={styles.tableCell}>{format(day.enterHour, "HH:mm")}</Text></View>
-                        <View style={styles.tableCol}><Text style={styles.tableCell}>{format(day.exitHour, "HH:mm")}</Text></View>
-                        <View style={styles.tableCol}><Text style={styles.tableCell}>{format(day.startRestHour, "HH:mm")}</Text></View>
-                        <View style={styles.tableCol}><Text style={styles.tableCell}>{format(day.endRestHour, "HH:mm")}</Text></View>
+                        <View style={styles.tableCol}><Text style={styles.tableCell}>{day.date ? format(day.date, "dd/MM/yyyy") : '-'}</Text></View>
+                        <View style={styles.tableCol}><Text style={styles.tableCell}>{day.enterHour ? format(day.enterHour, "HH:mm") : '-'}</Text></View>
+                        <View style={styles.tableCol}><Text style={styles.tableCell}>{day.exitHour ? format(day.exitHour, "HH:mm") : '-'}</Text></View>
+                        <View style={styles.tableCol}><Text style={styles.tableCell}>{day.startBreakfastHour ? format(day.startBreakfastHour, "HH:mm") : '-'}</Text></View>
+                        <View style={styles.tableCol}><Text style={styles.tableCell}>{day.endBreakfastHour ? format(day.endBreakfastHour, "HH:mm") : '-'}</Text></View>
+                        <View style={styles.tableCol}><Text style={styles.tableCell}>{day.startLunchHour ? format(day.startLunchHour, "HH:mm") : '-'}</Text></View>
+                        <View style={styles.tableCol}><Text style={styles.tableCell}>{day.endLunchHour ? format(day.endLunchHour, "HH:mm") : '-'}</Text></View>
                         <View style={styles.tableCol}><Text style={styles.tableCell}>{calculateWorkedHours(day)}</Text></View>
                     </View>
                 ))}
@@ -105,8 +118,10 @@ const TrabajadorDetails = () => {
         date: '',
         enterHour: '',
         exitHour: '',
-        startRestHour: '',
-        endRestHour: ''
+        startBreakfastHour: '',
+        endBreakfastHour: '',
+        startLunchHour: '',
+        endLunchHour: ''
     });
     const [showAddDay, setShowAddDay] = useState(false);
 
@@ -120,20 +135,28 @@ const TrabajadorDetails = () => {
         const timeExitParts = newWorkday.exitHour.split(':');
         const newExitDate: Date = new Date(newWorkday.date);
         newExitDate.setHours(parseInt(timeExitParts[0]), parseInt(timeExitParts[1]));
-        const timeStartRestParts = newWorkday.startRestHour.split(':');
-        const newStartRestDate: Date = new Date(newWorkday.date);
-        newStartRestDate.setHours(parseInt(timeStartRestParts[0]), parseInt(timeStartRestParts[1]));
-        const timeEndRestParts = newWorkday.endRestHour.split(':');
-        const newEndRestDate: Date = new Date(newWorkday.date);
-        newEndRestDate.setHours(parseInt(timeEndRestParts[0]), parseInt(timeEndRestParts[1]));
+        const timeStartBreakfastParts = newWorkday.startBreakfastHour.split(':');
+        const newStartBreakfastDate: Date = new Date(newWorkday.date);
+        newStartBreakfastDate.setHours(parseInt(timeStartBreakfastParts[0]), parseInt(timeStartBreakfastParts[1]));
+        const timeEndBreakfastParts = newWorkday.endBreakfastHour.split(':');
+        const newEndBreakfastDate: Date = new Date(newWorkday.date);
+        newEndBreakfastDate.setHours(parseInt(timeEndBreakfastParts[0]), parseInt(timeEndBreakfastParts[1]));
+        const timeStartLunchParts = newWorkday.startLunchHour.split(':');
+        const newStartLunchDate: Date = new Date(newWorkday.date);
+        newStartLunchDate.setHours(parseInt(timeStartLunchParts[0]), parseInt(timeStartLunchParts[1]));
+        const timeEndLunchParts = newWorkday.endLunchHour.split(':');
+        const newEndLunchDate: Date = new Date(newWorkday.date);
+        newEndLunchDate.setHours(parseInt(timeEndLunchParts[0]), parseInt(timeEndLunchParts[1]));
 
         const payload = {
             worker_code: selectedTrabajador?.code,
             date: newWorkday.date,
             enterHour: newEnterDate,
             exitHour: newExitDate,
-            startRestHour: newStartRestDate,
-            endRestHour: newEndRestDate
+            startBreakfastHour: newStartBreakfastDate,
+            endBreakfastHour: newEndBreakfastDate,
+            startLunchHour: newStartLunchDate,
+            endLunchHour: newEndLunchDate
         };
 
         console.log(payload);
@@ -169,7 +192,7 @@ const TrabajadorDetails = () => {
         fetchWorkedHours(startDate, endDate);
     }
 
-    type WorkingDayField = 'date' | 'enterHour' | 'exitHour' | 'startRestHour' | 'endRestHour';
+    type WorkingDayField = 'date' | 'enterHour' | 'exitHour' | 'startBreakfastHour' | 'endBreakfastHour' | 'startLunchHour' | 'endLunchHour';
 
     // Handler to toggle edit mode
     const toggleEditMode = (index: number, field: WorkingDayField) => {
@@ -262,21 +285,32 @@ const TrabajadorDetails = () => {
                 if (exit_hour.getFullYear() === 0) {
                     exit_hour = null;
                 }
-                let rest_start_hour: Date | null = new Date(work_schedule.rest_start_hour);
-                if (rest_start_hour.getFullYear() === 0) {
-                    rest_start_hour = null;
+                let breakfast_start_hour: Date | null = new Date(work_schedule.breakfast_start_hour);
+                if (breakfast_start_hour.getFullYear() === 0) {
+                    breakfast_start_hour = null;
                 }
-                let rest_end_hour: Date | null = new Date(work_schedule.rest_end_hour);
-                if (rest_end_hour.getFullYear() === 0) {
-                    rest_end_hour = null;
+                let breakfast_end_hour: Date | null = new Date(work_schedule.breakfast_end_hour);
+                if (breakfast_end_hour.getFullYear() === 0) {
+                    breakfast_end_hour = null;
                 }
+                let lunch_start_hour: Date | null = new Date(work_schedule.lunch_start_hour);
+                if (lunch_start_hour.getFullYear() === 0) {
+                    lunch_start_hour = null;
+                }
+                let lunch_end_hour: Date | null = new Date(work_schedule.lunch_end_hour);
+                if (lunch_end_hour.getFullYear() === 0) {
+                    lunch_end_hour = null;
+                }
+
 
                 return {
                     date,
                     enterHour: entry_hour,
                     exitHour: exit_hour,
-                    startRestHour: rest_start_hour,
-                    endRestHour: rest_end_hour
+                    startBreakfastHour: breakfast_start_hour,
+                    endBreakfastHour: breakfast_end_hour,
+                    startLunchHour: lunch_start_hour,
+                    endLunchHour: lunch_end_hour
                 }
             });
             console.log(obtainedWorkingDays)
@@ -372,12 +406,20 @@ const TrabajadorDetails = () => {
                                     <input type="time" className="form-control" id="exitHour" value={newWorkday.exitHour} onChange={(e) => setNewWorkday({ ...newWorkday, exitHour: e.target.value })} />
                                 </div>
                                 <div className="col-md-2">
-                                    <label htmlFor="startRestHour" className="form-label">Inicio Descanso</label>
-                                    <input type="time" className="form-control" id="startRestHour" value={newWorkday.startRestHour} onChange={(e) => setNewWorkday({ ...newWorkday, startRestHour: e.target.value })} />
+                                    <label htmlFor="startBreakfastHour" className="form-label">Inicio Desayuno</label>
+                                    <input type="time" className="form-control" id="startBreakfastHour" value={newWorkday.startBreakfastHour} onChange={(e) => setNewWorkday({ ...newWorkday, startBreakfastHour: e.target.value })} />
                                 </div>
                                 <div className="col-md-2">
-                                    <label htmlFor="endRestHour" className="form-label">Fin Descanso</label>
-                                    <input type="time" className="form-control" id="endRestHour" value={newWorkday.endRestHour} onChange={(e) => setNewWorkday({ ...newWorkday, endRestHour: e.target.value })} />
+                                    <label htmlFor="endBreakfastHour" className="form-label">Fin Desayuno</label>
+                                    <input type="time" className="form-control" id="endBreakfastHour" value={newWorkday.endBreakfastHour} onChange={(e) => setNewWorkday({ ...newWorkday, endBreakfastHour: e.target.value })} />
+                                </div>
+                                <div className="col-md-2">
+                                    <label htmlFor="startLunchHour" className="form-label">Inicio Almuerzo</label>
+                                    <input type="time" className="form-control" id="startLunchHour" value={newWorkday.startLunchHour} onChange={(e) => setNewWorkday({ ...newWorkday, startLunchHour: e.target.value })} />
+                                </div>
+                                <div className="col-md-2">
+                                    <label htmlFor="endLunchHour" className="form-label">Fin Almuerzo</label>
+                                    <input type="time" className="form-control" id="endLunchHour" value={newWorkday.endLunchHour} onChange={(e) => setNewWorkday({ ...newWorkday, endLunchHour: e.target.value })} />
                                 </div>
                                 <div className="col-md-1 d-flex align-items-end">
                                     <button type="button" className="btn btn-success" onClick={handleUpload}>Subir</button>
@@ -394,8 +436,10 @@ const TrabajadorDetails = () => {
                             <th>Fecha</th>
                             <th>Hora Entrada</th>
                             <th>Hora Salida</th>
-                            <th>Hora Inicio Descanso</th>
-                            <th>Hora Final Descanso</th>
+                            <th>Hora Inicio Desayuno</th>
+                            <th>Hora Final Desayuno</th>
+                            <th>Hora Inicio Almuerzo</th>
+                            <th>Hora Final Almuerzo</th>
                             <th>Horas Trabajadas</th>
                             <th>Acciones</th>
                         </tr>
@@ -424,18 +468,32 @@ const TrabajadorDetails = () => {
                                         day.exitHour ? format(day.exitHour, 'HH:mm') : '-'
                                     }
                                 </td>
-                                <td onClick={() => toggleEditMode(index, 'startRestHour')}>
-                                    {editMode.dayIndex === index && editMode.field === 'startRestHour' ?
-                                        <input type="time" value={format(day.startRestHour, 'HH:mm')} onChange={(e) => handleSaveChange(e, day, 'startRestHour')} />
+                                <td onClick={() => toggleEditMode(index, 'startBreakfastHour')}>
+                                    {editMode.dayIndex === index && editMode.field === 'startBreakfastHour' ?
+                                        <input type="time" value={day.startBreakfastHour ? format(day.startBreakfastHour, 'HH:mm') : '00:00'} onChange={(e) => handleSaveChange(e, day, 'startBreakfastHour')} />
                                         :
-                                        day.startRestHour ? format(day.startRestHour, 'HH:mm') : '-'
+                                        day.startBreakfastHour? format(day.startBreakfastHour, 'HH:mm') : '-'
                                     }
                                 </td>
-                                <td onClick={() => toggleEditMode(index, 'endRestHour')}>
-                                    {editMode.dayIndex === index && editMode.field === 'endRestHour' ?
-                                        <input type="time" value={format(day.endRestHour, 'HH:mm')} onChange={(e) => handleSaveChange(e, day, 'endRestHour')} />
+                                <td onClick={() => toggleEditMode(index, 'endBreakfastHour')}>
+                                    {editMode.dayIndex === index && editMode.field === 'endBreakfastHour' ?
+                                        <input type="time" value={day.endBreakfastHour ? format(day.endBreakfastHour, 'HH:mm') : '00:00'} onChange={(e) => handleSaveChange(e, day, 'endBreakfastHour')} />
                                         :
-                                        day.endRestHour ? format(day.endRestHour, 'HH:mm') : '-'
+                                        day.endBreakfastHour ? format(day.endBreakfastHour, 'HH:mm') : '-'
+                                    }
+                                </td>
+                                <td onClick={() => toggleEditMode(index, 'startLunchHour')}>
+                                    {editMode.dayIndex === index && editMode.field === 'startLunchHour' ?
+                                        <input type="time" value={day.startLunchHour ? format(day.startLunchHour, 'HH:mm') : '00:00'} onChange={(e) => handleSaveChange(e, day, 'startLunchHour')} />
+                                        :
+                                        day.startLunchHour ? format(day.startLunchHour, 'HH:mm') : '-'
+                                    }
+                                </td>
+                                <td onClick={() => toggleEditMode(index, 'endLunchHour')}>
+                                    {editMode.dayIndex === index && editMode.field === 'endLunchHour' ?
+                                        <input type="time" value={day.endLunchHour ? format(day.endLunchHour, 'HH:mm') : '00:00'} onChange={(e) => handleSaveChange(e, day, 'endLunchHour')} />
+                                        :
+                                        day.endLunchHour ? format(day.endLunchHour, 'HH:mm') : '-'
                                     }
                                 </td>
                                 <td>{calculateWorkedHours(day)}</td>
