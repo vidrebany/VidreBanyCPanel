@@ -1,6 +1,6 @@
 import React from "react";
 
-type DayType = "laborable" | "sabado" | "domingo_festivo";
+type DayType = "laborable" | "viernes" | "sabado" | "domingo_festivo";
 
 type ExtraHours = {
     day_type: DayType;
@@ -34,7 +34,7 @@ const HourRange: React.FC<HourRangeProps> = ({ label, ranges, extraHours, onChan
 
     return (
         <tr>
-            <td>{label === "laborable" ? "Laborables" : label === "sabado" ? "Sábados" : "Domingos y festivos"}</td>
+            <td>{label === "laborable" ? "Laborables" : label === "sabado" ? "Sábados" : label === "domingo_festivo" ? "Domingos y festivos" : "Viernes"}</td>
             {ranges.map((range, index) => {
                 const id = `${label}-${range.replace(":", "")}`;
                 //const [start_hour, end_hour] = range.split("-");

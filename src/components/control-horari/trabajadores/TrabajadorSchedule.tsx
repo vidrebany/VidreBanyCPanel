@@ -20,7 +20,7 @@ const TrabajadorSchedule = () => {
     const [searchParams] = useSearchParams();
     const code = searchParams.get("code");
 
-    type DayType = "laborable" | "sabado" | "domingo_festivo";
+    type DayType = "laborable" | "sabado" | "domingo_festivo" | "viernes";
 
     type ExtraHours = {
         day_type: DayType,
@@ -35,6 +35,7 @@ const TrabajadorSchedule = () => {
         laborable: { minEntryHour: '5:00', maxEntryHour: '5:00', minExitHour: '20:30', maxExitHour: '20:30' },
         sabado: { minEntryHour: '5:00', maxEntryHour: '20:00', minExitHour: '5:30', maxExitHour: '20:30' },
         domingo_festivo: { minEntryHour: '5:00', maxEntryHour: '20:00', minExitHour: '5:30', maxExitHour: '20:30' },
+        viernes: { minEntryHour: '5:00', maxEntryHour: '20:00', minExitHour: '5:30', maxExitHour: '20:30' }
     });
 
     const hourRanges = [
@@ -52,9 +53,9 @@ const TrabajadorSchedule = () => {
 
     // Utility functions to manage time conversions
     const timeToMinutes = (time: string): number => {
-        console.log("time:",time)
+        console.log("time:", time)
         const [hours, minutes] = time.split(":").map(Number);
-        console.log("hours:",hours * 60 + minutes)
+        console.log("hours:", hours * 60 + minutes)
         return hours * 60 + minutes;
     };
 
@@ -68,7 +69,8 @@ const TrabajadorSchedule = () => {
             const organizedHours: Record<DayType, ExtraHours[]> = {
                 laborable: [],
                 sabado: [],
-                domingo_festivo: []
+                domingo_festivo: [],
+                viernes: []
             };
 
             extraHours.forEach(eh => {
@@ -141,10 +143,10 @@ const TrabajadorSchedule = () => {
                     }
                 } else {
                     console.log("endMinutes:", endMinutes)
-                    console.log("maxEntryHour:",limits.maxEntryHour)
+                    console.log("maxEntryHour:", limits.maxEntryHour)
                     console.log("maxEntryMinutes:", maxEntryMinutes)
                     console.log("startMinutes:", startMinutes)
-                    console.log("minEntryHour:",limits.minEntryHour)
+                    console.log("minEntryHour:", limits.minEntryHour)
                     console.log("minEntryMinutes:", minEntryMinutes)
                     if (endMinutes <= minEntryMinutes || startMinutes <= maxEntryMinutes) {
                         toast.error("La hora de salida no puede ser antes de la hora de entrada más temprana.");
@@ -252,6 +254,9 @@ const TrabajadorSchedule = () => {
                 <tbody>
                     <HourRange label="laborable" ranges={hourRanges}
                         extraHours={extraHours.filter(eh => eh.day_type === "laborable")}
+                        onChange={handleExtraHoursChange} />
+                    <HourRange label="viernes" ranges={hourRanges}
+                        extraHours={extraHours.filter(eh => eh.day_type === "viernes")}
                         onChange={handleExtraHoursChange} />
                     <HourRange label="sabado" ranges={hourRanges}
                         extraHours={extraHours.filter(eh => eh.day_type === "sabado")}
