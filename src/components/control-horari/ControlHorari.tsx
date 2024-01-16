@@ -9,6 +9,7 @@ const ControlHorari = () => {
             <div className="d-flex flex-column justify-content-center">
                 <button className="btn btn-primary" onClick={() => navigate("trabajadores")}>Gestionar trabajadores</button>
                 <button className="btn btn-primary" onClick={() => navigate("trabajadores/trabajador/entrada")}>Acceso trabajador</button>
+                <button className="btn btn-primary" onClick={() => navigate("trabajadores/festivos")}>Gestionar fechas festivo</button>
                 <button className="btn btn-primary btn-dark" onClick={() => alert("No implementado")}>Gestionar envío de mails</button>
             </div>
         </div>

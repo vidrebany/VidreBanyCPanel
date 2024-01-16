@@ -35,7 +35,7 @@ root.render(
       <Navbar />
       <App />
     </Provider>
-    <ToastContainer position="top-right" theme="colored" closeOnClick />
+    <ToastContainer position="top-right" theme="colored" autoClose={15000} closeOnClick />
   </React.StrictMode>
 );
 

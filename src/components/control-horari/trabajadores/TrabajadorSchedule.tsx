@@ -39,6 +39,7 @@ const TrabajadorSchedule = () => {
     });
 
     const hourRanges = [
+        '4:30-5:00',
         '5:00-5:30', '5:30-6:00', '6:00-6:30', // Add all hour ranges here...
         '6:30-7:00', '7:00-7:30', '7:30-8:00',
         '8:00-8:30', '8:30-9:00', '9:00-9:30',
@@ -258,12 +259,14 @@ const TrabajadorSchedule = () => {
                     <HourRange label="viernes" ranges={hourRanges}
                         extraHours={extraHours.filter(eh => eh.day_type === "viernes")}
                         onChange={handleExtraHoursChange} />
+                        {/*
                     <HourRange label="sabado" ranges={hourRanges}
                         extraHours={extraHours.filter(eh => eh.day_type === "sabado")}
                         onChange={handleExtraHoursChange} />
                     <HourRange label="domingo_festivo" ranges={hourRanges}
                         extraHours={extraHours.filter(eh => eh.day_type === "domingo_festivo")}
                         onChange={handleExtraHoursChange} />
+                        */}
                 </tbody>
             </table>
         </div>
