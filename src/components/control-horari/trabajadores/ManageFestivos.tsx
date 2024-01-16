@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Form, ListGroup } from 'react-bootstrap';
 import { Api } from "../../../api/api";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const ManageFestivos = () => {
     const [selectedDate, setSelectedDate] = useState("");
@@ -88,9 +89,12 @@ const ManageFestivos = () => {
         setDatesList(newList);
     };
 
+    const navigate = useNavigate();
+
     return (
         <div className="container mt-4">
             <h1>Gestionar Festivos</h1>
+            <button className="btn btn-primary" onClick={() => navigate("/control-horari")}>Volver</button>
             {selectedDate && <p>Fecha seleccionada: {selectedDate}</p>}
             <Form.Group>
                 <Form.Label>Selecciona una fecha a subir:</Form.Label>
