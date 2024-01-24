@@ -7,6 +7,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import HourRange from "./HourRange";
 import { Api } from "../../../api/api";
 import { toast } from "react-toastify";
+import { DayType, ExtraHours } from "./types/trabajadoresTypes";
+import { fetchExtraHours } from "./fetchExtraHours";
 
 const TrabajadorSchedule = () => {
     const selectedTrabajador = useSelector((state: RootState) => state.trabajadores.selectedTrabajador);
@@ -20,21 +22,13 @@ const TrabajadorSchedule = () => {
     const [searchParams] = useSearchParams();
     const code = searchParams.get("code");
 
-    type DayType = "laborable" | "sabado" | "domingo_festivo" | "viernes";
 
-    type ExtraHours = {
-        day_type: DayType,
-        start_hour: string,
-        end_hour: string,
-        is_entry: boolean
-    }
+
 
 
     const [extraHours, setExtraHours] = useState<ExtraHours[]>([]);
     const [hourLimits, setHourLimits] = useState<Record<DayType, { minEntryHour: string, maxEntryHour: string, minExitHour: string, maxExitHour: string }>>({
         laborable: { minEntryHour: '5:00', maxEntryHour: '5:00', minExitHour: '20:30', maxExitHour: '20:30' },
-        sabado: { minEntryHour: '5:00', maxEntryHour: '20:00', minExitHour: '5:30', maxExitHour: '20:30' },
-        domingo_festivo: { minEntryHour: '5:00', maxEntryHour: '20:00', minExitHour: '5:30', maxExitHour: '20:30' },
         viernes: { minEntryHour: '5:00', maxEntryHour: '20:00', minExitHour: '5:30', maxExitHour: '20:30' }
     });
 
@@ -54,9 +48,7 @@ const TrabajadorSchedule = () => {
 
     // Utility functions to manage time conversions
     const timeToMinutes = (time: string): number => {
-        console.log("time:", time)
         const [hours, minutes] = time.split(":").map(Number);
-        console.log("hours:", hours * 60 + minutes)
         return hours * 60 + minutes;
     };
 
@@ -69,8 +61,6 @@ const TrabajadorSchedule = () => {
             // Organize extra hours by day type for efficient access
             const organizedHours: Record<DayType, ExtraHours[]> = {
                 laborable: [],
-                sabado: [],
-                domingo_festivo: [],
                 viernes: []
             };
 
@@ -115,13 +105,13 @@ const TrabajadorSchedule = () => {
 
     const handleExtraHoursChange = async (
         dayType: DayType,
-        hourRage: string,
+        hourRange: string,
         isChecked: boolean,
     ) => {
 
 
         try {
-            const [start_hour, end_hour] = hourRage.split("-");
+            const [start_hour, end_hour] = hourRange.split("-");
 
             // Convert 24hr time string to a comparable format (like minutes since midnight)
             const startMinutes = timeToMinutes(start_hour);
@@ -192,22 +182,10 @@ const TrabajadorSchedule = () => {
         }
     }
 
-    const fetchExtraHours = async () => {
-        const res = await Api.get(`/worker/extra_hours/${code}`).catch((err) => {
-            const error = (err.response.data.error);
-            toast.error("Error al obtener horario:", error);
-            return;
-        });
-
-        if (!res) return;
-
-        setExtraHours(res.data);
-
-    }
 
     useEffect(() => {
 
-        fetchExtraHours();
+        fetchExtraHours(setExtraHours, code);
 
         if (!selectedTrabajador) {
             if (code) {

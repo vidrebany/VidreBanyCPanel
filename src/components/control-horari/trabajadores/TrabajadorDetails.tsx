@@ -3,61 +3,71 @@ import { RootState } from '../../../redux/store';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { Trabajador, WorkingDay } from './types/trabajadoresTypes';
+import { DayType, ExtraHours, HourLimits, WorkingDay } from './types/trabajadoresTypes';
 import { selectTrabajadorByCode } from '../../../redux/features/trabajadores/trabajadoresSlice';
 import useFetchWorkers from '../../../hooks/useFetchTrabajadores';
 import { Api } from '../../../api/api';
 import { toast } from 'react-toastify';
-import { Page, Text, View, Document, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import ExtraWorkDaysPDF from './pdf/ExtraWorkDaysPDF';
+import WorkDaysPDF from './pdf/WorkDaysPDF';
+import { fetchExtraHours } from './fetchExtraHours';
 
 
-// Create PDF styles
-const styles = StyleSheet.create({
-    page: {
-        flexDirection: 'column',
-        backgroundColor: '#E4E4E4',
-        padding: 10
-    },
-    title: {
-        textAlign: 'center',
-        marginBottom: 10,
-    },
-    table: {
-        display: "flex",
-        width: "100%",
-        borderStyle: "solid",
-        borderWidth: 1,
-        borderRightWidth: 0,
-        borderBottomWidth: 0
-    },
-    tableRow: {
-        margin: "auto",
-        flexDirection: "row"
-    },
-    tableCol: {
-        width: "12.5%",
-        borderStyle: "solid",
-        borderWidth: 1,
-        borderLeftWidth: 0,
-        borderTopWidth: 0
-    },
-    tableCell: {
-        margin: "auto",
-        marginTop: 5,
-        fontSize: 10
+export const timeToMinutes = (time: string): number => {
+    const [hours, minutes] = time.split(":").map(Number);
+    return hours * 60 + minutes;
+};
+
+export const deepCopy = (obj: any): {} => {
+    if (obj === null || typeof obj !== 'object') {
+        return obj;
     }
-});
 
-const calculateWorkedHours = (day: WorkingDay) => {
+    if (obj instanceof Date) {
+        return new Date(obj.getTime());
+    }
+
+    if (Array.isArray(obj)) {
+        const copy = [];
+        for (let i = 0; i < obj.length; i++) {
+            copy[i] = deepCopy(obj[i]);
+        }
+        return copy;
+    }
+
+    if (typeof obj === 'object') {
+        const copy = {};
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                if (typeof obj === 'object') {
+                    const copy: { [key: string]: any } = {};
+                    for (const key in obj) {
+                        if (obj.hasOwnProperty(key)) {
+                            copy[key] = deepCopy(obj[key]);
+                        }
+                    }
+                    return copy;
+                }
+            }
+        }
+        return copy;
+    }
+
+    throw new Error('Unable to copy obj! Its type isn\'t supported.');
+}
+
+
+export const calculateWorkedHours = (day: WorkingDay) => {
     if (!day.enterHour || !day.exitHour) return (0).toFixed(2);
     const workDuration = (day.exitHour.getTime() - day.enterHour.getTime()) / (1000 * 60 * 60);
 
     let breakfastTime = 0;
     if (day.startBreakfastHour && day.endBreakfastHour)
-    breakfastTime = (day.endBreakfastHour.getTime() - day.startBreakfastHour.getTime()) / (1000 * 60 * 60);
+        breakfastTime = (day.endBreakfastHour.getTime() - day.startBreakfastHour.getTime()) / (1000 * 60 * 60);
     let lunchTime = 0;
     if (day.startLunchHour && day.endLunchHour)
-    lunchTime = (day.endLunchHour.getTime() - day.startLunchHour.getTime()) / (1000 * 60 * 60);
+        lunchTime = (day.endLunchHour.getTime() - day.startLunchHour.getTime()) / (1000 * 60 * 60);
 
     const restDuration = breakfastTime + lunchTime;
 
@@ -65,50 +75,19 @@ const calculateWorkedHours = (day: WorkingDay) => {
 }
 
 
-// Document Component
-const WorkDaysPDF = ({ workingDays, selectedTrabajador }: { workingDays: WorkingDay[], selectedTrabajador: Trabajador }) => (
-    <Document>
-        <Page size="A4" style={styles.page}>
-            <Text style={styles.title}>Control Horarios VidreBany - {selectedTrabajador.name} ({selectedTrabajador.code})</Text>
-            <View style={styles.table}>
-                {/* Table Header */}
-                <View style={styles.tableRow}>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>Fecha</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>Hora</Text><Text style={styles.tableCell}>Entrada</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>Hora</Text><Text style={styles.tableCell}>Salida</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>Inicio</Text><Text style={styles.tableCell}>Desayuno</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>Fin</Text><Text style={styles.tableCell}>Desayuno</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>Inicio</Text><Text style={styles.tableCell}>Almuerzo</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>Fin</Text><Text style={styles.tableCell}>Almuerzo</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>Horas</Text><Text style={styles.tableCell}>Trabajadas</Text></View>
-                </View>
-                {/* Table Rows */}
-                {workingDays.map((day: WorkingDay, index: number) => (
-                    <View key={index} style={styles.tableRow}>
-                        <View style={styles.tableCol}><Text style={styles.tableCell}>{day.date ? format(day.date, "dd/MM/yyyy") : '-'}</Text></View>
-                        <View style={styles.tableCol}><Text style={styles.tableCell}>{day.enterHour ? format(day.enterHour, "HH:mm") : '-'}</Text></View>
-                        <View style={styles.tableCol}><Text style={styles.tableCell}>{day.exitHour ? format(day.exitHour, "HH:mm") : '-'}</Text></View>
-                        <View style={styles.tableCol}><Text style={styles.tableCell}>{day.startBreakfastHour ? format(day.startBreakfastHour, "HH:mm") : '-'}</Text></View>
-                        <View style={styles.tableCol}><Text style={styles.tableCell}>{day.endBreakfastHour ? format(day.endBreakfastHour, "HH:mm") : '-'}</Text></View>
-                        <View style={styles.tableCol}><Text style={styles.tableCell}>{day.startLunchHour ? format(day.startLunchHour, "HH:mm") : '-'}</Text></View>
-                        <View style={styles.tableCol}><Text style={styles.tableCell}>{day.endLunchHour ? format(day.endLunchHour, "HH:mm") : '-'}</Text></View>
-                        <View style={styles.tableCol}><Text style={styles.tableCell}>{calculateWorkedHours(day)}</Text></View>
-                    </View>
-                ))}
-            </View>
-            {/* Footer */}
-            <View style={styles.tableRow}>
-                <View style={{ ...styles.tableCol, width: "80%" }}><Text style={styles.tableCell}>Sumatorio Horas Trabajadas</Text></View>
-                <View style={styles.tableCol}><Text style={styles.tableCell}>{workingDays.reduce((acc, day) => acc + parseFloat(calculateWorkedHours(day)), 0).toFixed(2)}</Text></View>
-            </View>
-        </Page>
-    </Document>
-);
+
+
 
 
 const TrabajadorDetails = () => {
     const selectedTrabajador = useSelector((state: RootState) => state.trabajadores.selectedTrabajador);
     const workers = useSelector((state: RootState) => state.trabajadores.trabajadores);
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const code = searchParams.get("code");
+
     // TODO: set dates to undefined
     const [startDate, setStartDate] = useState<string | number | readonly string[] | undefined>("2023-12-22");
     const [endDate, setEndDate] = useState<string | number | readonly string[] | undefined>("2024-02-05");
@@ -124,6 +103,118 @@ const TrabajadorDetails = () => {
         endLunchHour: ''
     });
     const [showAddDay, setShowAddDay] = useState(false);
+    const [extraHours, setExtraHours] = useState<ExtraHours[]>([]);
+    const [hourLimits, setHourLimits] = useState<HourLimits>({
+        laborable: { minEntryHour: '5:00', maxEntryHour: '5:00', minExitHour: '20:30', maxExitHour: '20:30' },
+        viernes: { minEntryHour: '5:00', maxEntryHour: '20:00', minExitHour: '5:30', maxExitHour: '20:30' }
+    });
+
+
+    useEffect(() => {
+
+
+        if (!selectedTrabajador) {
+            if (code) {
+                dispatch(selectTrabajadorByCode(code));
+                fetchExtraHours(setExtraHours, code);
+            } else {
+                navigate("/control-horari/trabajadores");
+                return;
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedTrabajador])
+
+
+    useEffect(() => {
+        if (extraHours.length === 0) return;
+
+        setHourLimits(prevHourLimits => {
+            const newHourLimits = { ...prevHourLimits };
+            // Organize extra hours by day type for efficient access
+            const organizedHours: Record<DayType, ExtraHours[]> = {
+                laborable: [],
+                viernes: []
+            };
+
+            extraHours.forEach(eh => {
+                organizedHours[eh.day_type].push(eh);
+            });
+            //sort organized hours by start_hour from earliest to latest and transform start_hour and end_hour to minutes temporarily
+            Object.keys(organizedHours).forEach(dayTypeKey => {
+                const dayType = dayTypeKey as DayType;
+                organizedHours[dayType].sort((a, b) => timeToMinutes(a.start_hour) - timeToMinutes(b.start_hour));
+            });
+
+            // Now process each day type separately
+            Object.keys(organizedHours).forEach(dayTypeKey => {
+                const dayType = dayTypeKey as DayType;
+                const dayHours = organizedHours[dayType];
+
+                // Process entry and exit hours separately
+                //const entryHours = dayHours.filter(eh => eh.is_entry).map(eh => eh.start_hour).sort(sortHours);
+                //const exitHours = dayHours.filter(eh => !eh.is_entry).map(eh => eh.end_hour).sort(sortHours);
+
+                // If there are day hours, for the first day hour and the consequent hour consequent dayhours
+                const entryHours: ExtraHours[] = [];
+                if (dayHours.length > 0) {
+                    // Get the first day hour
+                    entryHours.push(dayHours[0]);
+                    // Get the consequent day hours
+                    for (let i = 1; i < dayHours.length; i++) {
+                        const currentHour = dayHours[i];
+                        const previousHour = dayHours[i - 1];
+                        // If the current hour is not the consequent hour of the previous hour, add the previous hour
+                        if (timeToMinutes(currentHour.start_hour) - 30 === timeToMinutes(previousHour.start_hour)) {
+                            entryHours.push(previousHour);
+                        } else {
+                            entryHours.push(previousHour);
+                            // Exit the loop
+                            break;
+                        }
+                    }
+                }
+                // Now do the opposite so it will be for the exit hours
+                const exitHours: ExtraHours[] = [];
+                if (dayHours.length > 0) {
+                    // Get the last day hour
+                    exitHours.push(dayHours[dayHours.length - 1]);
+                    // Get the consequent day hours
+                    for (let i = dayHours.length - 2; i >= 0; i--) {
+                        const currentHour = dayHours[i];
+                        const previousHour = dayHours[i + 1];
+                        // If the current hour is not the consequent hour of the previous hour, add the previous hour
+                        if (timeToMinutes(currentHour.start_hour) + 30 === timeToMinutes(previousHour.start_hour)) {
+                            exitHours.push(previousHour);
+                        } else {
+                            exitHours.push(previousHour);
+                            // Exit the loop
+                            break;
+                        }
+                    }
+                }
+
+
+                // Update min and max entry hours
+                if (dayHours.length > 0) {
+                    newHourLimits[dayType].minEntryHour = entryHours[0].start_hour;
+                    newHourLimits[dayType].maxEntryHour = entryHours[entryHours.length - 1].start_hour;
+                    newHourLimits[dayType].minExitHour = exitHours[exitHours.length - 1].start_hour;
+                    newHourLimits[dayType].maxExitHour = exitHours[0].start_hour;
+                } else {
+                    // If there are no entry hours, set the min and max entry hours to 5:00
+                    newHourLimits[dayType].minEntryHour = '5:00'
+                    newHourLimits[dayType].maxEntryHour = '5:00'
+                    newHourLimits[dayType].minExitHour = '20:30'
+                    newHourLimits[dayType].maxExitHour = '20:30'
+                }
+
+            });
+
+            return newHourLimits;
+        });
+    }, [extraHours]); // Re-run when extraHours changes
+
 
     // Function to handle the upload
     const handleUpload = async () => {
@@ -159,12 +250,10 @@ const TrabajadorDetails = () => {
             endLunchHour: newEndLunchDate
         };
 
-        console.log(payload);
 
         // Here, adapt this to your API call logic
         try {
             const response = await Api.post('/worker/work_day/add', payload);
-            console.log(response.data);
             toast.success('Día de trabajo añadido correctamente');
             // After successful upload, fetch the updated workdays
             fetchWorkedHours(startDate, endDate);
@@ -235,16 +324,12 @@ const TrabajadorDetails = () => {
                 return;
             });
         if (!res) return;
-        console.log(res.data);
         toast.success('Hora registrada correctamente');
 
         const newWorkingDays = [...workingDays];
         newWorkingDays[editMode.dayIndex] = { ...day, [field]: field !== 'date' ? newDate : new Date(newDate) };
-        console.log(newWorkingDays)
         setWorkingDays(newWorkingDays);
 
-        // Log the change
-        console.log(`Changed ${field} to: `, e.target.value);
 
         // Exit edit mode
         setEditMode({ date: false, time: false, dayIndex: -1, field: '' });
@@ -253,10 +338,6 @@ const TrabajadorDetails = () => {
 
     useFetchWorkers();
 
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const code = searchParams.get("code");
 
     const fetchWorkedHours = useCallback(
         async (startDate: string | number | readonly string[] | undefined, endDate: string | number | readonly string[] | undefined) => {
@@ -313,7 +394,19 @@ const TrabajadorDetails = () => {
                     endLunchHour: lunch_end_hour
                 }
             });
-            console.log(obtainedWorkingDays)
+            //order the days from newest to oldest
+            obtainedWorkingDays.sort((a, b) => {
+                const [aYear, aMonth, aDay] = b.date.toISOString().slice(0, 10).split("-");
+                const [bYear, bMonth, bDay] = a.date.toISOString().slice(0, 10).split("-");
+                if (aYear !== bYear) {
+                    return parseInt(aYear) - parseInt(bYear);
+                }
+                if (aMonth !== bMonth) {
+                    return parseInt(aMonth) - parseInt(bMonth);
+                }
+                return parseInt(aDay) - parseInt(bDay);
+            });
+
 
             setWorkingDays(obtainedWorkingDays);
 
@@ -348,6 +441,14 @@ const TrabajadorDetails = () => {
     return (
         <>
             <button className="btn btn-primary align-items-start" onClick={() => navigate("/control-horari/trabajadores")}>Volver</button>
+            <PDFDownloadLink document={<ExtraWorkDaysPDF hourLimits={hourLimits} workingDays={deepCopy(workingDays) as WorkingDay[]} selectedTrabajador={selectedTrabajador} />} fileName={`${selectedTrabajador?.code}-${selectedTrabajador?.name}.pdf`}>
+                {({ blob, url, loading, error }) =>
+                    loading ? 'Loading document...' :
+                        <button className='btn btn-primary btn m-2' style={{ position: "absolute", right: 0, width: "fit-content", backgroundColor: "transparent", border: "none", boxShadow: "none" }}>
+                            <h3 style={{ display: "inline-block", verticalAlign: "middle" }} className=" align-items-center justify-content-center text-white">Generar PDF</h3>
+                        </button>
+                }
+            </PDFDownloadLink>
             <div className="d-flex flex-column">
                 <h1>Control horarios VidreBany</h1>
                 <h2 className="ms-4 mb-4">Detalles trabajador</h2>
@@ -380,7 +481,7 @@ const TrabajadorDetails = () => {
                 </div>
                 <div className="d-flex flex-row align-items-center justify-content-center m-2">
                     <button className="btn btn-primary btn-block btn-info" onClick={() => navigate("/control-horari/trabajadores/trabajador-details/manage-schedule?code=" + selectedTrabajador.code)} style={{ width: "fit-content" }}><h3 style={{ display: "incline-block", verticalAlign: "top" }} className=" align-items-center justify-content-center text-white">Gestionar horario</h3></button>
-                    <PDFDownloadLink document={<WorkDaysPDF workingDays={workingDays} selectedTrabajador={selectedTrabajador} />} fileName={`${selectedTrabajador?.code}-${selectedTrabajador?.name}.pdf`}>
+                    <PDFDownloadLink document={<WorkDaysPDF hourLimits={hourLimits} workingDays={deepCopy(workingDays) as WorkingDay[]} selectedTrabajador={selectedTrabajador} />} fileName={`${selectedTrabajador?.code}-${selectedTrabajador?.name}.pdf`}>
                         {({ blob, url, loading, error }) =>
                             loading ? 'Loading document...' :
                                 <button className='btn btn-primary btn-block justify-content-center align-items-center m-2' style={{ width: "fit-content" }}><h3 style={{ display: "incline-block", verticalAlign: "top" }} className=" align-items-center justify-content-center text-white">Generar PDF</h3></button>
@@ -472,7 +573,7 @@ const TrabajadorDetails = () => {
                                     {editMode.dayIndex === index && editMode.field === 'startBreakfastHour' ?
                                         <input type="time" value={day.startBreakfastHour ? format(day.startBreakfastHour, 'HH:mm') : '00:00'} onChange={(e) => handleSaveChange(e, day, 'startBreakfastHour')} />
                                         :
-                                        day.startBreakfastHour? format(day.startBreakfastHour, 'HH:mm') : '-'
+                                        day.startBreakfastHour ? format(day.startBreakfastHour, 'HH:mm') : '-'
                                     }
                                 </td>
                                 <td onClick={() => toggleEditMode(index, 'endBreakfastHour')}>

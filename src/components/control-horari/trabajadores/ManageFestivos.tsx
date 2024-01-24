@@ -51,7 +51,7 @@ const ManageFestivos = () => {
     }
 
     const deleteDate = async (date: string) => {
-        const response = await Api.delete(`/festivos/${date}`)
+       await Api.delete(`/festivos/${date}`)
             .catch((err) => {
                 console.log(err);
                 toast.error("Error al eliminar el festivo");
