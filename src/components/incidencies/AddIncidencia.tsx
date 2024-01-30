@@ -140,7 +140,7 @@ const Incidencies = () => {
             setUnresolvedChecked(false);
             setPendingInfoChecked(false);
         }
-        setResolvedChecked(event.target.checked);
+        setResolvedChecked(true);
 
     };
 
@@ -149,7 +149,7 @@ const Incidencies = () => {
             setResolvedChecked(false);
             setPendingInfoChecked(false);
         }
-        setUnresolvedChecked(event.target.checked);
+        setUnresolvedChecked(true);
 
     };
     const handlePendingInfoCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,7 +157,7 @@ const Incidencies = () => {
             setResolvedChecked(false);
             setUnresolvedChecked(false);
         }
-        setPendingInfoChecked(event.target.checked);
+        setPendingInfoChecked(true);
 
     };
 

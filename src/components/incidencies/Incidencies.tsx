@@ -5,7 +5,7 @@ import { List, ListItem, ListItemText, Typography } from '@mui/material';
 import { Button, Stack } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getDatabase, onValue, ref, remove } from "firebase/database";
+import { getDatabase, ref, remove, get, child } from "firebase/database";
 import { getStorage, ref as refStorage, deleteObject } from "firebase/storage";
 import { Incidencia } from "../../types";
 import firebaseApp from "../../firebase";
@@ -84,7 +84,7 @@ const Incidencies = () => {
 
 
     useEffect(() => {
-        onValue(incidenciesRef, (snapshot) => {
+        get(incidenciesRef).then((snapshot) => {
             const data = snapshot.val();
 
             let inconformitatsListTemp: Incidencia[] = [];
@@ -93,10 +93,9 @@ const Incidencies = () => {
 
 
                     let incidenciaData: Incidencia = data[key];
-
                     if (searchText !== "" &&
-                        (incidenciaData.nomDistribuidor || "".toLowerCase().includes(searchText.toLowerCase()) ||
-                            incidenciaData.codiDistribuidor || "".toLowerCase().includes(searchText.toLowerCase())) && filterIncidenciaType(incidenciaData)) {
+                        ((incidenciaData.nomDistribuidor && incidenciaData.nomDistribuidor.toLowerCase().includes(searchText.toLowerCase())) ||
+                            (incidenciaData.codiDistribuidor && incidenciaData.codiDistribuidor.toLowerCase().includes(searchText.toLowerCase()))) && filterIncidenciaType(incidenciaData)) {
                         inconformitatsListTemp.push(incidenciaData);
                     } else if (searchText === "" && filterIncidenciaType(incidenciaData)) {
                         inconformitatsListTemp.push(incidenciaData);

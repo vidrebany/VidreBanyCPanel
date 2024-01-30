@@ -265,7 +265,7 @@ const EditInconformitat = () => {
             setUnresolvedChecked(false);
             setPendingInfoChecked(false);
         }
-        setResolvedChecked(event.target.checked);
+        setResolvedChecked(true);
 
     };
 
@@ -274,7 +274,7 @@ const EditInconformitat = () => {
             setResolvedChecked(false);
             setPendingInfoChecked(false);
         }
-        setUnresolvedChecked(event.target.checked);
+        setUnresolvedChecked(true);
 
     };
     const handlePendingInfoCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -282,7 +282,7 @@ const EditInconformitat = () => {
             setResolvedChecked(false);
             setUnresolvedChecked(false);
         }
-        setPendingInfoChecked(event.target.checked);
+        setPendingInfoChecked(true);
 
     };
 
