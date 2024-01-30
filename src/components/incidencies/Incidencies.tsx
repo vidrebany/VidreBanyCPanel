@@ -95,8 +95,8 @@ const Incidencies = () => {
                     let incidenciaData: Incidencia = data[key];
 
                     if (searchText !== "" &&
-                        (incidenciaData.nomDistribuidor.toLowerCase().includes(searchText.toLowerCase()) ||
-                            incidenciaData.codiDistribuidor.toLowerCase().includes(searchText.toLowerCase())) && filterIncidenciaType(incidenciaData)) {
+                        (incidenciaData.nomDistribuidor || "".toLowerCase().includes(searchText.toLowerCase()) ||
+                            incidenciaData.codiDistribuidor || "".toLowerCase().includes(searchText.toLowerCase())) && filterIncidenciaType(incidenciaData)) {
                         inconformitatsListTemp.push(incidenciaData);
                     } else if (searchText === "" && filterIncidenciaType(incidenciaData)) {
                         inconformitatsListTemp.push(incidenciaData);
@@ -266,7 +266,7 @@ const Incidencies = () => {
                             <div className="listItemContentLeft">
                                 <Stack sx={{ justifyContent: 'center' }} spacing={2} direction="row">
                                     <h4>NC: {inconformitatsList[currentIndex].ncNum}</h4>
-                                    <h4>{dayjs(parseInt(inconformitatsList[currentIndex].date)).format("DD/MM/YYYY - HH:mm").toString()}</h4>
+                                    <h4>{dayjs(parseInt(inconformitatsList[currentIndex].date || "")).format("DD/MM/YYYY - HH:mm").toString()}</h4>
                                 </Stack>
                                 <Stack spacing={1} direction="column">
                                     <Stack spacing={1} direction="row">
@@ -294,8 +294,8 @@ const Incidencies = () => {
 
                                     <p><b>Comentaris inicials: </b>{"\n" + inconformitatsList[currentIndex].comentarisInicialsNC}</p>
                                     <p><b>Comentaris: </b>{"\n" + inconformitatsList[currentIndex].comentarisNC}</p>
-                                    {inconformitatsList[currentIndex].state !== "pendent" ? <p><b>Resolució ({dayjs(parseInt(inconformitatsList[currentIndex].resolucioTimestamp)).format("DD/MM/YYYY - HH:mm").toString()}):</b>{"\n" + inconformitatsList[currentIndex].resolucio}</p> : <p></p>}
-                                    <p>Nº arxius: {inconformitatsList[currentIndex].documents ? inconformitatsList[currentIndex].documents.length : 0} </p>
+                                    {inconformitatsList[currentIndex].state !== "pendent" ? <p><b>Resolució ({dayjs(parseInt(inconformitatsList[currentIndex].resolucioTimestamp || "")).format("DD/MM/YYYY - HH:mm").toString()}):</b>{"\n" + inconformitatsList[currentIndex].resolucio}</p> : <p></p>}
+                                    <p>Nº arxius: {inconformitatsList[currentIndex].documents ? inconformitatsList[currentIndex].documents?.length : 0} </p>
 
 
 

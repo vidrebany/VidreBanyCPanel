@@ -137,10 +137,10 @@ const EditInconformitat = () => {
                 setAdminName(data.name);
             });
 
-            setAdminId(incidenciaTemp.adminId);
-            setComandaType(incidenciaTemp.comandaType);
-            setComandaNovaType(incidenciaTemp.comandaNovaType);
-            setFormaRegistre(incidenciaTemp.formaRegistre);
+            setAdminId(incidenciaTemp.adminId || '');
+            setComandaType(incidenciaTemp.comandaType || '');
+            setComandaNovaType(incidenciaTemp.comandaNovaType || '');
+            setFormaRegistre(incidenciaTemp.formaRegistre || '');
 
             if (incidenciaTemp.date) {
                 setDate(dayjs(parseInt(incidenciaTemp.date)));
@@ -148,26 +148,26 @@ const EditInconformitat = () => {
             }
 
             setNcNum(incidenciaTemp.ncNum);
-            setComandaNum(incidenciaTemp.comandaNum);
-            setComandaNovaNum(incidenciaTemp.comandaNovaNum);
-            setCodiDistribuidor(incidenciaTemp.codiDistribuidor);
-            setNomDistribuidor(incidenciaTemp.nomDistribuidor);
-            setNomTrucador(incidenciaTemp.nomTrucador);
-            setCorreuTrucador(incidenciaTemp.correuTrucador);
-            setTlfTrucador(incidenciaTemp.tlfTrucador);
-            setDireccioClientFinal(incidenciaTemp.direccioClientFinal);
-            setTlfClientFinal(incidenciaTemp.tlfClientFinal);
-            setComentarisNC(incidenciaTemp.comentarisNC);
-            setTipusDefecte(incidenciaTemp.tipusDefecte === ("") ? 'SENSE ASSIGNAR' : incidenciaTemp.tipusDefecte);
+            setComandaNum(incidenciaTemp.comandaNum || '');
+            setComandaNovaNum(incidenciaTemp.comandaNovaNum || '');
+            setCodiDistribuidor(incidenciaTemp.codiDistribuidor || '');
+            setNomDistribuidor(incidenciaTemp.nomDistribuidor || '');
+            setNomTrucador(incidenciaTemp.nomTrucador || '');
+            setCorreuTrucador(incidenciaTemp.correuTrucador || '');
+            setTlfTrucador(incidenciaTemp.tlfTrucador || '');
+            setDireccioClientFinal(incidenciaTemp.direccioClientFinal || '');
+            setTlfClientFinal(incidenciaTemp.tlfClientFinal || '');
+            setComentarisNC(incidenciaTemp.comentarisNC || '');
+            setTipusDefecte(incidenciaTemp.tipusDefecte || 'SENSE ASSIGNAR');
 
-            setNomProveidor(incidenciaTemp.nomProveidor);
-            setNumProveidor(incidenciaTemp.numProveidor);
-            setComentarisInicialsNC(incidenciaTemp.comentarisInicialsNC);
+            setNomProveidor(incidenciaTemp.nomProveidor || '');
+            setNumProveidor(incidenciaTemp.numProveidor || '');
+            setComentarisInicialsNC(incidenciaTemp.comentarisInicialsNC || '');
             setServeiChecked(incidenciaTemp.serveioproducte === 'servei');
             setProducteChecked(incidenciaTemp.serveioproducte === 'producte');
             setAltresChecked(incidenciaTemp.serveioproducte === 'altres');
-            setState(incidenciaTemp.state);
-            setResolution(incidenciaTemp.resolucio);
+            setState(incidenciaTemp.state || '');
+            setResolution(incidenciaTemp.resolucio || '');
 
             if (incidenciaTemp.resolucioTimestamp) {
                 setResolutionDate(dayjs(parseInt(incidenciaTemp.resolucioTimestamp)));
@@ -181,19 +181,24 @@ const EditInconformitat = () => {
 
             if (incidenciaTemp.serveioproducte === 'producte') {
                 setProducteDisplay('');
-                setRefProducte(incidenciaTemp.refProducte);
-                setDescrProducte(incidenciaTemp.descrProducte);
+                setRefProducte(incidenciaTemp.refProducte || '');
+                setDescrProducte(incidenciaTemp.descrProducte || '');
             } else {
                 setProducteDisplay('none');
             }
 
-            //get file names from storage using documents url
+            // Get file names from storage using documents url
             if (incidenciaTemp.documents) {
                 let documentsNamesTemp: string[] = [];
-                for (let i = 0; i < incidenciaTemp.documentsNames.length; i++) {
-                    const documentName = incidenciaTemp.documentsNames[i];
-                    documentsNamesTemp.push(documentName);
+
+                // Check if documentsNames is not null
+                if (incidenciaTemp.documentsNames) {
+                    for (let i = 0; i < incidenciaTemp.documentsNames.length; i++) {
+                        const documentName = incidenciaTemp.documentsNames[i];
+                        documentsNamesTemp.push(documentName);
+                    }
                 }
+
                 setDocumentsUrls(incidenciaTemp.documents || []);
                 setDocumentsNames(documentsNamesTemp);
             }
