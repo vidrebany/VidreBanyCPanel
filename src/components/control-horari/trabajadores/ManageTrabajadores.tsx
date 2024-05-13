@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Trabajador } from "./types/trabajadoresTypes";
 import TrabajadoresList from "./TrabajadoresList";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,46 +6,39 @@ import { RootState } from "../../../redux/store";
 import { addTrabajador } from "../../../redux/features/trabajadores/trabajadoresSlice";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { getDatabase, ref, onValue, push, set } from 'firebase/database'; // Importa los módulos de Firebase Database
+import useFetchWorkers from "../../../hooks/useFetchTrabajadores";
+import { Api } from "../../../api/api";
+
 
 const ManageTrabajadores = () => {
-    const db = getDatabase(); // Obtiene la instancia de la base de datos de Firebase
     const [trabajadorCodeSearch, setTrabajadorCodeSearch] = useState<string>("");
     const [filteredTrabajadores, setFilteredTrabajadores] = useState<Trabajador[]>([]);
     const [trabajadorCode, setTrabajadorCode] = useState<string>("");
     const [trabajadorName, setTrabajadorName] = useState<string>("");
     const [isAddingTrabajador, setIsAddingTrabajador] = useState<boolean>(false);
 
+
     const trabajadores = useSelector((state: RootState) => state.trabajadores.trabajadores);
+
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
-    useEffect(() => {
-        const trabajadoresRef = ref(db, "trabajadores"); // Obtén la referencia a la colección "trabajadores"
-        const handleData = (snapshot: any) => { // Cambia any por el tipo correcto si es posible
-            const data = snapshot.val();
-            if (data) {
-                const trabajadoresArray: Trabajador[] = Object.values(data);
-                setFilteredTrabajadores(trabajadoresArray);
-                dispatch(addTrabajador(trabajadoresArray[0])); // Pasar solo el primer trabajador del array
-            }
-        };
-        const offCallback = onValue(trabajadoresRef, handleData); // Escucha los cambios en la base de datos
 
-        return () => { 
-            // Detiene la escucha cuando el componente se desmonta
-            offCallback(); 
-        };
-    }, [db, dispatch]);
 
     const handleSearch = () => {
         if (trabajadorCodeSearch === "") {
             setFilteredTrabajadores(trabajadores);
         } else {
+            // Filter workers by code
             const filtered = trabajadores.filter((trabajador) => trabajador.code.toLowerCase().includes(trabajadorCodeSearch.toLowerCase()));
             setFilteredTrabajadores(filtered);
         }
-    };
+    }
+
+    useEffect(() => {
+        setFilteredTrabajadores(trabajadores);
+    }, [trabajadores])
+
+    useFetchWorkers();
 
     const handleAddTrabajadorClick = () => {
         setIsAddingTrabajador(!isAddingTrabajador);
@@ -53,30 +46,40 @@ const ManageTrabajadores = () => {
 
     const handleAddTrabajador = async () => {
         if (trabajadorCode === "" || trabajadorName === "") return toast.error("Debes rellenar todos los campos");
-
-        try {
-            const trabajadorRef = push(ref(db, "trabajadores")); // Genera una nueva referencia en la colección "trabajadores"
-            await set(trabajadorRef, { // Establece los datos en la nueva referencia
-                name: trabajadorName,
-                code: trabajadorCode
+        const newTrabajador: Trabajador = {
+            name: trabajadorName,
+            code: trabajadorCode
+        };
+        const res = await Api.post("/worker/create", newTrabajador)
+            .catch((err) => {
+                const error = (err.response.data.error);
+                if (error.includes("duplicate")) {
+                    toast.error("Ya existe un trabajador con ese código");
+                    return;
+                }
+                toast.error("Error al crear trabajador:", error);
+                return;
             });
-            setIsAddingTrabajador(false);
-            setTrabajadorCode("");
-            setTrabajadorName("");
-            toast.success("Trabajador añadido correctamente");
-        } catch (error) {
-            console.error("Error al crear trabajador:", error);
-            toast.error("Error al crear trabajador");
-        }
+
+        if (!res) return;
+        dispatch(addTrabajador(res.data.worker));
+        setIsAddingTrabajador(false);
+        setTrabajadorCode("");
+        setTrabajadorName("");
+        toast.success("Trabajador añadido correctamente");
     };
 
+    const navigate = useNavigate();
+
+
+
     return (
-        <div>
         <div className="d-flex flex-column align-items-center">
             <div>
-                <h1>Gestión trabajadoress</h1>
+                <h1>Gestión trabajadores</h1>
             </div>
             <button className="btn btn-primary align-self-start mb-2" onClick={() => navigate("/control-horari")}>Volver</button>
+            {/*Input with code input to search workers*/}
             <div className="w-100">
                 <div className="w-100 row justify-content-center">
                     <input value={trabajadorCodeSearch} onChange={(e) => setTrabajadorCodeSearch(e.target.value)} type="text" className="col form-control col-auto w-auto mb-2" placeholder="Código trabajador" />
@@ -84,9 +87,10 @@ const ManageTrabajadores = () => {
                 </div>
                 <div className="row justify-content-center">
                     <div className="col-auto">
-                        <button onClick={handleAddTrabajadorClick} className={`btn btn-primary ${isAddingTrabajador && "btn-danger"} mb-2`}> Añadir trabajador</button>
+                        <button onClick={handleAddTrabajadorClick} className={`btn btn-primary ${isAddingTrabajador && "btn-danger"} mb-2`}>Añadir trabajador</button>
                     </div>
                 </div>
+                {/* Collapse section for adding trabajador */}
                 {isAddingTrabajador && (
                     <div id="addTrabajadorCollapse" className="collapse show">
                         <div className="card card-body">
@@ -97,10 +101,9 @@ const ManageTrabajadores = () => {
                     </div>
                 )}
             </div>
-            <TrabajadoresList/>
+            <TrabajadoresList trabajadores={filteredTrabajadores} />
         </div>
-        </div>
-    );
-};
+    )
+}
 
-export default ManageTrabajadores;
+export default ManageTrabajadores
