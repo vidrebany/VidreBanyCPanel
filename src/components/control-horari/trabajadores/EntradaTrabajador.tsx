@@ -1,16 +1,24 @@
+import React, { useState, useEffect } from 'react';
 import { useSelector } from "react-redux";
 import useFetchWorkers from "../../../hooks/useFetchTrabajadores";
 import { RootState } from "../../../redux/store";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useNavbar } from "../../NavbarContext";
 
 const EntradaTrabajador = () => {
-
     const trabajadores = useSelector((state: RootState) => state.trabajadores.trabajadores);
     const [trabajadorCode, setTrabajadorCode] = useState<string>("");
     const navigate = useNavigate();
+    const { setNavbarVisible } = useNavbar(); 
 
     useFetchWorkers();
+
+    useEffect(() => {
+        setNavbarVisible(false);
+        return () => {
+            setNavbarVisible(true);
+        };
+    }, [setNavbarVisible]);
 
     return (
         <div>
@@ -22,7 +30,7 @@ const EntradaTrabajador = () => {
                 <button disabled={!Boolean(trabajadorCode !== "" && trabajadores.find((trabajador) => trabajador.code === trabajadorCode))} className="btn btn-primary" onClick={() => navigate("/control-horari/trabajadores/trabajador?code=" + trabajadorCode)}>Entrada</button>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default EntradaTrabajador
+export default EntradaTrabajador;
