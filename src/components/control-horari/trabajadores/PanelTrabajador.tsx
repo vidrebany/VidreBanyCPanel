@@ -120,8 +120,8 @@ const PanelTrabajador = () => {
             </div>
             <div className="d-flex justify-content-center gap-2 mb-3">
                 <button type="button" className="btn btn-primary" onClick={() => postTime('entry')}><h2 className="text-white mb-0">Entrada</h2></button>
-                <button type="button" className="btn btn-secondary" onClick={() => postTime('startRest')}><h2 className="text-white mb-0">Inicio<br />Descanso</h2></button>
-                <button type="button" className="btn btn-secondary" onClick={() => postTime('endRest')}><h2 className="text-white mb-0">Final<br />Descanso</h2></button>
+                {/* <button type="button" className="btn btn-secondary" onClick={() => postTime('startRest')}><h2 className="text-white mb-0">Inicio<br />Descanso</h2></button> */}
+                {/* <button type="button" className="btn btn-secondary" onClick={() => postTime('endRest')}><h2 className="text-white mb-0">Final<br />Descanso</h2></button> */}
                 <button type="button" className="btn btn-danger" onClick={() => postTime('exit')}><h2 className="text-white mb-0">Salida</h2></button>
             </div>
             <div className="position-absolute bottom-0 end-0 p-3">
