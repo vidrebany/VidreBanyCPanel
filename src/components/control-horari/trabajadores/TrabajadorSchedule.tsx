@@ -222,13 +222,29 @@ const TrabajadorSchedule = () => {
                     <HourRange label="viernes" ranges={hourRanges}
                         extraHours={extraHours.filter(eh => eh.day_type === "viernes")}
                         onChange={handleExtraHoursChange} />
-                    {/*<HourRange label="sabado" ranges={hourRanges}
-                        extraHours={extraHours.filter(eh => eh.day_type === "sabado")}
-                        onChange={handleExtraHoursChange} />
-                    <HourRange label="domingo_festivo" ranges={hourRanges}
-                        extraHours={extraHours.filter(eh => eh.day_type === "domingo_festivo")}
-                        onChange={handleExtraHoursChange} />
-                    */}
+                    <HourRange
+    label={"sabado" as DayType}
+    ranges={hourRanges}
+    extraHours={hourRanges.map(range => ({
+        day_type: "sabado" as DayType,
+        start_hour: range.split("-")[0],
+        end_hour: range.split("-")[1],
+        is_entry: true
+    }))}
+    onChange={handleExtraHoursChange}
+/>
+<HourRange
+    label={"domingo" as DayType}
+    ranges={hourRanges}
+    extraHours={hourRanges.map(range => ({
+        day_type: "domingo" as DayType,
+        start_hour: range.split("-")[0],
+        end_hour: range.split("-")[1],
+        is_entry: true
+    }))}
+    onChange={handleExtraHoursChange}
+/>
+
                 </tbody>
             </table>
         </div>

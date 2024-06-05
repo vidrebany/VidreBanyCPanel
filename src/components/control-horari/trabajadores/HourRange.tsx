@@ -34,7 +34,7 @@ const HourRange: React.FC<HourRangeProps> = ({ label, ranges, extraHours, onChan
 
     return (
         <tr>
-            <td>{label === "laborable" ? "Laborables" : "Viernes"}</td>
+<td>{label === "laborable" ? "Laborables" : label === "viernes" ? "Viernes" : label === "sabado" ? "Sábado" : "Domingo"}</td>
             {ranges.map((range, index) => {
                 const id = `${label}-${range.replace(":", "")}`;
                 //const [start_hour, end_hour] = range.split("-");
