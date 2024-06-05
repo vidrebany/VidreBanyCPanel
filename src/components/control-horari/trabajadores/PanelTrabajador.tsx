@@ -1,22 +1,19 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import useFetchWorkers from "../../../hooks/useFetchTrabajadores"
 import { RootState } from "../../../redux/store";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import { selectTrabajadorByCode } from "../../../redux/features/trabajadores/trabajadoresSlice";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Api } from "../../../api/api";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
 import { useNavbar } from "../../NavbarContext"; // Importar el hook useNavbar del contexto de la Navbar
 
 const PanelTrabajador = () => {
-
     const dispatch = useDispatch();
     const trabajadores = useSelector((state: RootState) => state.trabajadores.trabajadores);
-    const selectedTrabajador = useSelector((state: RootState) => state.trabajadores.selectedTrabajador);
     const [searchParams] = useSearchParams();
     const [currentDateTime, setCurrentDateTime] = useState('');
-    const code = searchParams.get("code");
     const navigate = useNavigate();
     const { setNavbarVisible } = useNavbar(); // Obtener la función setNavbarVisible del contexto de la Navbar
 
@@ -26,16 +23,6 @@ const PanelTrabajador = () => {
             setNavbarVisible(true); // Mostrar la barra de navegación cuando el componente se desmonta
         };
     }, [setNavbarVisible]); // Asegurar que el efecto se ejecute cuando setNavbarVisible cambie
-
-    useEffect(() => {
-        if (!selectedTrabajador) {
-            if (code) {
-                dispatch(selectTrabajadorByCode(code));
-            }
-        }
-    }, [code, dispatch, selectedTrabajador, trabajadores]);
-
-    useFetchWorkers();
 
     useEffect(() => {
         const intervalId = setInterval(() => {
@@ -50,11 +37,12 @@ const PanelTrabajador = () => {
     }, []);
 
     const postTime = async (type: 'entry' | 'startRest' | 'endRest' | 'exit') => {
+        const code = searchParams.get("code");
         const now = new Date();
         const isoDate = now.toISOString();
         const date = isoDate.slice(0, isoDate.indexOf('T'));
         const payload = {
-            worker_code: selectedTrabajador?.code,
+            worker_code: code,
             date: date,
             type,
             time: now
@@ -82,7 +70,10 @@ const PanelTrabajador = () => {
         }
     };
 
-    if (!selectedTrabajador) return <h1>Selecciona un trabajador</h1>;
+    const trabajadorCode = searchParams.get("code");
+    const selectedTrabajadorName = trabajadores.find(trabajador => trabajador.code === trabajadorCode)?.name;
+
+    if (!selectedTrabajadorName) return <h1>Selecciona un trabajador</h1>;
 
     return (
         <div className="container">
@@ -90,7 +81,7 @@ const PanelTrabajador = () => {
             <button className="btn btn-primary" onClick={() => navigate("/control-horari/trabajadores/trabajador/entrada")}>Volver</button>
             <div className="mb-3">
                 <label htmlFor="usuario" className="form-label">Usuario:</label>
-                <input type="text" id="usuario" className="form-control" value={selectedTrabajador.name} readOnly />
+                <input type="text" id="usuario" className="form-control" value={selectedTrabajadorName} readOnly />
             </div>
             <div className="d-flex justify-content-center gap-2 mb-3">
                 <button type="button" className="btn btn-primary" onClick={() => postTime('entry')}><h2 className="text-white mb-0">Entrada</h2></button>
